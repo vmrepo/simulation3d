@@ -5,13 +5,16 @@ using UnityEngine;
 public class chassis : MonoBehaviour
 {
     [SerializeField]
+    public float x = 0.0f;
+    public float y = 0.0f;
+    public float z = 0.0f;
     public float height = 1.0f;
     public float width = 0.5f;
 
     // Start is called before the first frame update
     void Start()
     {
-        Vector3 position = new Vector3(0.0f, 0.0f, 0.0f);
+        Vector3 position = new Vector3(x, y, z);
 
         //ставим в начало координат на нижнюю грань и устанвливаем размеры
         //можно ставить в любое место, всё должно автоматом посчитаться
