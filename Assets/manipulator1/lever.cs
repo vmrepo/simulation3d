@@ -8,6 +8,8 @@ public class lever : MonoBehaviour
     public float width = 0.03f;
     public float height = 0.6f;
 
+    private DriveJoint drive = new DriveJoint();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,6 +25,6 @@ public class lever : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        drive.Update(gameObject, 270 + 45);
     }
 }

@@ -11,6 +11,8 @@ public class chassis : MonoBehaviour
     public float height = 1.0f;
     public float width = 0.5f;
 
+    private DriveJoint drive = new DriveJoint();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,6 +32,6 @@ public class chassis : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        drive.Update(gameObject, 270 + 45);
     }
 }
