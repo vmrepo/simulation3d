@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class holder : MonoBehaviour
 {
+    public DriveJoint drive = new DriveJoint();
+
     [SerializeField]
     public float width = 0.03f;
     public float height = 0.14f;
-
-    private DriveJoint drive = new DriveJoint();
 
     // Start is called before the first frame update
     void Start()
@@ -20,11 +20,16 @@ public class holder : MonoBehaviour
         float h = GetComponent<HingeJoint>().connectedBody.GetComponent<leverhinge>().diameter;
         GetComponent<HingeJoint>().connectedBody.gameObject.transform.position = new Vector3(transform.position.x, transform.position.y + (height + h) / 2, transform.position.z);
         GetComponent<HingeJoint>().anchor = new Vector3(0.0f, 0.5f + h / height / 2, 0.0f);
+
+        //настраиваем привод шарнира
+        drive.AttachGameObject(gameObject);
+        drive.SetAngleLimits(10, 60);
+        drive.SetTargetAngle(10);
     }
 
     // Update is called once per frame
     void Update()
     {
-        drive.Update(gameObject, 270 + 45);
+        drive.Update();
     }
 }
