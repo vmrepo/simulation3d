@@ -6,7 +6,8 @@ public class rotatingplatform : MonoBehaviour
 {
     [SerializeField]
     public float diameter = 0.5f;
-    public float height = 0.02f;
+    public float height = 0.01f;
+    //remember for cylinder, height (y - scale) is half of real
 
     public void Init()
     {
