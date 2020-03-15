@@ -13,25 +13,40 @@ public class chassis : MonoBehaviour
     public float height = 1.0f;
     public float width = 0.5f;
 
-    // Start is called before the first frame update
-    void Start()
+    public void Init()
     {
         Vector3 position = new Vector3(x, y, z);
 
-        //ставим в начало координат на нижнюю грань и устанвливаем размеры
-        //можно ставить в любое место, всё должно автоматом посчитаться
+        //ставим в начало координат на нижнюю грань и устанавливаем размеры
+        //можно ставить в любое место, всё должно посчитаться
         transform.position = new Vector3(position.x, position.y + height / 2, position.z);
         transform.localScale = new Vector3(width, height, width);
 
-        //размещаем roatatingplatform
-        float h = GetComponent<HingeJoint>().connectedBody.GetComponent<rotatingplatform>().height;
-        GetComponent<HingeJoint>().connectedBody.gameObject.transform.position = new Vector3(transform.position.x, transform.position.y + (height + h) / 2, transform.position.z);
-        GetComponent<HingeJoint>().anchor = new Vector3(0.0f, 0.5f, 0.0f);
+        //следующее звено
+        HingeJoint hinge = GetComponent<HingeJoint>();
+        GameObject next = hinge.connectedBody.gameObject;
+        rotatingplatform nextbehavior = hinge.connectedBody.GetComponent<rotatingplatform>();
+
+        //размещаем следующее звено
+        next.transform.localScale = new Vector3(nextbehavior.diameter, nextbehavior.height, nextbehavior.diameter);
+        next.transform.position = new Vector3(transform.position.x, transform.position.y + (height + nextbehavior.height) / 2, transform.position.z);
+
+        //якорь шарнира
+        hinge.anchor = new Vector3(0.0f, 0.5f, 0.0f);
 
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
         drive.SetAngleLimits(0, 360);
         drive.SetTargetAngle(0);
+
+        //инициализируем следующее звено
+        nextbehavior.Init();
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        Init();
     }
 
     // Update is called once per frame

@@ -8,11 +8,14 @@ public class arm : MonoBehaviour
     public float width = 0.03f;
     public float height = 0.6f;
 
+    public void Init()
+    {
+
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        //устанавливаем размер
-        transform.localScale = new Vector3(width, height, width);
 
     }
 

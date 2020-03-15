@@ -8,16 +8,28 @@ public class rotatingplatform : MonoBehaviour
     public float diameter = 0.5f;
     public float height = 0.02f;
 
+    public void Init()
+    {
+        //следующее звено
+        FixedJoint fixedjoint = GetComponent<FixedJoint>();
+        GameObject next = fixedjoint.connectedBody.gameObject;
+        holder nextbehavior = fixedjoint.connectedBody.GetComponent<holder>();
+
+        //размещаем следующее звено
+        next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.height, nextbehavior.width);
+        next.transform.position = new Vector3(transform.position.x, transform.position.y + (height + nextbehavior.height) / 2, transform.position.z);
+
+        //якорь шарнира
+        fixedjoint.anchor = new Vector3(0.0f, 0.5f, 0.0f);
+
+        //инициализируем следующее звено
+        nextbehavior.Init();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        //устанавливаем размер
-        transform.localScale = new Vector3(diameter, height, diameter);
 
-        //размещаем holder
-        float h = GetComponent<FixedJoint>().connectedBody.GetComponent<holder>().height;
-        GetComponent<FixedJoint>().connectedBody.gameObject.transform.position = new Vector3(transform.position.x, transform.position.y + (height + h) / 2, transform.position.z);
-        GetComponent<FixedJoint>().anchor = new Vector3(0.0f, 0.5f, 0.0f);
     }
 
     // Update is called once per frame
