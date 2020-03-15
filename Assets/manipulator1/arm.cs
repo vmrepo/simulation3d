@@ -6,7 +6,7 @@ public class arm : MonoBehaviour
 {
     [SerializeField]
     public float width = 0.03f;
-    public float height = 0.6f;
+    public float length = 0.6f;
 
     public void Init()
     {

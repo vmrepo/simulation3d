@@ -16,8 +16,8 @@ public class armhinge : MonoBehaviour
         arm nextbehavior = fixedjoint.connectedBody.GetComponent<arm>();
 
         //размещаем следующее звено
-        next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.height, nextbehavior.width);
-        next.transform.position = new Vector3(transform.position.x, transform.position.y + (diameter + nextbehavior.height) / 2, transform.position.z);
+        next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.length, nextbehavior.width);
+        next.transform.position = new Vector3(transform.position.x, transform.position.y + (diameter + nextbehavior.length) / 2, transform.position.z);
 
         //якорь шарнира
         fixedjoint.anchor = new Vector3(0.0f, 0.5f, 0.0f);
