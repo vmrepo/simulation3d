@@ -28,8 +28,8 @@ public class chassis : MonoBehaviour
         rotatingplatform nextbehavior = hinge.connectedBody.GetComponent<rotatingplatform>();
 
         //размещаем следующее звено
-        next.transform.localScale = new Vector3(nextbehavior.diameter, nextbehavior.height, nextbehavior.diameter);
-        next.transform.position = new Vector3(transform.position.x, transform.position.y + (height + nextbehavior.height) / 2, transform.position.z);
+        next.transform.localScale = new Vector3(nextbehavior.diameter, nextbehavior.width, nextbehavior.diameter);
+        next.transform.position = new Vector3(transform.position.x, transform.position.y + (height + /*mul 2 for cylinder*/2 * nextbehavior.width) / 2, transform.position.z);
 
         //якорь шарнира
         hinge.anchor = new Vector3(0.0f, 0.5f, 0.0f);

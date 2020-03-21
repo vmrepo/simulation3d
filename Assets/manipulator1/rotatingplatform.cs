@@ -6,8 +6,8 @@ public class rotatingplatform : MonoBehaviour
 {
     [SerializeField]
     public float diameter = 0.5f;
-    public float height = 0.01f;
-    //remember for cylinder, height (y - scale) is half of real
+    public float width = 0.01f;
+    //remember for cylinder, width (y - scale) is half of real
 
     public void Init()
     {
@@ -18,7 +18,7 @@ public class rotatingplatform : MonoBehaviour
 
         //размещаем следующее звено
         next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.height, nextbehavior.width);
-        next.transform.position = new Vector3(transform.position.x, transform.position.y + (height + nextbehavior.height) / 2, transform.position.z);
+        next.transform.position = new Vector3(transform.position.x, transform.position.y + (/*mul 2 for cylinder*/2 * width + nextbehavior.height) / 2, transform.position.z);
 
         //якорь шарнира
         fixedjoint.anchor = new Vector3(0.0f, 0.5f, 0.0f);

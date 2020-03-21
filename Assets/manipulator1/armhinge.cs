@@ -7,7 +7,7 @@ public class armhinge : MonoBehaviour
     [SerializeField]
     public float diameter = 0.08f;
     public float width = 0.0115f;
-    //remember for cylinder, height (y - scale) is half of real
+    //remember for cylinder, width (y - scale) is half of real
 
     public void Init()
     {

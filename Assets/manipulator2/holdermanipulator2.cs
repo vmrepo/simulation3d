@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class holdermanipulator2 : MonoBehaviour
 {
+    [SerializeField]
+    public float width = 0.03f;
+    public float height = 0.14f;
+
     public void Init()
     {
 
