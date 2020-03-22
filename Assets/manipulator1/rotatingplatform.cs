@@ -17,8 +17,8 @@ public class rotatingplatform : MonoBehaviour
         holder nextbehavior = fixedjoint.connectedBody.GetComponent<holder>();
 
         //размещаем следующее звено
-        next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.height, nextbehavior.width);
-        next.transform.position = new Vector3(transform.position.x, transform.position.y + (/*mul 2 for cylinder*/2 * width + nextbehavior.height) / 2, transform.position.z);
+        next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.length, nextbehavior.width);
+        next.transform.position = new Vector3(transform.position.x, transform.position.y + (/*mul 2 for cylinder*/2 * width + nextbehavior.length) / 2, transform.position.z);
 
         //якорь шарнира
         fixedjoint.anchor = new Vector3(0.0f, 0.5f, 0.0f);

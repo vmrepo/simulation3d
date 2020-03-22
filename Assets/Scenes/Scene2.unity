@@ -1806,8 +1806,8 @@ MonoBehaviour:
   x: 0
   y: 0
   z: 0
-  angle: 90
-  height: 0.5
+  angle: 0
+  height: 1
   width: 0.5
 --- !u!1 &1545595877
 GameObject:

@@ -18,8 +18,8 @@ public class rotatingplatformmanipulator2 : MonoBehaviour
             holder1manipulator2 nextbehavior = fixedjoint.connectedBody.GetComponent<holder1manipulator2>();
 
             //размещаем следующее звено
-            next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.height, nextbehavior.width);
-            next.transform.position = new Vector3(transform.position.x, transform.position.y + (/*mul 2 for cylinder*/2 * width + nextbehavior.height) / 2, transform.position.z + nextbehavior.offset);
+            next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.length, nextbehavior.width);
+            next.transform.position = new Vector3(transform.position.x, transform.position.y + (/*mul 2 for cylinder*/2 * width + nextbehavior.length) / 2, transform.position.z + nextbehavior.offset);
 
             //якорь шарнира
             fixedjoint.anchor = new Vector3(0.0f, 0.5f, 0.0f);
@@ -35,8 +35,8 @@ public class rotatingplatformmanipulator2 : MonoBehaviour
             holder2manipulator2 nextbehavior = fixedjoint.connectedBody.GetComponent<holder2manipulator2>();
 
             //размещаем следующее звено
-            next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.height, nextbehavior.width);
-            next.transform.position = new Vector3(transform.position.x, transform.position.y + (/*mul 2 for cylinder*/2 * width + nextbehavior.height) / 2, transform.position.z - nextbehavior.offset);
+            next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.length, nextbehavior.width);
+            next.transform.position = new Vector3(transform.position.x, transform.position.y + (/*mul 2 for cylinder*/2 * width + nextbehavior.length) / 2, transform.position.z - nextbehavior.offset);
 
             //якорь шарнира
             fixedjoint.anchor = new Vector3(0.0f, 0.5f, 0.0f);
