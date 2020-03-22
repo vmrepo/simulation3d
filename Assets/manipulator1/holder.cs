@@ -10,7 +10,7 @@ public class holder : MonoBehaviour
     public float width = 0.03f;
     public float height = 0.14f;
 
-    public void Init()
+    public void Init(float angle)
     {
         //следующее звено
         HingeJoint hinge = GetComponent<HingeJoint>();
@@ -29,8 +29,11 @@ public class holder : MonoBehaviour
         drive.SetAngleLimits(10, 60);
         drive.SetTargetAngle(10);
 
-        //инициализируем следующее звено
-        nextbehavior.Init();
+        //инициализируем следующие звенья
+        nextbehavior.Init(angle);
+
+        //поворачиваем вокруг вертикальной оси
+        transform.RotateAround(Vector3.zero, Vector3.down, angle);
     }
 
     // Start is called before the first frame update

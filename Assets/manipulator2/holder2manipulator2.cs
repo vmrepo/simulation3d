@@ -11,7 +11,7 @@ public class holder2manipulator2 : MonoBehaviour
     public float height = 0.14f;
     public float offset = 0.0895f;
 
-    public void Init()
+    public void Init(float angle)
     {
         //следующее звено
         HingeJoint hinge = GetComponent<HingeJoint>();
@@ -30,8 +30,11 @@ public class holder2manipulator2 : MonoBehaviour
         drive.SetAngleLimits(10, 60);
         drive.SetTargetAngle(10);
 
-        //инициализируем следующее звено
-        nextbehavior.Init();
+        //инициализируем следующие звенья
+        nextbehavior.Init(angle);
+
+        //поворачиваем вокруг вертикальной оси
+        transform.RotateAround(Vector3.zero, Vector3.down, angle);
     }
 
     // Start is called before the first frame update

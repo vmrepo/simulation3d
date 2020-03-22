@@ -10,6 +10,7 @@ public class chassis : MonoBehaviour
     public float x = 0.0f;
     public float y = 0.0f;
     public float z = 0.0f;
+    public float angle = 0.0f;
     public float height = 1.0f;
     public float width = 0.5f;
 
@@ -39,8 +40,11 @@ public class chassis : MonoBehaviour
         drive.SetAngleLimits(0, 360);
         drive.SetTargetAngle(0);
 
-        //инициализируем следующее звено
-        nextbehavior.Init();
+        //инициализируем следующие звенья
+        nextbehavior.Init(angle);
+
+        //поворачиваем вокруг вертикальной оси
+        transform.RotateAround(Vector3.zero, Vector3.down, angle);
     }
 
     // Start is called before the first frame update

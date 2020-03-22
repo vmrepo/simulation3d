@@ -603,7 +603,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   diameter: 0.5
-  height: 0.01
+  width: 0.01
 --- !u!138 &766834482
 FixedJoint:
   m_ObjectHideFlags: 0
@@ -1339,6 +1339,7 @@ MonoBehaviour:
   x: 0
   y: 0
   z: 0
+  angle: 0
   height: 1
   width: 0.5
 --- !u!59 &2079219284

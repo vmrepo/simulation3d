@@ -9,7 +9,7 @@ public class rotatingplatform : MonoBehaviour
     public float width = 0.01f;
     //remember for cylinder, width (y - scale) is half of real
 
-    public void Init()
+    public void Init(float angle)
     {
         //следующее звено
         FixedJoint fixedjoint = GetComponent<FixedJoint>();
@@ -23,8 +23,11 @@ public class rotatingplatform : MonoBehaviour
         //якорь шарнира
         fixedjoint.anchor = new Vector3(0.0f, 0.5f, 0.0f);
 
-        //инициализируем следующее звено
-        nextbehavior.Init();
+        //инициализируем следующие звенья
+        nextbehavior.Init(angle);
+
+        //поворот вокруг вертикальной оси
+        transform.RotateAround(Vector3.zero, Vector3.down, angle);
     }
 
     // Start is called before the first frame update
