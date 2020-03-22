@@ -410,7 +410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   width: 0.03
-  height: 0.14
+  length: 0.14
   offset: 0.0895
 --- !u!1 &309064790
 GameObject:
@@ -1366,7 +1366,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   width: 0.03
-  height: 0.14
+  length: 0.14
   offset: 0.0895
 --- !u!1 &1370191012
 GameObject:

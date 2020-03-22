@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class chassismanipulator2 : MonoBehaviour
 {
+    //нужно соблюдать:
+    //holder1.length == holder2.length
+    //wheelhinge1.diameter == wheelhinge2.diameter == leverhinge.diameter == leverhinge1.diameter
+    //lever.length == lever1.length
+    //armhinge.diameter == armhinge1.diameter
+
     public DriveJoint drive = new DriveJoint();
 
     [SerializeField]
