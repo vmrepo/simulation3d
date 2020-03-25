@@ -20,7 +20,7 @@ public class armmanipulator2 : MonoBehaviour
         next.transform.position = new Vector3(transform.position.x + (length + nextbehavior.diameter) / 2, transform.position.y, transform.position.z);
 
         //якорь шарнира
-        hinge.anchor = new Vector3(0.0f, 0.5f + nextbehavior.diameter / length / 2, 0.0f);
+        hinge.anchor = new Vector3(0.0f, -0.5f - nextbehavior.diameter / length / 2, 0.0f);
 
         //инициализируем следующие звенья
         nextbehavior.Init(angle);

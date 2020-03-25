@@ -62,6 +62,22 @@ public class chassismanipulator2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //drive.Update();
+        float delta = 30.0f;
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            DriveJoint drive = GameObject.Find("chassis").GetComponent<chassismanipulator2>().drive;
+            float a = drive.GetTargetAngle();
+            drive.SetTargetAngle(a - delta);
+        }
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            DriveJoint drive = GameObject.Find("chassis").GetComponent<chassismanipulator2>().drive;
+            float a = drive.GetTargetAngle();
+            drive.SetTargetAngle(a + delta);
+        }
+
+        drive.Update();
     }
 }

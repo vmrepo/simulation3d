@@ -21,7 +21,7 @@ public class lever1manipulator2 : MonoBehaviour
             transform.position = new Vector3(nextbehavior.transform.position.x, nextbehavior.transform.position.y + (length + nextbehavior.diameter) / 2, nextbehavior.transform.position.z - /*mul 2 for cylinder*/2 * nextbehavior.transform.localScale.y / 2 + width / 2);
 
             //якорь шарнира
-            hinge.anchor = new Vector3(0.0f, - 0.5f - nextbehavior.diameter / length / 2, 0.0f);
+            hinge.anchor = new Vector3(0.0f, -0.5f - nextbehavior.diameter / length / 2, 0.0f);
         }
 
         {
