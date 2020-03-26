@@ -24,8 +24,12 @@ public class lever1manipulator2 : MonoBehaviour
             hinge.anchor = new Vector3(0.0f, -0.5f - nextbehavior.diameter / length / 2, 0.0f);
         }
 
+        //поворачиваем вокруг вертикальной оси
+        //именно здесь т.к. эта цепочка звеньев смыкается с другой уже инициализированной цепочкой звеньев
+        transform.RotateAround(Vector3.zero, Vector3.down, angle);
+
         {
-            //ещё соединённое звено
+            //ещё соединённое звено (из другой цепочки звеньев)
             HingeJoint hinge = GetComponents<HingeJoint>()[1];
             GameObject next = hinge.connectedBody.gameObject;
             armhinge1manipulator2 nextbehavior = hinge.connectedBody.GetComponent<armhinge1manipulator2>();
@@ -33,9 +37,6 @@ public class lever1manipulator2 : MonoBehaviour
             //якорь шарнира
             hinge.anchor = new Vector3(0.0f, 0.5f + nextbehavior.diameter / length / 2, 0.0f);
         }
-
-        //поворачиваем вокруг вертикальной оси
-        transform.RotateAround(Vector3.zero, Vector3.down, angle);
     }
 
     // Start is called before the first frame update
