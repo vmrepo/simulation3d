@@ -17,35 +17,52 @@ public class DriveJoint
         gameObject = obj;
     }
 
-    public bool SetAngleLimits(float angle1, float angle2)
+    private float checkrange(float angle)
     {
         //приводим к даиапазону [0, 360)
-        angle1 = angle1 % 360;
-        if (angle1 < 0)
-            angle1 += 360;
 
-        //приводим к даиапазону [0, 360)
-        angle2 = angle2 % 360;
-        if (angle2 < 0)
-            angle2 += 360;
+        angle = angle % 360;
+        if (angle < 0)
+            angle += 360;
 
-        if (angle2 == 0)
-            angle2 = 360;
+        return angle;
+    }
 
-        if (angle1 >= angle2)
-            return false;
+    private void checklimits()
+    {
+        //контролируем ограничение для targetangle
 
-        downlimit = angle1;
-        uplimit = angle2;
-
-        //контролируем ограничение
-        if (targetangle < downlimit || uplimit <= targetangle)
+        if (downlimit < uplimit)
         {
-            if (DistanceAngle(targetangle, downlimit) < DistanceAngle(targetangle, uplimit))
-                targetangle = downlimit;
-            else
-                targetangle = uplimit < 360 ? uplimit : 0;
+            if (targetangle < downlimit || uplimit <= targetangle)
+            {
+                if (DistanceAngle(targetangle, downlimit) < DistanceAngle(targetangle, uplimit))
+                    targetangle = downlimit < 360 ? downlimit : 0;
+                else
+                    targetangle = uplimit < 360 ? uplimit : 0;
+            }
         }
+        else
+        {
+            if (targetangle < downlimit && uplimit <= targetangle)
+            {
+                if (DistanceAngle(targetangle, downlimit) < DistanceAngle(targetangle, uplimit))
+                    targetangle = downlimit < 360 ? downlimit : 0;
+                else
+                    targetangle = uplimit < 360 ? uplimit : 0;
+            }
+        }
+    }
+
+    public bool SetAngleLimits(float angle1, float angle2)
+    {
+        downlimit = checkrange(angle1);
+        uplimit = checkrange(angle2);
+
+        if (uplimit == 0)
+            uplimit = 360;
+
+        checklimits();
 
         return true;
     }
@@ -62,15 +79,8 @@ public class DriveJoint
 
     public float DistanceAngle(float angle1, float angle2)
     {
-        //приводим к даиапзону [0, 360)
-        angle1 = angle1 % 360;
-        if (angle1 < 0)
-            angle1 += 360;
-
-        //приводим к даиапзону [0, 360)
-        angle2 = angle2 % 360;
-        if (angle2 < 0)
-            angle2 += 360;
+        angle1 = checkrange(angle1);
+        angle2 = checkrange(angle2);
 
         float distance = Mathf.Abs(angle2 - angle1);
 
@@ -82,21 +92,8 @@ public class DriveJoint
 
     public void SetTargetAngle(float angle)
     {
-        //приводим к даиапзону [0, 360)
-        angle = angle % 360;
-        if (angle < 0)
-            angle += 360;
-
-        targetangle = angle;
-
-        //контролируем ограничение
-        if (targetangle < downlimit || uplimit <= targetangle)
-        {
-            if (DistanceAngle(targetangle, downlimit) < DistanceAngle(targetangle, uplimit))
-                targetangle = downlimit;
-            else
-                targetangle = uplimit < 360 ? uplimit : 0;
-        }
+        targetangle = checkrange(angle);
+        checklimits();
     }
 
     public float GetTargetAngle()

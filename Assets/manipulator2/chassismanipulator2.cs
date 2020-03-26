@@ -62,20 +62,58 @@ public class chassismanipulator2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float delta = 30.0f;
+        float delta = 10.0f;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
             DriveJoint drive = GameObject.Find("chassis").GetComponent<chassismanipulator2>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a - delta);
+            drive.SetTargetAngle(drive.GetTargetAngle() - delta);
         }
 
         if (Input.GetKeyDown(KeyCode.W))
         {
             DriveJoint drive = GameObject.Find("chassis").GetComponent<chassismanipulator2>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a + delta);
+            drive.SetTargetAngle(drive.GetTargetAngle() + delta);
+        }
+
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            DriveJoint drive = GameObject.Find("lever").GetComponent<levermanipulator2>().drive;
+            DriveJoint drive1 = GameObject.Find("holder1").GetComponent<holder1manipulator2>().drive;
+            DriveJoint drive2 = GameObject.Find("holder2").GetComponent<holder2manipulator2>().drive;
+
+            drive2.SetTargetAngle(drive2.GetTargetAngle() - delta);
+            drive1.SetTargetAngle(drive2.GetTargetAngle() + drive.GetTargetAngle());
+        }
+
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            DriveJoint drive = GameObject.Find("lever").GetComponent<levermanipulator2>().drive;
+            DriveJoint drive1 = GameObject.Find("holder1").GetComponent<holder1manipulator2>().drive;
+            DriveJoint drive2 = GameObject.Find("holder2").GetComponent<holder2manipulator2>().drive;
+
+            drive2.SetTargetAngle(drive2.GetTargetAngle() + delta);
+            drive1.SetTargetAngle(drive2.GetTargetAngle() + drive.GetTargetAngle());
+        }
+
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            DriveJoint drive = GameObject.Find("lever").GetComponent<levermanipulator2>().drive;
+            DriveJoint drive1 = GameObject.Find("holder1").GetComponent<holder1manipulator2>().drive;
+            DriveJoint drive2 = GameObject.Find("holder2").GetComponent<holder2manipulator2>().drive;
+
+            drive.SetTargetAngle(drive.GetTargetAngle() - delta);
+            drive1.SetTargetAngle(drive2.GetTargetAngle() + drive.GetTargetAngle());
+        }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            DriveJoint drive = GameObject.Find("lever").GetComponent<levermanipulator2>().drive;
+            DriveJoint drive1 = GameObject.Find("holder1").GetComponent<holder1manipulator2>().drive;
+            DriveJoint drive2 = GameObject.Find("holder2").GetComponent<holder2manipulator2>().drive;
+
+            drive.SetTargetAngle(drive.GetTargetAngle() + delta);
+            drive1.SetTargetAngle(drive2.GetTargetAngle() + drive.GetTargetAngle());
         }
 
         drive.Update();

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class levermanipulator2 : MonoBehaviour
 {
+    public DriveJoint drive = new DriveJoint();
+
     [SerializeField]
     public float width = 0.03f;
     public float length = 0.6f;
@@ -22,6 +24,11 @@ public class levermanipulator2 : MonoBehaviour
         //якорь шарнира
         hinge.anchor = new Vector3(0.0f, 0.5f + nextbehavior.diameter / length / 2, 0.0f);
 
+        //настраиваем привод шарнира
+        drive.AttachGameObject(gameObject);
+        drive.SetAngleLimits(-90 + 60, -90 + 120);
+        drive.SetTargetAngle(-90 + 60);
+
         //инициализируем следующие звенья
         nextbehavior.Init(angle);
 
@@ -38,6 +45,6 @@ public class levermanipulator2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        drive.Update();
     }
 }

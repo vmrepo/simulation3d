@@ -27,8 +27,9 @@ public class holder1manipulator2 : MonoBehaviour
 
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
-        drive.SetAngleLimits(40, 50);
-        drive.SetTargetAngle(40);
+        //нужно согласовать с углами holder2 и lever: A = Aholder2 + Alever
+        drive.SetAngleLimits(-90 + 60 + 0, -90 + 120 + 60);
+        drive.SetTargetAngle(-90 + 60 + 0);
 
         //инициализируем следующие звенья
         nextbehavior.Init(angle);
@@ -46,6 +47,6 @@ public class holder1manipulator2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //drive.Update();
+        drive.Update();
     }
 }
