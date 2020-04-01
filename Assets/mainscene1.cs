@@ -4,82 +4,50 @@ using UnityEngine;
 
 public class mainscene1 : MonoBehaviour
 {
-    private GameObject chassis = null;
-    private GameObject rotatingplatform = null;
-    private GameObject holder = null;
-    private GameObject leverhinge = null;
-    private GameObject lever = null;
-    private GameObject armhinge = null;
-    private GameObject arm = null;
+    private manipulator1 manipulator = null;
 
     // Start is called before the first frame update
     void Start()
     {
-        chassis = Instantiate(Resources.Load("manipulator1/chassis", typeof(GameObject)) as GameObject);
-        rotatingplatform = Instantiate(Resources.Load("manipulator1/rotatingplatform", typeof(GameObject)) as GameObject);
-        holder = Instantiate(Resources.Load("manipulator1/holder", typeof(GameObject)) as GameObject);
-        leverhinge = Instantiate(Resources.Load("manipulator1/leverhinge", typeof(GameObject)) as GameObject);
-        lever = Instantiate(Resources.Load("manipulator1/lever", typeof(GameObject)) as GameObject);
-        armhinge = Instantiate(Resources.Load("manipulator1/armhinge", typeof(GameObject)) as GameObject);
-        arm = Instantiate(Resources.Load("manipulator1/arm", typeof(GameObject)) as GameObject);
+        manipulator = new manipulator1();
+        manipulator.Create();
 
-        chassis.GetComponent<HingeJoint>().connectedBody = rotatingplatform.GetComponent<Rigidbody>();
-        rotatingplatform.GetComponent<FixedJoint>().connectedBody = holder.GetComponent<Rigidbody>();
-        holder.GetComponent<HingeJoint>().connectedBody = leverhinge.GetComponent<Rigidbody>();
-        leverhinge.GetComponent<FixedJoint>().connectedBody = lever.GetComponent<Rigidbody>();
-        lever.GetComponent<HingeJoint>().connectedBody = armhinge.GetComponent<Rigidbody>();
-        armhinge.GetComponent<FixedJoint>().connectedBody = arm.GetComponent<Rigidbody>();
-
-        chassis.GetComponent<chassis>().Init();
-
-        GameObject.Find("Main Camera").GetComponent<camera>().target = chassis.transform;
+        GameObject.Find("Main Camera").GetComponent<camera>().targetposition = new Vector3(0, 1, 0);
     }
 
     // Update is called once per frame
     void Update()
     {
-        float delta = 30.0f;
+        float delta = 10.0f;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            DriveJoint drive = chassis.GetComponent<chassis>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a - delta);
+            manipulator.SetPos0(manipulator.GetPos0() - delta);
         }
 
         if (Input.GetKeyDown(KeyCode.W))
         {
-            DriveJoint drive = chassis.GetComponent<chassis>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a + delta);
+            manipulator.SetPos0(manipulator.GetPos0() + delta);
         }
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            DriveJoint drive = holder.GetComponent<holder>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a - delta);
+            manipulator.SetPos1(manipulator.GetPos1() - delta);
         }
 
         if (Input.GetKeyDown(KeyCode.S))
         {
-            DriveJoint drive = holder.GetComponent<holder>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a + delta);
+            manipulator.SetPos1(manipulator.GetPos1() + delta);
         }
 
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            DriveJoint drive = lever.GetComponent<lever>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a - delta);
+            manipulator.SetPos2(manipulator.GetPos2() - delta);
         }
 
         if (Input.GetKeyDown(KeyCode.X))
         {
-            DriveJoint drive = lever.GetComponent<lever>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a + delta);
+            manipulator.SetPos2(manipulator.GetPos2() + delta);
         }
     }
 }

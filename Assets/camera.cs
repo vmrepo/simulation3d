@@ -6,7 +6,7 @@ public class camera : MonoBehaviour
 {
 
     [SerializeField]
-    public Transform target; //невидимая цель для камеры
+    public Vector3 targetposition; //невидимая цель для камеры
 
     public float zoomSpeed = 5.0f; //скорость приближения камеры
     private Vector3 _offset; //смещение камеры относительно объекта
@@ -18,14 +18,14 @@ public class camera : MonoBehaviour
     {
         _rotY = transform.eulerAngles.y;
         _rotX = transform.eulerAngles.x;
-        _offset = target.position - transform.position; //получает начальное смещение
+        _offset = targetposition - transform.position; //получает начальное смещение
     }
 
     void LookAtTarget()
     {
         Quaternion rotation = Quaternion.Euler(_rotY, _rotX, 0); //задает вращение камеры 
-        transform.position = target.position - (rotation * _offset);
-        transform.LookAt(target);
+        transform.position = targetposition - (rotation * _offset);
+        transform.LookAt(targetposition);
     }
 
     void LateUpdate()
@@ -51,7 +51,7 @@ public class camera : MonoBehaviour
             //x_axis = Input.GetAxis("Mouse X") * mouse_sens;
             //y_axis = Input.GetAxis("Mouse Y") * mouse_sens;
 
-            //target.position = new Vector3(target.position.x + x_axis, target.position.y + y_axis, target.position.z);
+            //targetposition = new Vector3(targetposition.x + x_axis, targetposition.y + y_axis, targetposition.z);
 
             //LookAtTarget();
         }
