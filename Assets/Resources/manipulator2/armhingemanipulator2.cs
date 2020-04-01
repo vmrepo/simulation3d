@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class wheel2manipulator2 : MonoBehaviour
+public class armhingemanipulator2 : MonoBehaviour
 {
+    public GameObject wheel1object = null;
+    public GameObject armhinge1object = null;
+
     [SerializeField]
-    public float diameter = 0.32f;
+    public float diameter = 0.08f;
     public float width = 0.0115f;
     //remember for cylinder, width (y - scale) is half of real
 
@@ -14,16 +17,15 @@ public class wheel2manipulator2 : MonoBehaviour
         //следующее звено
         FixedJoint fixedjoint = GetComponent<FixedJoint>();
         GameObject next = fixedjoint.connectedBody.gameObject;
-        leverhingemanipulator2 nextbehavior = fixedjoint.connectedBody.GetComponent<leverhingemanipulator2>();
+        armmanipulator2 nextbehavior = fixedjoint.connectedBody.GetComponent<armmanipulator2>();
 
         //потребуются звенья
-        levermanipulator2 lever = GameObject.Find("lever").GetComponent<levermanipulator2>();
-        rotatingplatformmanipulator2 rotatingplatform = GameObject.Find("rotatingplatform").GetComponent<rotatingplatformmanipulator2>();
+        wheel1manipulator2 wheel1 = wheel1object.GetComponent<wheel1manipulator2>();
+        armhinge1manipulator2 armhinge1 = armhinge1object.GetComponent<armhinge1manipulator2>();
 
         //размещаем следующее звено
-        float nexwidth = rotatingplatform.transform.position.z + lever.width / 2 - (transform.position.z + /*mul 2 for cylinder*/2 * width / 2);
-        next.transform.localScale = new Vector3(nextbehavior.diameter, nexwidth / 2/*div 2 for cylinder*/, nextbehavior.diameter);
-        next.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + (/*mul 2 for cylinder*/2 * width + nexwidth) / 2);
+        next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.length, nextbehavior.width);
+        next.transform.position = new Vector3(transform.position.x - (nextbehavior.length / 2 - (wheel1.lever - armhinge1.diameter / 2)), transform.position.y, transform.position.z);
 
         //якорь шарнира
         fixedjoint.anchor = new Vector3(0.0f, 0.5f, 0.0f);

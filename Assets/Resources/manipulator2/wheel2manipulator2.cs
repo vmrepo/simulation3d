@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class armhingemanipulator2 : MonoBehaviour
+public class wheel2manipulator2 : MonoBehaviour
 {
+    public GameObject leverobject = null;
+    public GameObject rotatingplatformobject = null;
+
     [SerializeField]
-    public float diameter = 0.08f;
+    public float diameter = 0.32f;
     public float width = 0.0115f;
     //remember for cylinder, width (y - scale) is half of real
 
@@ -14,15 +17,16 @@ public class armhingemanipulator2 : MonoBehaviour
         //следующее звено
         FixedJoint fixedjoint = GetComponent<FixedJoint>();
         GameObject next = fixedjoint.connectedBody.gameObject;
-        armmanipulator2 nextbehavior = fixedjoint.connectedBody.GetComponent<armmanipulator2>();
+        leverhingemanipulator2 nextbehavior = fixedjoint.connectedBody.GetComponent<leverhingemanipulator2>();
 
         //потребуются звенья
-        wheel1manipulator2 wheel1 = GameObject.Find("wheel1").GetComponent<wheel1manipulator2>();
-        armhinge1manipulator2 armhinge1 = GameObject.Find("armhinge1").GetComponent<armhinge1manipulator2>();
+        levermanipulator2 lever = leverobject.GetComponent<levermanipulator2>();
+        rotatingplatformmanipulator2 rotatingplatform = rotatingplatformobject.GetComponent<rotatingplatformmanipulator2>();
 
         //размещаем следующее звено
-        next.transform.localScale = new Vector3(nextbehavior.width, nextbehavior.length, nextbehavior.width);
-        next.transform.position = new Vector3(transform.position.x - (nextbehavior.length / 2 - (wheel1.lever - armhinge1.diameter / 2)), transform.position.y, transform.position.z);
+        float nexwidth = rotatingplatform.transform.position.z + lever.width / 2 - (transform.position.z + /*mul 2 for cylinder*/2 * width / 2);
+        next.transform.localScale = new Vector3(nextbehavior.diameter, nexwidth / 2/*div 2 for cylinder*/, nextbehavior.diameter);
+        next.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + (/*mul 2 for cylinder*/2 * width + nexwidth) / 2);
 
         //якорь шарнира
         fixedjoint.anchor = new Vector3(0.0f, 0.5f, 0.0f);

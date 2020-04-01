@@ -50,56 +50,12 @@ public class chassis : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Init();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        float delta = 30.0f;
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            DriveJoint drive = GameObject.Find("chassis").GetComponent<chassis>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a - delta);
-        }
-
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            DriveJoint drive = GameObject.Find("chassis").GetComponent<chassis>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a + delta);
-        }
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            DriveJoint drive = GameObject.Find("holder").GetComponent<holder>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a - delta);
-        }
-
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            DriveJoint drive = GameObject.Find("holder").GetComponent<holder>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a + delta);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            DriveJoint drive = GameObject.Find("lever").GetComponent<lever>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a - delta);
-        }
-
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            DriveJoint drive = GameObject.Find("lever").GetComponent<lever>().drive;
-            float a = drive.GetTargetAngle();
-            drive.SetTargetAngle(a + delta);
-        }
-
         drive.Update();
     }
 }

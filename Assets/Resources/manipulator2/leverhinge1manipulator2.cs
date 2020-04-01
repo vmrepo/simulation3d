@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class leverhinge1manipulator2 : MonoBehaviour
 {
+    public GameObject lever1object = null;
+
     [SerializeField]
     public float diameter = 0.08f;
     //remember for cylinder, width (y - scale) is half of real
@@ -11,7 +13,7 @@ public class leverhinge1manipulator2 : MonoBehaviour
     public void Init(float angle)
     {
         //подсоединён к звену, его нужно инициализировать
-        lever1manipulator2 lever1 = GameObject.Find("lever1").GetComponent<lever1manipulator2>();
+        lever1manipulator2 lever1 = lever1object.GetComponent<lever1manipulator2>();
         lever1.Init(angle);
 
         //поворачиваем вокруг вертикальной оси

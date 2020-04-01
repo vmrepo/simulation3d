@@ -6,7 +6,7 @@ public class camera : MonoBehaviour
 {
 
     [SerializeField]
-    private Transform target; //невидимая цель для камеры
+    public Transform target; //невидимая цель для камеры
 
     public float zoomSpeed = 5.0f; //скорость приближения камеры
     private Vector3 _offset; //смещение камеры относительно объекта

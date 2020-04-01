@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class wheel1manipulator2 : MonoBehaviour
 {
+    public GameObject lever1object = null;
+    public GameObject rotatingplatformobject = null;
+
     [SerializeField]
     public float diameter = 0.32f;
     public float width = 0.0115f;
@@ -18,8 +21,8 @@ public class wheel1manipulator2 : MonoBehaviour
         leverhinge1manipulator2 nextbehavior = fixedjoint.connectedBody.GetComponent<leverhinge1manipulator2>();
 
         //потребуются звенья
-        lever1manipulator2 lever1 = GameObject.Find("lever1").GetComponent<lever1manipulator2>();
-        rotatingplatformmanipulator2 rotatingplatform = GameObject.Find("rotatingplatform").GetComponent<rotatingplatformmanipulator2>();
+        lever1manipulator2 lever1 = lever1object.GetComponent<lever1manipulator2>();
+        rotatingplatformmanipulator2 rotatingplatform = rotatingplatformobject.GetComponent<rotatingplatformmanipulator2>();
 
         //размещаем следующее звено
         float nexwidth = (transform.position.z - /*mul 2 for cylinder*/2 * width / 2) + lever1.width / 2 - rotatingplatform.transform.position.z;
