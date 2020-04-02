@@ -6,9 +6,18 @@ public class chassismanipulator2 : MonoBehaviour
 {
     //нужно соблюдать:
     //holder1.length == holder2.length
+    //holder1.width == holder2.width
+    //holder1.offset == holder2.offset
     //wheelhinge1.diameter == wheelhinge2.diameter == leverhinge.diameter == leverhinge1.diameter
+    //wheelhinge1.width == wheelhinge2.width
+    //wheel1.diameter == wheel2.diameter
+    //wheel1.width == wheel2.width
+    //lever.width == lever1.width
     //lever.length == lever1.length
     //armhinge.diameter == armhinge1.diameter
+    //armhinge.width == armhinge1.width
+    //holder1.angle0 = holder2.angle0 + lever.angle0
+    //holder1.angle1 = holder2.angle1 + lever.angle1
 
     public DriveJoint drive = new DriveJoint();
 
@@ -19,6 +28,8 @@ public class chassismanipulator2 : MonoBehaviour
     public float angle = 0.0f;
     public float height = 1.0f;
     public float width = 0.5f;
+    public float angle0 = 0.0f;
+    public float angle1 = 360.0f;
 
     public void Init()
     {
@@ -43,8 +54,8 @@ public class chassismanipulator2 : MonoBehaviour
 
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
-        drive.SetAngleLimits(0, 360);
-        drive.SetTargetAngle(0);
+        drive.SetAngleLimits(angle0, angle1);
+        drive.SetTargetAngle(angle0);
 
         //инициализируем следующие звенья
         nextbehavior.Init(angle);

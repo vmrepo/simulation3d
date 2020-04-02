@@ -10,6 +10,8 @@ public class holder2manipulator2 : MonoBehaviour
     public float width = 0.03f;
     public float length = 0.14f;
     public float offset = 0.0895f;
+    public float angle0 = 10.0f;
+    public float angle1 = 60.0f;
 
     public void Init(float angle)
     {
@@ -27,8 +29,8 @@ public class holder2manipulator2 : MonoBehaviour
 
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
-        drive.SetAngleLimits(0, 60);
-        drive.SetTargetAngle(0);
+        drive.SetAngleLimits(angle0, angle1);
+        drive.SetTargetAngle(angle0);
 
         //инициализируем следующие звенья
         nextbehavior.Init(angle);

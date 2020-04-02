@@ -9,6 +9,8 @@ public class lever : MonoBehaviour
     [SerializeField]
     public float width = 0.03f;
     public float length = 0.6f;
+    public float angle0 = 60.0f;
+    public float angle1 = 120.0f;
 
     public void Init(float angle)
     {
@@ -26,8 +28,8 @@ public class lever : MonoBehaviour
 
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
-        drive.SetAngleLimits(60, 120);
-        drive.SetTargetAngle(60);
+        drive.SetAngleLimits(angle0, angle1);
+        drive.SetTargetAngle(angle0);
 
         //инициализируем следующие звенья
         nextbehavior.Init(angle);

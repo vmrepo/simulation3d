@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class mainscene2 : MonoBehaviour
+public class mainscene : MonoBehaviour
 {
     private manipulator2 manipulator = null;
 
@@ -10,7 +10,7 @@ public class mainscene2 : MonoBehaviour
     void Start()
     {
         manipulator = new manipulator2();
-        manipulator.Create();
+        manipulator.Place(0, 0, 0, 0);
 
         GameObject.Find("Main Camera").GetComponent<camera>().targetposition = new Vector3(0, 1, 0);
     }
