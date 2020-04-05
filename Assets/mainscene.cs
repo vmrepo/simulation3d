@@ -11,14 +11,14 @@ public class mainscene : MonoBehaviour
         Server0.Start();
     }
 
-    void OnApplicationQuit()
-    {
-        Server0.Stop();
-    }
-
     // Update is called once per frame
     void Update()
     {
+        Server0.Update();
+    }
 
+    void OnApplicationQuit()
+    {
+        Server0.Stop();
     }
 }

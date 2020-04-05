@@ -88,6 +88,7 @@ public class Server0
 
     static private int create_manipulator1(PacketHeader packet)
     {
+        // в потоке клинта нельзя вызывать, нужно поставить для вызова в Update
         maxid++;
         device dev = new manipulator1();
         ((manipulator1)dev).config = UnityEngine.JsonUtility.FromJson<configmanipulator1>(packet.json_data);
@@ -98,6 +99,7 @@ public class Server0
 
     static private int create_manipulator2(PacketHeader packet)
     {
+        // в потоке клинта нельзя вызывать, нужно поставить для вызова в Update
         maxid++;
         device dev = new manipulator2();
         ((manipulator2)dev).config = UnityEngine.JsonUtility.FromJson<configmanipulator2>(packet.json_data);
@@ -113,33 +115,27 @@ public class Server0
 
     static private PacketHeader receive_packet(Context context, bool blocking = true)
     {
-        log("receive packet entered");//?эта функция с ошибкой - не работает
-
         string buf = "";
 
         try
         {
             byte[] bytes = new byte[1024];
 
-            if (blocking)
+            if (blocking || context.client.GetStream().DataAvailable)
             {
-                while (!context.client.GetStream().DataAvailable)
+                while (true)
                 {
-                    Thread.Sleep(50);
-                }
-            }
+                    int r = context.client.GetStream().Read(bytes, 0, bytes.Length);
 
-            while (true)
-            {
-                int r = context.client.GetStream().Read(bytes, 0, bytes.Length);
+                    if (r > 0)
+                    {
+                        buf += Encoding.ASCII.GetString(bytes, 0, r);
+                    }
 
-                if (r > 0)
-                {
-                    buf += Encoding.ASCII.GetString(bytes, 0, r);
-                }
-                else
-                {
-                    break;
+                    if (!context.client.GetStream().DataAvailable)
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -161,15 +157,16 @@ public class Server0
 
                         while (pos > buf.Length)
                         {
+                            if (!context.client.GetStream().DataAvailable)
+                            {
+                                break;
+                            }
+
                             int r = context.client.GetStream().Read(bytes, 0, bytes.Length);
 
                             if (r > 0)
                             {
                                 buf += buf += Encoding.ASCII.GetString(bytes, 0, r);
-                            }
-                            else
-                            {
-                                break;
                             }
                         }
 
@@ -240,6 +237,11 @@ public class Server0
         Thread.Start(port);
     }
 
+    static public void Update()
+    {
+
+    }
+
     static public void Stop()
     {
         setstopped(true);
@@ -306,9 +308,7 @@ public class Server0
                     }
                     else if (packet.packet == "create")
                     {
-                        //send_packet(context, new PacketCreateResponse(create(packet)));
-                        //send_packet(context, new PacketCreateResponse(0));
-                        send_packet(context, new PacketReady());
+                        send_packet(context, new PacketCreateResponse(create(packet)));
                         continue;
 
                     }
@@ -337,6 +337,7 @@ public class Server0
             catch (Exception e)
             {
                 log("control error: exception " + e.ToString());
+                break;
             }
         }
 
