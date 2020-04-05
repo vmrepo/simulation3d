@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class manipulator1
+[System.Serializable]
+public class configmanipulator1
 {
+    public float x = 0.0f;
+    public float y = 0.0f;
+    public float z = 0.0f;
+    public float angle = 0.0f;
     public float ChassisHeight = 1.0f;
     public float ChassisWidth = 0.5f;
     public float RotatingplatformAngle0 = 0.0f;
@@ -24,6 +29,11 @@ public class manipulator1
     public float ArmhingeWidth = 0.0115f * 2;/*mul 2 for cylinder*/
     public float ArmWidth = 0.03f;
     public float ArmLength = 0.6f;
+}
+
+public class manipulator1 : device
+{
+    public configmanipulator1 config = null;
 
     private bool isinited = false;
     private GameObject chassis = null;
@@ -34,8 +44,13 @@ public class manipulator1
     private GameObject armhinge = null;
     private GameObject arm = null;
 
-    public void Place(float x, float y, float z, float a)
+    public override void Place()
     {
+        if (config == null)
+        {
+            config = new configmanipulator1();
+        }
+
         if (!isinited)
         {
             chassis = GameObject.Instantiate(Resources.Load("manipulator1/chassis", typeof(GameObject)) as GameObject);
@@ -58,54 +73,54 @@ public class manipulator1
 
         {
             var b = chassis.GetComponent<chassis>();
-            b.x = x;
-            b.y = y;
-            b.z = z;
-            b.angle = a;
-            b.height = ChassisHeight;
-            b.width = ChassisWidth;
-            b.angle0 = RotatingplatformAngle0;
-            b.angle1 = RotatingplatformAngle1;
+            b.x = config.x;
+            b.y = config.y;
+            b.z = config.z;
+            b.angle = config.angle;
+            b.height = config.ChassisHeight;
+            b.width = config.ChassisWidth;
+            b.angle0 = config.RotatingplatformAngle0;
+            b.angle1 = config.RotatingplatformAngle1;
         }
 
         {
             var b = rotatingplatform.GetComponent<rotatingplatform>();
-            b.diameter = RotatingplatformDiameter;
-            b.width = RotatingplatformWidth / 2;/*div 2 for cylinder*/
+            b.diameter = config.RotatingplatformDiameter;
+            b.width = config.RotatingplatformWidth / 2;/*div 2 for cylinder*/
         }
 
         {
             var b = holder.GetComponent<holder>();
-            b.width = HolderWidth;
-            b.length = HolderLength;
-            b.angle0 = LeverAngle0;
-            b.angle1 = LeverAngle1;
+            b.width = config.HolderWidth;
+            b.length = config.HolderLength;
+            b.angle0 = config.LeverAngle0;
+            b.angle1 = config.LeverAngle1;
         }
 
         {
             var b = leverhinge.GetComponent<leverhinge>();
-            b.diameter = LeverhingeDiameter;
-            b.width = LeverhingeWidth / 2;/*div 2 for cylinder*/
+            b.diameter = config.LeverhingeDiameter;
+            b.width = config.LeverhingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
             var b = lever.GetComponent<lever>();
-            b.length = LeverLength;
-            b.width = LeverWidth;
-            b.angle0 = ArmAngle0;
-            b.angle1 = ArmAngle1;
+            b.length = config.LeverLength;
+            b.width = config.LeverWidth;
+            b.angle0 = config.ArmAngle0;
+            b.angle1 = config.ArmAngle1;
         }
 
         {
             var b = armhinge.GetComponent<armhinge>();
-            b.diameter = ArmhingeDiameter;
-            b.width = ArmhingeWidth / 2;/*div 2 for cylinder*/
+            b.diameter = config.ArmhingeDiameter;
+            b.width = config.ArmhingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
             var b = arm.GetComponent<arm>();
-            b.width = ArmWidth;
-            b.length = ArmLength;
+            b.width = config.ArmWidth;
+            b.length = config.ArmLength;
         }
 
         chassis.GetComponent<chassis>().Init();

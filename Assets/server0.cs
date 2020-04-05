@@ -22,28 +22,89 @@ public class Context
 }
 
 [System.Serializable]
-public class PacketHeader
+public class Packet
 {
-    public string packet;
+    public string packet = "";
+}
+
+[System.Serializable]
+public class PacketReady : Packet
+{
+    public PacketReady()
+    {
+        packet = "ready";
+    }
+}
+
+[System.Serializable]
+public class PacketHeader : Packet
+{
     public string json_data;
 }
 
 [System.Serializable]
-public class Packet
+public class PacketCreate : Packet
 {
-    public string packet = "";
+    public string type;
+    public string json_data;
+}
 
-    public Packet(string packet_)
+[System.Serializable]
+public class PacketCreateResponse : Packet
+{
+    public int id;
+
+    public PacketCreateResponse(int id_)
     {
-        packet = packet_;
+        packet = "create";
+        id = id_;
     }
 }
 
 public class Server0
 {
+    static private int maxid = 0;
+    static private Dictionary<int, device> devices = new Dictionary<int, device>();
     static private Mutex stopmut = new Mutex();
     static private bool stopped = false;
     static private TcpListener Listener = null;
+
+    static private int create(PacketHeader packet)
+    {
+        PacketCreate create = UnityEngine.JsonUtility.FromJson<PacketCreate>(packet.json_data);
+
+        switch (create.type)
+        {
+            case "manipulator1":
+                return create_manipulator1(packet);
+
+            case "manipulator2":
+                return create_manipulator2(packet);
+
+            default:
+                return 0;
+        }
+    }
+
+    static private int create_manipulator1(PacketHeader packet)
+    {
+        maxid++;
+        device dev = new manipulator1();
+        ((manipulator1)dev).config = UnityEngine.JsonUtility.FromJson<configmanipulator1>(packet.json_data);
+        dev.Place();
+        devices[maxid] = dev;
+        return maxid;
+    }
+
+    static private int create_manipulator2(PacketHeader packet)
+    {
+        maxid++;
+        device dev = new manipulator2();
+        ((manipulator2)dev).config = UnityEngine.JsonUtility.FromJson<configmanipulator2>(packet.json_data);
+        dev.Place();
+        devices[maxid] = dev;
+        return maxid;
+    }
 
     static private void log(string s)
     {
@@ -52,72 +113,80 @@ public class Server0
 
     static private PacketHeader receive_packet(Context context, bool blocking = true)
     {
+        log("receive packet entered");//?эта функция с ошибкой - не работает
+
         string buf = "";
 
-        byte[] bytes = new byte[1024];
-
-        if (blocking)
+        try
         {
-            while (!context.client.GetStream().DataAvailable)
+            byte[] bytes = new byte[1024];
+
+            if (blocking)
             {
-                Thread.Sleep(50);
-            }
-        }
-
-        while (true)
-        {
-            int r = context.client.GetStream().Read(bytes, 0, bytes.Length);
-
-            if (r > 0)
-            {
-                buf += Encoding.ASCII.GetString(bytes, 0, r);
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        int pos = 0;
-
-        while (true)
-        {
-            string packet = "";
-
-            if (buf.Substring(0, 4) == "json")
-            {
-                int pos1 = buf.IndexOf(":", pos);
-
-                if (pos1 != -1)
+                while (!context.client.GetStream().DataAvailable)
                 {
-                    int size = Int32.Parse(buf.Substring(pos + 4, pos1 - pos - 4));
-                    pos1 += 1;
-                    pos = pos1 + size;
-
-                    while (pos > buf.Length)
-                    {
-                        int r = context.client.GetStream().Read(bytes, 0, bytes.Length);
-
-                        if (r > 0)
-                        {
-                            buf += buf += Encoding.ASCII.GetString(bytes, 0, r);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
-                    packet = buf.Substring(pos1, size);
+                    Thread.Sleep(50);
                 }
             }
 
-            if (packet.Length == 0)
+            while (true)
             {
-                break;
+                int r = context.client.GetStream().Read(bytes, 0, bytes.Length);
+
+                if (r > 0)
+                {
+                    buf += Encoding.ASCII.GetString(bytes, 0, r);
+                }
+                else
+                {
+                    break;
+                }
             }
 
-            context.packetdeque.Enqueue(packet);
+            int pos = 0;
+
+            while (true)
+            {
+                string packet = "";
+
+                if (buf.Substring(0, 4) == "json")
+                {
+                    int pos1 = buf.IndexOf(":", pos);
+
+                    if (pos1 != -1)
+                    {
+                        int size = Int32.Parse(buf.Substring(pos + 4, pos1 - pos - 4));
+                        pos1 += 1;
+                        pos = pos1 + size;
+
+                        while (pos > buf.Length)
+                        {
+                            int r = context.client.GetStream().Read(bytes, 0, bytes.Length);
+
+                            if (r > 0)
+                            {
+                                buf += buf += Encoding.ASCII.GetString(bytes, 0, r);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        packet = buf.Substring(pos1, size);
+                    }
+                }
+
+                if (packet.Length == 0)
+                {
+                    break;
+                }
+
+                context.packetdeque.Enqueue(packet);
+            }
+        }
+        catch
+        {
         }
 
         if (context.packetdeque.Count == 0)
@@ -208,7 +277,9 @@ public class Server0
     {
         TcpClient client = (TcpClient)StateInfo;
 
-        log(("control connected " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString()));
+        string ip = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
+
+        log("control connected " + ip);
 
         Context context = new Context();
 
@@ -221,7 +292,7 @@ public class Server0
             {
                 if (context.status == Status.Connected)
                 {
-                    send_packet(context, new Packet("ready"));
+                    send_packet(context, new PacketReady());
                     context.status = Status.Working;
                 }
 
@@ -235,6 +306,10 @@ public class Server0
                     }
                     else if (packet.packet == "create")
                     {
+                        //send_packet(context, new PacketCreateResponse(create(packet)));
+                        //send_packet(context, new PacketCreateResponse(0));
+                        send_packet(context, new PacketReady());
+                        continue;
 
                     }
                     else if (packet.packet == "setpos")
@@ -255,7 +330,7 @@ public class Server0
                         log("unexpected packet");
                     }
                     {
-                        send_packet(context, new Packet("ready"));
+                        send_packet(context, new PacketReady());
                     }
                 }
             }
@@ -265,6 +340,6 @@ public class Server0
             }
         }
 
-        log(("control disconnected " + ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString()));
+        log("control disconnected " + ip);
     }
 }

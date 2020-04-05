@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class manipulator2
+[System.Serializable]
+public class configmanipulator2
 {
+    public float x = 0.0f;
+    public float y = 0.0f;
+    public float z = 0.0f;
+    public float angle = 0.0f;
     public float ChassisHeight = 1.0f;
     public float ChassisWidth = 0.5f;
     public float RotatingplatformAngle0 = 0.0f;
@@ -28,6 +33,11 @@ public class manipulator2
     public float WheelLever = 0.12f;
     public float LeverAngle0 = 10.0f;
     public float LeverAngle1 = 60.0f;
+}
+
+public class manipulator2 : device
+{
+    public configmanipulator2 config = null;
 
     private bool isinited = false;
     private GameObject chassis = null;
@@ -46,8 +56,13 @@ public class manipulator2
     private GameObject wheelhinge2 = null;
     private GameObject wheel2 = null;
 
-    public void Place(float x, float y, float z, float a)
+    public override void Place()
     {
+        if (config == null)
+        {
+            config = new configmanipulator2();
+        }
+
         if (!isinited)
         {
             chassis = GameObject.Instantiate(Resources.Load("manipulator2/chassis", typeof(GameObject)) as GameObject);
@@ -95,105 +110,105 @@ public class manipulator2
 
         {
             var b = chassis.GetComponent<chassismanipulator2>();
-            b.x = x;
-            b.y = y;
-            b.z = z;
-            b.angle = a;
-            b.height = ChassisHeight;
-            b.width = ChassisWidth;
-            b.angle0 = RotatingplatformAngle0;
-            b.angle1 = RotatingplatformAngle1;
+            b.x = config.x;
+            b.y = config.y;
+            b.z = config.z;
+            b.angle = config.angle;
+            b.height = config.ChassisHeight;
+            b.width = config.ChassisWidth;
+            b.angle0 = config.RotatingplatformAngle0;
+            b.angle1 = config.RotatingplatformAngle1;
         }
 
         {
             var b = rotatingplatform.GetComponent<rotatingplatformmanipulator2>();
-            b.diameter = RotatingplatformDiameter;
-            b.width = RotatingplatformWidth / 2;/*div 2 for cylinder*/
+            b.diameter = config.RotatingplatformDiameter;
+            b.width = config.RotatingplatformWidth / 2;/*div 2 for cylinder*/
         }
 
         {
             var b = leverhinge.GetComponent<leverhingemanipulator2>();
-            b.diameter = LeverhingeDiameter;
+            b.diameter = config.LeverhingeDiameter;
         }
 
         {
             var b = lever.GetComponent<levermanipulator2>();
-            b.width = LeverWidth;
-            b.length = LeverLength;
-            b.angle0 = ArmAngle0;
-            b.angle1 = ArmAngle1;
+            b.width = config.LeverWidth;
+            b.length = config.LeverLength;
+            b.angle0 = config.ArmAngle0;
+            b.angle1 = config.ArmAngle1;
         }
 
         {
             var b = armhinge.GetComponent<armhingemanipulator2>();
-            b.diameter = ArmhingeDiameter;
-            b.width = ArmhingeWidth / 2;/*div 2 for cylinder*/
+            b.diameter = config.ArmhingeDiameter;
+            b.width = config.ArmhingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
             var b = arm.GetComponent<armmanipulator2>();
-            b.width = ArmWidth;
-            b.length = ArmLength;
+            b.width = config.ArmWidth;
+            b.length = config.ArmLength;
         }
 
         {
             var b = holder1.GetComponent<holder1manipulator2>();
-            b.width = HolderWidth;
-            b.length = HolderLength;
-            b.offset = HoldersDistance / 2;
-            b.angle0 = ArmAngle0 + LeverAngle0;
-            b.angle1 = ArmAngle1 + LeverAngle1;
+            b.width = config.HolderWidth;
+            b.length = config.HolderLength;
+            b.offset = config.HoldersDistance / 2;
+            b.angle0 = config.ArmAngle0 + config.LeverAngle0;
+            b.angle1 = config.ArmAngle1 + config.LeverAngle1;
         }
 
         {
             var b = wheelhinge1.GetComponent<wheelhinge1manipulator2>();
-            b.diameter = LeverhingeDiameter;
-            b.width = WheelhingeWidth / 2;/*div 2 for cylinder*/
+            b.diameter = config.LeverhingeDiameter;
+            b.width = config.WheelhingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
             var b = wheel1.GetComponent<wheel1manipulator2>();
-            b.diameter = WheelDiameter;
-            b.width = WheelWidth / 2;/*div 2 for cylinder*/
-            b.lever = WheelLever;
+            b.diameter = config.WheelDiameter;
+            b.width = config.WheelWidth / 2;/*div 2 for cylinder*/
+            b.lever = config.WheelLever;
         }
 
         {
             var b = leverhinge1.GetComponent<leverhinge1manipulator2>();
-            b.diameter = LeverhingeDiameter;
+            b.diameter = config.LeverhingeDiameter;
         }
 
         {
             var b = lever1.GetComponent<lever1manipulator2>();
-            b.width = LeverWidth;
-            b.length = LeverLength;
+            b.width = config.LeverWidth;
+            b.length = config.LeverLength;
         }
 
         {
             var b = armhinge1.GetComponent<armhinge1manipulator2>();
-            b.diameter = ArmhingeDiameter;
-            b.width = ArmhingeWidth / 2;/*div 2 for cylinder*/
+            b.diameter = config.ArmhingeDiameter;
+            b.width = config.ArmhingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
             var b = holder2.GetComponent<holder2manipulator2>();
-            b.width = HolderWidth;
-            b.length = HolderLength;
-            b.offset = HoldersDistance / 2;
-            b.angle0 = LeverAngle0;
-            b.angle1 = LeverAngle1;
+            b.width = config.HolderWidth;
+            b.length = config.HolderLength;
+            b.offset = config.HoldersDistance / 2;
+            b.angle0 = config.LeverAngle0;
+            b.angle1 = config.LeverAngle1;
         }
 
         {
             var b = wheelhinge2.GetComponent<wheelhinge2manipulator2>();
-            b.diameter = LeverhingeDiameter;
-            b.width = WheelhingeWidth / 2;/*div 2 for cylinder*/
+            b.diameter = config.LeverhingeDiameter;
+            b.width = config.WheelhingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
             var b = wheel2.GetComponent<wheel2manipulator2>();
-            b.diameter = WheelDiameter;
-            b.width = WheelWidth / 2;/*div 2 for cylinder*/
+            b.diameter = config.WheelDiameter;
+            b.width = config.WheelWidth / 2;/*div 2 for cylinder*/
         }
 
         chassis.GetComponent<chassismanipulator2>().Init();

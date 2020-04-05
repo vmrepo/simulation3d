@@ -85,6 +85,11 @@ def main():
 
     if data['packet'] == 'ready':
 
+
+        send_packet(context, {'packet':'create', 'type':'manipulator1', 'y':1})
+        data = receive_packet(context)
+
+
         send_packet(context, {'packet':'end'})
 
 if __name__ == '__main__':
