@@ -214,7 +214,43 @@ public class manipulator2 : device
         chassis.GetComponent<chassismanipulator2>().Init();
     }
 
-    public void SetPos0(float angle)
+    public override void Remove()
+    {
+        MonoBehaviour.Destroy(chassis);
+        MonoBehaviour.Destroy(rotatingplatform);
+        MonoBehaviour.Destroy(leverhinge);
+        MonoBehaviour.Destroy(lever);
+        MonoBehaviour.Destroy(armhinge);
+        MonoBehaviour.Destroy(arm);
+        MonoBehaviour.Destroy(holder1);
+        MonoBehaviour.Destroy(wheelhinge1);
+        MonoBehaviour.Destroy(wheel1);
+        MonoBehaviour.Destroy(leverhinge1);
+        MonoBehaviour.Destroy(lever1);
+        MonoBehaviour.Destroy(armhinge1);
+        MonoBehaviour.Destroy(holder2);
+        MonoBehaviour.Destroy(wheelhinge2);
+        MonoBehaviour.Destroy(wheel2);
+
+        isinited = false;
+        chassis = null;
+        rotatingplatform = null;
+        leverhinge = null;
+        lever = null;
+        armhinge = null;
+        arm = null;
+        holder1 = null;
+        wheelhinge1 = null;
+        wheel1 = null;
+        leverhinge1 = null;
+        lever1 = null;
+        armhinge1 = null;
+        holder2 = null;
+        wheelhinge2 = null;
+        wheel2 = null;
+}
+
+public void SetPos0(float angle)
     {
         DriveJoint drive = chassis.GetComponent<chassismanipulator2>().drive;
         drive.SetTargetAngle(angle);

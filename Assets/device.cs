@@ -7,4 +7,8 @@ public class device
     public virtual void Place()
     {
     }
+
+    public virtual void Remove()
+    {
+    }
 }

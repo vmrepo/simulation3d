@@ -85,10 +85,14 @@ def main():
 
     if data['packet'] == 'ready':
 
-
-        send_packet(context, {'packet':'create', 'type':'manipulator1', 'y':1})
+        send_packet(context, {'packet':'create', 'type':'manipulator1', 'x':-1})
         data = receive_packet(context)
 
+        send_packet(context, {'packet':'create', 'type':'manipulator2', 'x':1})
+        data = receive_packet(context)
+
+        send_packet(context, {'packet':'delete', 'id':1})
+        data = receive_packet(context)
 
         send_packet(context, {'packet':'end'})
 

@@ -126,7 +126,27 @@ public class manipulator1 : device
         chassis.GetComponent<chassis>().Init();
     }
 
-    public void SetPos0(float angle)
+    public override void Remove()
+    {
+        MonoBehaviour.Destroy(chassis);
+        MonoBehaviour.Destroy(rotatingplatform);
+        MonoBehaviour.Destroy(holder);
+        MonoBehaviour.Destroy(leverhinge);
+        MonoBehaviour.Destroy(lever);
+        MonoBehaviour.Destroy(armhinge);
+        MonoBehaviour.Destroy(arm);
+
+        isinited = false;
+        chassis = null;
+        rotatingplatform = null;
+        holder = null;
+        leverhinge = null;
+        lever = null;
+        armhinge = null;
+        arm = null;
+}
+
+public void SetPos0(float angle)
     {
         chassis.GetComponent<chassis>().drive.SetTargetAngle(angle);
     }

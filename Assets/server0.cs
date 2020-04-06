@@ -50,6 +50,13 @@ public class PacketCreate : Packet
 }
 
 [System.Serializable]
+public class PacketDelete : Packet
+{
+    public int id;
+    public string json_data;
+}
+
+[System.Serializable]
 public class PacketCreateResponse : Packet
 {
     public int id;
@@ -61,14 +68,87 @@ public class PacketCreateResponse : Packet
     }
 }
 
+[System.Serializable]
+public class PacketDeleteResponse : Packet
+{
+    public int ok;
+
+    public PacketDeleteResponse(int ok_)
+    {
+        packet = "delete";
+        ok = ok_;
+    }
+}
+
+public enum Calltype
+{
+    None,
+    Create,
+    Delete,
+    Setpos,
+    Setcamera
+}
+
+public class Call
+{
+    public Mutex mutex = new Mutex();
+    public ManualResetEvent manualevent = new ManualResetEvent(false);
+    public Calltype type = Calltype.None;
+    public PacketHeader packet = null;
+    public int intresult = 0;
+}
+
 public class Server0
 {
+    static private Call call = new Call();
+
+    //доступ только из потока событий unity
     static private int maxid = 0;
     static private Dictionary<int, device> devices = new Dictionary<int, device>();
-    static private Mutex stopmut = new Mutex();
+
+    static private Mutex stoppedmutex = new Mutex();
     static private bool stopped = false;
     static private TcpListener Listener = null;
 
+    static private int callcreate(PacketHeader packet)
+    {
+        call.mutex.WaitOne();
+        call.type = Calltype.Create;
+        call.packet = packet;
+        call.manualevent.Reset();
+        call.mutex.ReleaseMutex();
+
+        call.manualevent.WaitOne();
+
+        call.mutex.WaitOne();
+        call.type = Calltype.None;
+        call.packet = null;
+        int id = call.intresult;
+        call.mutex.ReleaseMutex();
+
+        return id;
+    }
+
+    static private int calldelete(PacketHeader packet)
+    {
+        call.mutex.WaitOne();
+        call.type = Calltype.Delete;
+        call.packet = packet;
+        call.manualevent.Reset();
+        call.mutex.ReleaseMutex();
+
+        call.manualevent.WaitOne();
+
+        call.mutex.WaitOne();
+        call.type = Calltype.None;
+        call.packet = null;
+        int id = call.intresult;
+        call.mutex.ReleaseMutex();
+
+        return id;
+    }
+
+    // вызывается из потока собыйти unity
     static private int create(PacketHeader packet)
     {
         PacketCreate create = UnityEngine.JsonUtility.FromJson<PacketCreate>(packet.json_data);
@@ -86,9 +166,23 @@ public class Server0
         }
     }
 
+    // вызывается из потока собыйти unity
+    static private int delete(PacketHeader packet)
+    {
+        PacketDelete delete = UnityEngine.JsonUtility.FromJson<PacketDelete>(packet.json_data);
+
+        if (!devices.ContainsKey(delete.id))
+            return 0;
+
+        devices[delete.id].Remove();
+        devices.Remove(delete.id);
+
+        return 1;
+    }
+
+    // в потоке клиента нельзя вызывать, только из потока событий unity
     static private int create_manipulator1(PacketHeader packet)
     {
-        // в потоке клинта нельзя вызывать, нужно поставить для вызова в Update
         maxid++;
         device dev = new manipulator1();
         ((manipulator1)dev).config = UnityEngine.JsonUtility.FromJson<configmanipulator1>(packet.json_data);
@@ -97,9 +191,9 @@ public class Server0
         return maxid;
     }
 
+    // в потоке клиента нельзя вызывать, только из потока событий unity
     static private int create_manipulator2(PacketHeader packet)
     {
-        // в потоке клинта нельзя вызывать, нужно поставить для вызова в Update
         maxid++;
         device dev = new manipulator2();
         ((manipulator2)dev).config = UnityEngine.JsonUtility.FromJson<configmanipulator2>(packet.json_data);
@@ -216,16 +310,16 @@ public class Server0
 
     static private void setstopped(bool stopped_)
     {
-        stopmut.WaitOne();
+        stoppedmutex.WaitOne();
         stopped = stopped_;
-        stopmut.ReleaseMutex();
+        stoppedmutex.ReleaseMutex();
     }
 
     static private bool isstopped()
     {
-        stopmut.WaitOne();
+        stoppedmutex.WaitOne();
         bool stopped_ = stopped;
-        stopmut.ReleaseMutex();
+        stoppedmutex.ReleaseMutex();
         return stopped_;
     }
 
@@ -239,7 +333,28 @@ public class Server0
 
     static public void Update()
     {
+        call.mutex.WaitOne();
 
+        switch (call.type)
+        {
+            case Calltype.Create:
+                call.intresult = create(call.packet);
+                call.manualevent.Set();
+                break;
+
+            case Calltype.Delete:
+                call.intresult = delete(call.packet);
+                call.manualevent.Set();
+                break;
+
+            case Calltype.Setpos:
+                break;
+
+            case Calltype.Setcamera:
+                break;
+        }
+
+        call.mutex.ReleaseMutex();
     }
 
     static public void Stop()
@@ -308,7 +423,13 @@ public class Server0
                     }
                     else if (packet.packet == "create")
                     {
-                        send_packet(context, new PacketCreateResponse(create(packet)));
+                        send_packet(context, new PacketCreateResponse(callcreate(packet)));
+                        continue;
+
+                    }
+                    else if (packet.packet == "delete")
+                    {
+                        send_packet(context, new PacketDeleteResponse(calldelete(packet)));
                         continue;
 
                     }
