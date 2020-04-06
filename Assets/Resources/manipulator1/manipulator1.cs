@@ -33,7 +33,7 @@ public class configmanipulator1
 
 public class manipulator1 : device
 {
-    public configmanipulator1 config = null;
+    public configmanipulator1 config = new configmanipulator1();
 
     private bool isinited = false;
     private GameObject chassis = null;
@@ -46,11 +46,6 @@ public class manipulator1 : device
 
     public override void Place()
     {
-        if (config == null)
-        {
-            config = new configmanipulator1();
-        }
-
         if (!isinited)
         {
             chassis = GameObject.Instantiate(Resources.Load("manipulator1/chassis", typeof(GameObject)) as GameObject);

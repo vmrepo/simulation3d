@@ -91,8 +91,14 @@ def main():
         send_packet(context, {'packet':'create', 'type':'manipulator2', 'x':1})
         data = receive_packet(context)
 
-        send_packet(context, {'packet':'delete', 'id':1})
+        send_packet(context, {'packet':'setpos', 'id':1, 'a0':90, 'a1':45, 'a2':90})
         data = receive_packet(context)
+
+        send_packet(context, {'packet':'setpos', 'id':2, 'a0':90, 'a1':45, 'a2':90})
+        data = receive_packet(context)
+
+        #send_packet(context, {'packet':'delete', 'id':1})
+        #data = receive_packet(context)
 
         send_packet(context, {'packet':'end'})
 

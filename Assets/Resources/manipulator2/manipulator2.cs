@@ -37,7 +37,7 @@ public class configmanipulator2
 
 public class manipulator2 : device
 {
-    public configmanipulator2 config = null;
+    public configmanipulator2 config = new configmanipulator2();
 
     private bool isinited = false;
     private GameObject chassis = null;
@@ -58,11 +58,6 @@ public class manipulator2 : device
 
     public override void Place()
     {
-        if (config == null)
-        {
-            config = new configmanipulator2();
-        }
-
         if (!isinited)
         {
             chassis = GameObject.Instantiate(Resources.Load("manipulator2/chassis", typeof(GameObject)) as GameObject);
@@ -272,7 +267,7 @@ public void SetPos0(float angle)
         DriveJoint drive1 = holder1.GetComponent<holder1manipulator2>().drive;
         DriveJoint drive2 = holder2.GetComponent<holder2manipulator2>().drive;
 
-        drive.SetTargetAngle(angle);
+        drive.SetTargetAngle(-90 + angle);
         drive1.SetTargetAngle(drive2.GetTargetAngle() + drive.GetTargetAngle());
     }
 
