@@ -113,8 +113,8 @@ public class Calldata
     public Mutex mutex = new Mutex();
     public ManualResetEvent manualevent = new ManualResetEvent(false);
     public Calltype type = Calltype.None;
-    public PacketHeader packet = null;
-    public int intresult = 0;
+    public PacketHeader inputpacket = null;
+    public Packet outputpacket = null;
 }
 
 public class Server0
@@ -129,11 +129,12 @@ public class Server0
     static private bool stopped = false;
     static private TcpListener Listener = null;
 
-    static private int call(Calltype type, PacketHeader packet)
+    static private Packet call(Calltype type, PacketHeader inputpacket)
     {
         calldata.mutex.WaitOne();
         calldata.type = type;
-        calldata.packet = packet;
+        calldata.inputpacket = inputpacket;
+        calldata.outputpacket = null;
         calldata.manualevent.Reset();
         calldata.mutex.ReleaseMutex();
 
@@ -141,52 +142,52 @@ public class Server0
 
         calldata.mutex.WaitOne();
         calldata.type = Calltype.None;
-        calldata.packet = null;
-        int id = calldata.intresult;
+        calldata.inputpacket = null;
+        Packet outputpacket = calldata.outputpacket;
         calldata.mutex.ReleaseMutex();
 
-        return id;
+        return outputpacket;
     }
 
     // вызывается из потока собыйти unity
-    static private int create(PacketHeader packet)
+    static private PacketCreateReady create(PacketHeader packet)
     {
         PacketCreate create = UnityEngine.JsonUtility.FromJson<PacketCreate>(packet.json_data);
 
         switch (create.type)
         {
             case "manipulator1":
-                return create_manipulator1(packet);
+                return new PacketCreateReady(create_manipulator1(packet));
 
             case "manipulator2":
-                return create_manipulator2(packet);
+                return new PacketCreateReady(create_manipulator2(packet));
 
             default:
-                return 0;
+                return new PacketCreateReady(0);
         }
     }
 
     // вызывается из потока собыйти unity
-    static private int delete(PacketHeader packet)
+    static private PacketDeleteReady delete(PacketHeader packet)
     {
         PacketDelete delete = UnityEngine.JsonUtility.FromJson<PacketDelete>(packet.json_data);
 
         if (!devices.ContainsKey(delete.id))
-            return 0;
+            return new PacketDeleteReady(0);
 
         devices[delete.id].Remove();
         devices.Remove(delete.id);
 
-        return 1;
+        return new PacketDeleteReady(1);
     }
 
     // вызывается из потока собыйти unity
-    static private int setpos(PacketHeader packet)
+    static private PacketSetposReady setpos(PacketHeader packet)
     {
         PacketSetpos setpos = UnityEngine.JsonUtility.FromJson<PacketSetpos>(packet.json_data);
 
         if (!devices.ContainsKey(setpos.id))
-            return 0;
+            return new PacketSetposReady(0);
 
         switch (devices[setpos.id].GetType().ToString())
         {
@@ -209,10 +210,10 @@ public class Server0
                 break;
 
             default:
-                return 0;
+                return new PacketSetposReady(0);
         }
 
-        return 1;
+        return new PacketSetposReady(1);
     }
 
     // в потоке клиента нельзя вызывать, только из потока событий unity
@@ -373,17 +374,17 @@ public class Server0
         switch (calldata.type)
         {
             case Calltype.Create:
-                calldata.intresult = create(calldata.packet);
+                calldata.outputpacket = create(calldata.inputpacket);
                 calldata.manualevent.Set();
                 break;
 
             case Calltype.Delete:
-                calldata.intresult = delete(calldata.packet);
+                calldata.outputpacket = delete(calldata.inputpacket);
                 calldata.manualevent.Set();
                 break;
 
             case Calltype.Setpos:
-                calldata.intresult = setpos(calldata.packet);
+                calldata.outputpacket = setpos(calldata.inputpacket);
                 calldata.manualevent.Set();
                 break;
 
@@ -460,19 +461,19 @@ public class Server0
                     }
                     else if (packet.packet == "create")
                     {
-                        send_packet(context, new PacketCreateReady(call(Calltype.Create, packet)));
+                        send_packet(context, call(Calltype.Create, packet));
                         continue;
 
                     }
                     else if (packet.packet == "delete")
                     {
-                        send_packet(context, new PacketDeleteReady(call(Calltype.Delete, packet)));
+                        send_packet(context, call(Calltype.Delete, packet));
                         continue;
 
                     }
                     else if (packet.packet == "setpos")
                     {
-                        send_packet(context, new PacketSetposReady(call(Calltype.Setpos, packet)));
+                        send_packet(context, call(Calltype.Setpos, packet));
                         continue;
                     }
                     else if (packet.packet == "camera")
