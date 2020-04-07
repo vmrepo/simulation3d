@@ -7,18 +7,24 @@ public class camera : MonoBehaviour
 
     [SerializeField]
     public Vector3 targetposition; //невидимая цель для камеры
-
     public float zoomSpeed = 5.0f; //скорость приближения камеры
-    private Vector3 _offset; //смещение камеры относительно объекта
     public float mouse_sens = 1f;
     public Camera cam_holder;
-    float x_axis, y_axis, z_axis, _rotY, _rotX; //мышь по x, y, зум, координаты для обзора
 
-    void Start()
+    private Vector3 _offset; //смещение камеры относительно объекта
+    private float x_axis, y_axis, z_axis, _rotY, _rotX; //мышь по x, y, зум, координаты для обзора
+
+    public void Init()
     {
+        transform.LookAt(targetposition);
         _rotY = transform.eulerAngles.y;
         _rotX = transform.eulerAngles.x;
         _offset = targetposition - transform.position; //получает начальное смещение
+    }
+
+    void Start()
+    {
+        Init();
     }
 
     void LookAtTarget()
@@ -48,23 +54,21 @@ public class camera : MonoBehaviour
         {
             //обзор вокруг объекта
             //смещение камеры по осям X и Y
-            //x_axis = Input.GetAxis("Mouse X") * mouse_sens;
-            //y_axis = Input.GetAxis("Mouse Y") * mouse_sens;
+            x_axis = Input.GetAxis("Mouse X") * mouse_sens;
+            y_axis = Input.GetAxis("Mouse Y") * mouse_sens;
 
-            //targetposition = new Vector3(targetposition.x + x_axis, targetposition.y + y_axis, targetposition.z);
+            targetposition = new Vector3(targetposition.x - x_axis, targetposition.y - y_axis, targetposition.z);
 
-            //LookAtTarget();
+            LookAtTarget();
         }
         if (Input.GetMouseButton(2)) //колесико
         {
             //обзор вокруг камеры
             x_axis = Input.GetAxis("Mouse X") * mouse_sens;
             y_axis = Input.GetAxis("Mouse Y") * mouse_sens;
-            //z_axis = Input.GetAxis("Mouse ScrollWheel") * wheel_sens;
 
             cam_holder.transform.Rotate(Vector3.up, x_axis, Space.World);
             cam_holder.transform.Rotate(Vector3.right, y_axis, Space.Self);
-            //cam_holder.transform.localPosition = cam_holder.transform.localPosition * (1 - z_axis);
         }
     }
 }

@@ -58,9 +58,20 @@ public class PacketDelete : Packet
 public class PacketSetpos : Packet
 {
     public int id;
-    public int a0;
-    public int a1;
-    public int a2;
+    public float a0;
+    public float a1;
+    public float a2;
+}
+
+[System.Serializable]
+public class PacketSetcamera : Packet
+{
+    public float x0;
+    public float y0;
+    public float z0;
+    public float x1;
+    public float y1;
+    public float z1;
 }
 
 [System.Serializable]
@@ -93,6 +104,18 @@ public class PacketSetposReady : Packet
     public int ok;
 
     public PacketSetposReady(int ok_)
+    {
+        packet = "ready";
+        ok = ok_;
+    }
+}
+
+[System.Serializable]
+public class PacketSetcameraReady : Packet
+{
+    public int ok;
+
+    public PacketSetcameraReady(int ok_)
     {
         packet = "ready";
         ok = ok_;
@@ -214,6 +237,22 @@ public class Server0
         }
 
         return new PacketSetposReady(1);
+    }
+
+    // вызывается из потока собыйти unity
+    static private PacketSetcameraReady setcamera(PacketHeader packet)
+    {
+        PacketSetcamera setcamera = UnityEngine.JsonUtility.FromJson<PacketSetcamera>(packet.json_data);
+
+        UnityEngine.GameObject obj = UnityEngine.GameObject.Find("Main Camera");
+        camera bhv = obj.GetComponent<camera>();
+
+        bhv.targetposition = new UnityEngine.Vector3(setcamera.x0, setcamera.y0, setcamera.z0);
+        obj.transform.position = new UnityEngine.Vector3(setcamera.x1, setcamera.y1, setcamera.z1);
+
+        bhv.Init();
+
+        return new PacketSetcameraReady(1);
     }
 
     // в потоке клиента нельзя вызывать, только из потока событий unity
@@ -389,6 +428,8 @@ public class Server0
                 break;
 
             case Calltype.Setcamera:
+                calldata.outputpacket = setcamera(calldata.inputpacket);
+                calldata.manualevent.Set();
                 break;
         }
 
@@ -476,9 +517,10 @@ public class Server0
                         send_packet(context, call(Calltype.Setpos, packet));
                         continue;
                     }
-                    else if (packet.packet == "camera")
+                    else if (packet.packet == "setcamera")
                     {
-
+                        send_packet(context, call(Calltype.Setcamera, packet));
+                        continue;
                     }
                     else if (packet.packet == "end")
                     {

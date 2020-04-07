@@ -7,7 +7,7 @@ public class mainscene : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        GameObject.Find("Main Camera").GetComponent<camera>().targetposition = new Vector3(0, 1, 0);
+        GameObject.Find("Main Camera").GetComponent<camera>().targetposition = new Vector3(0, 0, 0);
         Server0.Start();
     }
 

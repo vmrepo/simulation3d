@@ -85,6 +85,9 @@ def main():
 
     if data['packet'] == 'ready':
 
+        send_packet(context, {'packet':'setcamera', 'x0':0, 'y0':0, 'z0':0, 'x1':0, 'y1':5, 'z1':5})
+        data = receive_packet(context)
+
         send_packet(context, {'packet':'create', 'type':'manipulator1', 'x':-1})
         data = receive_packet(context)
 
