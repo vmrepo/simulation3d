@@ -1,4 +1,6 @@
 
+#client sample for simulation3d
+
 import os
 import sys
 import json
@@ -13,7 +15,7 @@ import base64
 import cv2
 
 HOST = 'localhost'
-PORT = 8887
+PORT = 8888
 
 class Context:
     pass

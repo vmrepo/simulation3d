@@ -142,6 +142,9 @@ public class Calldata
 
 public class Server0
 {
+    static public int Port = 8888;
+    static public string Logfile = "./simulation3dlog.txt";
+
     static private Calldata calldata = new Calldata();
 
     //доступ только из потока событий unity
@@ -277,9 +280,19 @@ public class Server0
         return maxid;
     }
 
-    static private void log(string s)
+    static public void Log(string text)
     {
-        UnityEngine.MonoBehaviour.print(s);
+        try
+        {
+            using (StreamWriter sw = new StreamWriter(Logfile, true, System.Text.Encoding.Default))
+            {
+                sw.WriteLine(DateTime.Now.ToString() + " " + text);
+            }
+        }
+        catch (Exception e)
+        {
+            UnityEngine.MonoBehaviour.print("error write log to " + Logfile + " " + e.Message);
+        }
     }
 
     static private PacketHeader receive_packet(Context context, bool blocking = true)
@@ -364,7 +377,7 @@ public class Server0
 
         PacketHeader data = UnityEngine.JsonUtility.FromJson<PacketHeader>(json_data);
 
-        log("received " + json_data);
+        Log("received " + json_data);
 
         data.json_data = json_data;
 
@@ -374,11 +387,12 @@ public class Server0
     static private bool send_packet(Context context, Packet packet)
     {
         string json_data = UnityEngine.JsonUtility.ToJson(packet);
+
+        Log("sent " + json_data);
+
         json_data = "json" + json_data.Length.ToString() + ":" + json_data;
 
         context.client.GetStream().Write(Encoding.ASCII.GetBytes(json_data), 0, json_data.Length);
-
-        log("sent " + json_data);
 
         return true;
     }
@@ -398,12 +412,10 @@ public class Server0
         return stopped_;
     }
 
-    static public void Start(int port = 8887)
+    static public void Start()
     {
-        //string[] args = System.Environment.GetCommandLineArgs();
-
         Thread Thread = new Thread(new ParameterizedThreadStart(ServerThread));
-        Thread.Start(port);
+        Thread.Start(Port);
     }
 
     static public void Update()
@@ -444,10 +456,18 @@ public class Server0
     {
         int port = (int)StateInfo;
 
-        Listener = new TcpListener(IPAddress.Any, port);
-        Listener.Start();
+        try
+        {
+            Listener = new TcpListener(IPAddress.Any, port);
+            Listener.Start();
+        }
+        catch
+        {
+            Log("error start server, port " + Port.ToString());
+            return;
+        }
 
-        log("control server started");
+        Log("control server started, port " + Port.ToString());
 
         setstopped(false);
 
@@ -464,7 +484,7 @@ public class Server0
             }
         }
 
-        log("control server stopped");
+        Log("control server stopped");
     }
 
     static private void ClientThread(Object StateInfo)
@@ -473,7 +493,7 @@ public class Server0
 
         string ip = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
 
-        log("control connected " + ip);
+        Log("control client connected " + ip);
 
         Context context = new Context();
 
@@ -527,7 +547,7 @@ public class Server0
                     }
                     else
                     {
-                        log("unexpected packet");
+                        Log("unexpected packet");
                     }
                     {
                         send_packet(context, new PacketReady());
@@ -536,11 +556,11 @@ public class Server0
             }
             catch (Exception e)
             {
-                log("control error: exception " + e.ToString());
+                Log("control client error: exception " + e.ToString());
                 break;
             }
         }
 
-        log("control disconnected " + ip);
+        Log("control client disconnected " + ip);
     }
 }
