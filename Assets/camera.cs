@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class camera : MonoBehaviour
 {
-
     [SerializeField]
     public Vector3 targetposition; //невидимая цель для камеры
     public float zoomSpeed = 5.0f; //скорость приближения камеры
@@ -56,7 +55,7 @@ public class camera : MonoBehaviour
         if (Input.GetMouseButton(1)) //правая кнопка
         {
             //обзор вокруг объекта
-            //смещение камеры по осям X и Y todo по осям перпендикуляров к направлению
+            //смещение камеры
 
             float x_axis = -Input.GetAxis("Mouse X") * mouseSensTranslatiton;
             float y_axis = -Input.GetAxis("Mouse Y") * mouseSensTranslatiton;

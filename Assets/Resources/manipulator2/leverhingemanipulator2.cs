@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class leverhingemanipulator2 : MonoBehaviour
 {
-    [SerializeField]
     public float diameter = 0.08f;
     //remember for cylinder, width (y - scale) is half of real
 

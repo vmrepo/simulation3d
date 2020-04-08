@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class lever1manipulator2 : MonoBehaviour
 {
-    [SerializeField]
     public float width = 0.03f;
     public float length = 0.6f;
 

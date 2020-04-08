@@ -6,7 +6,6 @@ public class holder : MonoBehaviour
 {
     public DriveJoint drive = new DriveJoint();
 
-    [SerializeField]
     public float width = 0.03f;
     public float length = 0.14f;
     public float angle0 = 10.0f;

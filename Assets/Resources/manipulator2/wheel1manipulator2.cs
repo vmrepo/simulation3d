@@ -7,7 +7,6 @@ public class wheel1manipulator2 : MonoBehaviour
     public GameObject lever1object = null;
     public GameObject rotatingplatformobject = null;
 
-    [SerializeField]
     public float diameter = 0.32f;
     public float width = 0.0115f;
     public float lever = 0.12f;

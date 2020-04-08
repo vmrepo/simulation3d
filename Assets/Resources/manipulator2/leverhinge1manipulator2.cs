@@ -6,7 +6,6 @@ public class leverhinge1manipulator2 : MonoBehaviour
 {
     public GameObject lever1object = null;
 
-    [SerializeField]
     public float diameter = 0.08f;
     //remember for cylinder, width (y - scale) is half of real
 

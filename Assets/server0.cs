@@ -414,24 +414,22 @@ public class Server0
         {
             case Calltype.Create:
                 calldata.outputpacket = create(calldata.inputpacket);
-                calldata.manualevent.Set();
                 break;
 
             case Calltype.Delete:
                 calldata.outputpacket = delete(calldata.inputpacket);
-                calldata.manualevent.Set();
                 break;
 
             case Calltype.Setpos:
                 calldata.outputpacket = setpos(calldata.inputpacket);
-                calldata.manualevent.Set();
                 break;
 
             case Calltype.Setcamera:
                 calldata.outputpacket = setcamera(calldata.inputpacket);
-                calldata.manualevent.Set();
                 break;
         }
+
+        calldata.manualevent.Set();
 
         calldata.mutex.ReleaseMutex();
     }

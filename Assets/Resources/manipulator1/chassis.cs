@@ -6,7 +6,6 @@ public class chassis : MonoBehaviour
 {
     public DriveJoint drive = new DriveJoint();
 
-    [SerializeField]
     public float x = 0.0f;
     public float y = 0.0f;
     public float z = 0.0f;

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class rotatingplatformmanipulator2 : MonoBehaviour
 {
-    [SerializeField]
     public float diameter = 0.5f;
     public float width = 0.01f;
     //remember for cylinder, width (y - scale) is half of real

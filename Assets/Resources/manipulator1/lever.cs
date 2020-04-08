@@ -6,7 +6,6 @@ public class lever : MonoBehaviour
 {
     public DriveJoint drive = new DriveJoint();
 
-    [SerializeField]
     public float width = 0.03f;
     public float length = 0.6f;
     public float angle0 = 60.0f;

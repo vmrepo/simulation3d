@@ -88,19 +88,21 @@ def main():
         send_packet(context, {'packet':'setcamera', 'x0':0, 'y0':0, 'z0':0, 'x1':0, 'y1':5, 'z1':5})
         data = receive_packet(context)
 
-        send_packet(context, {'packet':'create', 'type':'manipulator1', 'x':-1})
+        send_packet(context, {'packet':'create', 'type':'manipulator1', 'x':-1, 'y':0, 'z':0})
+        data = receive_packet(context)
+        id1 = data['id']
+
+        send_packet(context, {'packet':'create', 'type':'manipulator2', 'x':1, 'y':0, 'z':0})
+        data = receive_packet(context)
+        id2 = data['id']
+
+        send_packet(context, {'packet':'setpos', 'id':id1, 'a0':90, 'a1':45, 'a2':90})
         data = receive_packet(context)
 
-        send_packet(context, {'packet':'create', 'type':'manipulator2', 'x':1})
+        send_packet(context, {'packet':'setpos', 'id':id2, 'a0':90, 'a1':45, 'a2':90})
         data = receive_packet(context)
 
-        send_packet(context, {'packet':'setpos', 'id':1, 'a0':90, 'a1':45, 'a2':90})
-        data = receive_packet(context)
-
-        send_packet(context, {'packet':'setpos', 'id':2, 'a0':90, 'a1':45, 'a2':90})
-        data = receive_packet(context)
-
-        #send_packet(context, {'packet':'delete', 'id':1})
+        #send_packet(context, {'packet':'delete', 'id':id1})
         #data = receive_packet(context)
 
         send_packet(context, {'packet':'end'})

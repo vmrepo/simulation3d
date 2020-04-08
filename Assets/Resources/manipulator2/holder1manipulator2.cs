@@ -6,7 +6,6 @@ public class holder1manipulator2 : MonoBehaviour
 {
     public DriveJoint drive = new DriveJoint();
 
-    [SerializeField]
     public float width = 0.03f;
     public float length = 0.14f;
     public float offset = 0.0895f;

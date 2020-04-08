@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class wheelhinge2manipulator2 : MonoBehaviour
 {
-    [SerializeField]
     public float diameter = 0.08f;
     public float width = 0.023f;
     //remember for cylinder, width (y - scale) is half of real
