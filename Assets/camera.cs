@@ -12,14 +12,13 @@ public class camera : MonoBehaviour
     public Camera cam_holder;
 
     private Vector3 _offset;
-    private float _rotY, _rotX;
+    private Quaternion _rotation;
 
     public void Init()
     {
-        _rotY = 0.0f;
-        _rotX = 0.0f;
-        _offset = targetposition - transform.position; //получает начальное смещение
-        LookAtTarget();
+        transform.LookAt(targetposition);
+        _rotation = Quaternion.identity;
+        _offset = targetposition - transform.position;
     }
 
     void Start()
@@ -29,8 +28,7 @@ public class camera : MonoBehaviour
 
     void LookAtTarget()
     {
-        Quaternion rotation = Quaternion.Euler(_rotY, _rotX, 0); //задает вращение камеры 
-        transform.position = targetposition - (rotation * _offset);
+        transform.position = targetposition - (_rotation * _offset);
         transform.LookAt(targetposition);
     }
 
@@ -39,24 +37,26 @@ public class camera : MonoBehaviour
         float input = Input.GetAxis("Mouse ScrollWheel"); //крутится колесико
         if (input != 0) 
         {
-            transform.Translate(Vector3.forward * input);
+            Vector3 v = (targetposition - transform.position).normalized;
 
-            Init();
+            transform.position += v * input;
+            targetposition += v * input;
         }
 
-        if (Input.GetMouseButton(0)) //левая кнопка мыши
-        { //вращение вокруг объекта
-            _rotX += -Input.GetAxis("Mouse X") * mouseSensRotatiton; //поворот камеры вокруг объекта и сохранение координат
-            _rotY += -Input.GetAxis("Mouse Y") * mouseSensRotatiton;
+        if (Input.GetMouseButton(0)) //левая кнопка
+        {
+            //вращение
+            float rotX = Input.GetAxis("Mouse X") * mouseSensRotatiton;
+            float rotY = Input.GetAxis("Mouse Y") * mouseSensRotatiton;
 
+            _rotation *= Quaternion.Euler(rotY, rotX, 0);
+            
             LookAtTarget();
         }
 
         if (Input.GetMouseButton(1)) //правая кнопка
         {
-            //обзор вокруг объекта
-            //смещение камеры
-
+            //смещение
             float x_axis = -Input.GetAxis("Mouse X") * mouseSensTranslatiton;
             float y_axis = -Input.GetAxis("Mouse Y") * mouseSensTranslatiton;
 
@@ -66,15 +66,5 @@ public class camera : MonoBehaviour
 
             LookAtTarget();
         }
-
-        /*if (Input.GetMouseButton(2)) //нажимается колесико
-        {
-            //обзор вокруг камеры
-            float x_axis = -Input.GetAxis("Mouse X") * mouse_sens;
-            float y_axis = -Input.GetAxis("Mouse Y") * mouse_sens;
-
-            cam_holder.transform.Rotate(Vector3.up, x_axis, Space.World);
-            cam_holder.transform.Rotate(Vector3.right, y_axis, Space.Self);
-        }*/
     }
 }
