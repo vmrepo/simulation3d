@@ -18,7 +18,6 @@ public class Context
 {
     public TcpClient client;
     public Status status;
-    public Queue<string> packetdeque = new Queue<string>();
 }
 
 [System.Serializable]
@@ -297,6 +296,8 @@ public class Server0
 
     static private PacketHeader receive_packet(Context context, bool blocking = true)
     {
+        string json_data = "";
+
         string buf = "";
 
         try
@@ -361,19 +362,17 @@ public class Server0
                     break;
                 }
 
-                context.packetdeque.Enqueue(packet);
+                json_data = packet;
             }
         }
         catch
         {
         }
 
-        if (context.packetdeque.Count == 0)
+        if (json_data.Length == 0)
         {
             return null;
         }
-
-        string json_data = context.packetdeque.Dequeue();
 
         PacketHeader data = UnityEngine.JsonUtility.FromJson<PacketHeader>(json_data);
 
