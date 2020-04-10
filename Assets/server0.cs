@@ -57,6 +57,11 @@ public class PacketDelete : Packet
 }
 
 [System.Serializable]
+public class PacketClear : Packet
+{
+}
+
+[System.Serializable]
 public class PacketSetpos : Packet
 {
     public int id;
@@ -101,6 +106,18 @@ public class PacketDeleteReady : Packet
 }
 
 [System.Serializable]
+public class PacketClearReady : Packet
+{
+    public int ok;
+
+    public PacketClearReady(int ok_)
+    {
+        packet = "ready";
+        ok = ok_;
+    }
+}
+
+[System.Serializable]
 public class PacketSetposReady : Packet
 {
     public int ok;
@@ -129,6 +146,7 @@ public enum Calltype
     None,
     Create,
     Delete,
+    Clear,
     Setpos,
     Setcamera
 }
@@ -216,6 +234,21 @@ public class Server0
         devices.Remove(delete.id);
 
         return new PacketDeleteReady(1);
+    }
+
+    // вызывается из потока собыйти unity
+    static private PacketClearReady clear(PacketHeader packet)
+    {
+        PacketClear delete = UnityEngine.JsonUtility.FromJson<PacketClear>(packet.json_data);
+
+        foreach (KeyValuePair<int, device> pair in devices) 
+        {
+            pair.Value.Remove();
+        }
+
+        devices.Clear();
+
+        return new PacketClearReady(1);
     }
 
     // вызывается из потока собыйти unity
@@ -464,6 +497,11 @@ public class Server0
                 calldata.manualevent.Set();
                 break;
 
+            case Calltype.Clear:
+                calldata.outputpacket = clear(calldata.inputpacket);
+                calldata.manualevent.Set();
+                break;
+
             case Calltype.Setpos:
                 calldata.outputpacket = setpos(calldata.inputpacket);//async
                 break;
@@ -563,6 +601,12 @@ public class Server0
                     else if (packet.packet == "delete")
                     {
                         send_packet(context, call(Calltype.Delete, packet));
+                        continue;
+
+                    }
+                    else if (packet.packet == "clear")
+                    {
+                        send_packet(context, call(Calltype.Clear, packet));
                         continue;
 
                     }

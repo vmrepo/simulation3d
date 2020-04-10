@@ -106,6 +106,9 @@ def main():
         #send_packet(context, {'packet':'delete', 'id':id1})
         #data = receive_packet(context)
 
+        #send_packet(context, {'packet':'clear'})
+        #data = receive_packet(context)
+
         send_packet(context, {'packet':'end'})
 
 if __name__ == '__main__':
