@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.IO;
+using System.Diagnostics;
 
 public enum Status
 {
@@ -17,8 +18,9 @@ public enum Status
 public class Context
 {
     public TcpClient client;
+    public string buffer;
     public Status status;
-    public Queue<string> packetdeque = new Queue<string>();
+    public Queue<PacketHeader> packetdeque = new Queue<PacketHeader>();
 }
 
 [System.Serializable]
@@ -154,6 +156,15 @@ public class Server0
     static private Mutex stoppedmutex = new Mutex();
     static private bool stopped = false;
     static private TcpListener Listener = null;
+
+    static private void async(Calltype type, PacketHeader inputpacket)
+    {
+        calldata.mutex.WaitOne();
+        calldata.type = type;
+        calldata.inputpacket = inputpacket;
+        calldata.outputpacket = null;
+        calldata.mutex.ReleaseMutex();
+    }
 
     static private Packet call(Calltype type, PacketHeader inputpacket)
     {
@@ -291,53 +302,56 @@ public class Server0
         }
         catch (Exception e)
         {
-            UnityEngine.MonoBehaviour.print("error write log to " + Logfile + " " + e.Message);
+            UnityEngine.MonoBehaviour.print("error write log to " + Logfile + " " + e.ToString());
         }
     }
 
     static private PacketHeader receive_packet(Context context, bool blocking = true)
     {
-        string buf = "";
+        var start = Process.GetCurrentProcess().TotalProcessorTime;
 
         try
         {
             byte[] bytes = new byte[1024];
 
-            if (blocking || context.client.GetStream().DataAvailable)
+            if (context.buffer.Length == 0)
             {
-                while (true)
+                if (blocking || context.client.GetStream().DataAvailable)
                 {
-                    int r = context.client.GetStream().Read(bytes, 0, bytes.Length);
-
-                    if (r > 0)
+                    while (true)
                     {
-                        buf += Encoding.ASCII.GetString(bytes, 0, r);
-                    }
+                        int r = context.client.GetStream().Read(bytes, 0, bytes.Length);
 
-                    if (!context.client.GetStream().DataAvailable)
-                    {
-                        break;
+                        if (r > 0)
+                        {
+                            context.buffer += Encoding.ASCII.GetString(bytes, 0, r);
+                        }
+
+                        if (!context.client.GetStream().DataAvailable)
+                        {
+                            break;
+                        }
                     }
                 }
             }
 
-            int pos = 0;
-
             while (true)
             {
+                int pos = 0;
+
                 string packet = "";
 
-                if (buf.Substring(0, 4) == "json")
+                if (context.buffer.Length > 0 && context.buffer.Substring(pos, 4) == "json")
                 {
-                    int pos1 = buf.IndexOf(":", pos);
+                    int pos1 = context.buffer.IndexOf(":", pos);
 
                     if (pos1 != -1)
                     {
-                        int size = Int32.Parse(buf.Substring(pos + 4, pos1 - pos - 4));
+                        int size = Int32.Parse(context.buffer.Substring(pos + 4, pos1 - pos - 4));
                         pos1 += 1;
                         pos = pos1 + size;
 
-                        while (pos > buf.Length)
+                        while (pos > context.buffer.Length)
                         {
                             if (!context.client.GetStream().DataAvailable)
                             {
@@ -348,11 +362,12 @@ public class Server0
 
                             if (r > 0)
                             {
-                                buf += buf += Encoding.ASCII.GetString(bytes, 0, r);
+                                context.buffer += Encoding.ASCII.GetString(bytes, 0, r);
                             }
                         }
 
-                        packet = buf.Substring(pos1, size);
+                        packet = context.buffer.Substring(pos1, size);
+                        context.buffer = context.buffer.Substring(pos);
                     }
                 }
 
@@ -361,11 +376,29 @@ public class Server0
                     break;
                 }
 
-                context.packetdeque.Enqueue(packet);
+                PacketHeader data = UnityEngine.JsonUtility.FromJson<PacketHeader>(packet);
+
+                if (context.packetdeque.Count > 0 && context.packetdeque.Peek().packet == "setpos" && data.packet == "setpos")
+                {
+                    context.packetdeque.Peek().json_data = packet;
+                }
+                else
+                {
+                    data.json_data = packet;
+                    context.packetdeque.Enqueue(data);
+                }
+
+                var check = Process.GetCurrentProcess().TotalProcessorTime;
+
+                if ((check - start).Milliseconds >= 20)
+                {
+                    break;
+                }
             }
         }
-        catch
+        catch (Exception e)
         {
+            Log(e.ToString());
         }
 
         if (context.packetdeque.Count == 0)
@@ -373,15 +406,12 @@ public class Server0
             return null;
         }
 
-        string json_data = context.packetdeque.Dequeue();
+        if (context.packetdeque.Peek().packet != "setpos")
+        {
+            Log("received " + context.packetdeque.Peek().json_data);
+        }
 
-        PacketHeader data = UnityEngine.JsonUtility.FromJson<PacketHeader>(json_data);
-
-        Log("received " + json_data);
-
-        data.json_data = json_data;
-
-        return data;
+        return context.packetdeque.Dequeue();
     }
 
     static private bool send_packet(Context context, Packet packet)
@@ -426,22 +456,27 @@ public class Server0
         {
             case Calltype.Create:
                 calldata.outputpacket = create(calldata.inputpacket);
+                calldata.manualevent.Set();
                 break;
 
             case Calltype.Delete:
                 calldata.outputpacket = delete(calldata.inputpacket);
+                calldata.manualevent.Set();
                 break;
 
             case Calltype.Setpos:
-                calldata.outputpacket = setpos(calldata.inputpacket);
+                calldata.outputpacket = setpos(calldata.inputpacket);//async
                 break;
 
             case Calltype.Setcamera:
                 calldata.outputpacket = setcamera(calldata.inputpacket);
+                calldata.manualevent.Set();
+                break;
+
+            default:
+                calldata.manualevent.Set();
                 break;
         }
-
-        calldata.manualevent.Set();
 
         calldata.mutex.ReleaseMutex();
     }
@@ -499,6 +534,7 @@ public class Server0
 
         context.client = client;
         context.status = Status.Connected;
+        context.buffer = "";
 
         while (context.status != Status.End)
         {
@@ -532,7 +568,7 @@ public class Server0
                     }
                     else if (packet.packet == "setpos")
                     {
-                        send_packet(context, call(Calltype.Setpos, packet));
+                        async(Calltype.Setpos, packet);
                         continue;
                     }
                     else if (packet.packet == "setcamera")

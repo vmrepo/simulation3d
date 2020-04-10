@@ -99,10 +99,9 @@ def main():
         id2 = data['id']
 
         send_packet(context, {'packet':'setpos', 'id':id1, 'a0':90, 'a1':45, 'a2':90})
-        data = receive_packet(context)
-
+        time.sleep(0.2)
         send_packet(context, {'packet':'setpos', 'id':id2, 'a0':90, 'a1':45, 'a2':90})
-        data = receive_packet(context)
+        time.sleep(0.2)
 
         #send_packet(context, {'packet':'delete', 'id':id1})
         #data = receive_packet(context)
