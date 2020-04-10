@@ -12,6 +12,9 @@ public class configmanipulator2
     public float ChassisHeight = 1.0f;
     public float ChassisWidth = 0.5f;
     public float RotatingplatformMass = 1.0f;
+    public float RotatingplatformACSProportional = 1.5f;
+    public float RotatingplatformACSIntegral = 0.0f;
+    public float RotatingplatformACSDifferential = 1.1f;
     public float RotatingplatformAngle0 = 0.0f;
     public float RotatingplatformAngle1 = 360.0f;
     public float RotatingplatformDiameter = 0.5f;
@@ -19,9 +22,15 @@ public class configmanipulator2
     public float LeverhingeMass = 1.0f;
     public float LeverhingeDiameter = 0.08f;
     public float LeverMass = 1.0f;
+    public float LeverACSProportional = 1.5f;
+    public float LeverACSIntegral = 0.0f;
+    public float LeverACSDifferential = 1.1f;
     public float LeverWidth = 0.03f;
     public float LeverLength = 0.6f;
     public float ArmMass = 1.0f;
+    public float ArmACSProportional = 1.5f;
+    public float ArmACSIntegral = 0.0f;
+    public float ArmACSDifferential = 1.1f;
     public float ArmAngle0 = 60.0f;
     public float ArmAngle1 = 120.0f;
     public float ArmhingeMass = 1.0f;
@@ -113,6 +122,9 @@ public class manipulator2 : device
 
         {
             var b = chassis.GetComponent<chassismanipulator2>();
+            b.drive.Proportional = config.RotatingplatformACSProportional;
+            b.drive.Integral = config.RotatingplatformACSIntegral;
+            b.drive.Differential = config.RotatingplatformACSDifferential;
             b.x = config.x;
             b.y = config.y;
             b.z = config.z;
@@ -139,6 +151,9 @@ public class manipulator2 : device
         {
             lever.GetComponent<Rigidbody>().mass = config.LeverMass;
             var b = lever.GetComponent<levermanipulator2>();
+            b.drive.Proportional = config.ArmACSProportional;
+            b.drive.Integral = config.ArmACSIntegral;
+            b.drive.Differential = config.ArmACSDifferential;
             b.width = config.LeverWidth;
             b.length = config.LeverLength;
             b.angle0 = config.ArmAngle0;
@@ -162,6 +177,9 @@ public class manipulator2 : device
         {
             holder1.GetComponent<Rigidbody>().mass = config.HolderMass;
             var b = holder1.GetComponent<holder1manipulator2>();
+            b.drive.Proportional = config.ArmACSProportional;
+            b.drive.Integral = config.ArmACSIntegral;
+            b.drive.Differential = config.ArmACSDifferential;
             b.width = config.HolderWidth;
             b.length = config.HolderLength;
             b.offset = config.HoldersDistance / 2;
@@ -207,6 +225,9 @@ public class manipulator2 : device
         {
             holder2.GetComponent<Rigidbody>().mass = config.HolderMass;
             var b = holder2.GetComponent<holder2manipulator2>();
+            b.drive.Proportional = config.LeverACSProportional;
+            b.drive.Integral = config.LeverACSIntegral;
+            b.drive.Differential = config.LeverACSDifferential;
             b.width = config.HolderWidth;
             b.length = config.HolderLength;
             b.offset = config.HoldersDistance / 2;

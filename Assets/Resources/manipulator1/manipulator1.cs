@@ -12,6 +12,9 @@ public class configmanipulator1
     public float ChassisHeight = 1.0f;
     public float ChassisWidth = 0.5f;
     public float RotatingplatformMass = 1.0f;
+    public float RotatingplatformACSProportional = 1.5f;
+    public float RotatingplatformACSIntegral = 0.0f;
+    public float RotatingplatformACSDifferential = 1.1f;
     public float RotatingplatformAngle0 = 0.0f;
     public float RotatingplatformAngle1 = 360.0f;
     public float RotatingplatformDiameter = 0.5f;
@@ -20,6 +23,9 @@ public class configmanipulator1
     public float HolderWidth = 0.03f;
     public float HolderLength = 0.14f;
     public float LeverMass = 1.0f;
+    public float LeverACSProportional = 1.5f;
+    public float LeverACSIntegral = 0.0f;
+    public float LeverACSDifferential = 1.1f;
     public float LeverAngle0 = 10.0f;
     public float LeverAngle1 = 60.0f;
     public float LeverhingeMass = 1.0f;
@@ -28,6 +34,9 @@ public class configmanipulator1
     public float LeverWidth = 0.03f;
     public float LeverLength = 0.6f;
     public float ArmMass = 1.0f;
+    public float ArmACSProportional = 1.5f;
+    public float ArmACSIntegral = 0.0f;
+    public float ArmACSDifferential = 1.1f;
     public float ArmAngle0 = 60.0f;
     public float ArmAngle1 = 120.0f;
     public float ArmhingeMass = 1.0f;
@@ -74,6 +83,9 @@ public class manipulator1 : device
 
         {
             var b = chassis.GetComponent<chassis>();
+            b.drive.Proportional = config.RotatingplatformACSProportional;
+            b.drive.Integral = config.RotatingplatformACSIntegral;
+            b.drive.Differential = config.RotatingplatformACSDifferential;
             b.x = config.x;
             b.y = config.y;
             b.z = config.z;
@@ -94,6 +106,9 @@ public class manipulator1 : device
         {
             holder.GetComponent<Rigidbody>().mass = config.HolderMass;
             var b = holder.GetComponent<holder>();
+            b.drive.Proportional = config.LeverACSProportional;
+            b.drive.Integral = config.LeverACSIntegral;
+            b.drive.Differential = config.LeverACSDifferential;
             b.width = config.HolderWidth;
             b.length = config.HolderLength;
             b.angle0 = config.LeverAngle0;
@@ -110,6 +125,9 @@ public class manipulator1 : device
         {
             lever.GetComponent<Rigidbody>().mass = config.LeverMass;
             var b = lever.GetComponent<lever>();
+            b.drive.Proportional = config.ArmACSProportional;
+            b.drive.Integral = config.ArmACSIntegral;
+            b.drive.Differential = config.ArmACSDifferential;
             b.length = config.LeverLength;
             b.width = config.LeverWidth;
             b.angle0 = config.ArmAngle0;

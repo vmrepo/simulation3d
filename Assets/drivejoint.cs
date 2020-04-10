@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class DriveJoint
 {
+    public float Proportional = 1.5f;
+    public float Integral = 0.0f;
+    public float Differential = 1.1f;
+
     private GameObject gameObject = null;
     private bool isInit = false;
     private Quaternion rotationInit = Quaternion.identity;
@@ -140,9 +144,9 @@ public class DriveJoint
         else
             deltaVelocity = Mathf.Abs(deltaVelocity);
 
-        float kP = 1.5f;
-        float kI = 0.0f;
-        float kD = 1.1f;
+        float kP = Proportional;
+        float kI = Integral;
+        float kD = Differential;
 
         JointMotor motor = hinge.motor;
         motor.targetVelocity = -Mathf.Sign(deltaAngle) * 1000;
