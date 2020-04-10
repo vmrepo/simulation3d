@@ -11,23 +11,31 @@ public class configmanipulator2
     public float angle = 0.0f;
     public float ChassisHeight = 1.0f;
     public float ChassisWidth = 0.5f;
+    public float RotatingplatformMass = 1.0f;
     public float RotatingplatformAngle0 = 0.0f;
     public float RotatingplatformAngle1 = 360.0f;
     public float RotatingplatformDiameter = 0.5f;
     public float RotatingplatformWidth = 0.01f * 2;/*mul 2 for cylinder*/
+    public float LeverhingeMass = 1.0f;
     public float LeverhingeDiameter = 0.08f;
+    public float LeverMass = 1.0f;
     public float LeverWidth = 0.03f;
     public float LeverLength = 0.6f;
+    public float ArmMass = 1.0f;
     public float ArmAngle0 = 60.0f;
     public float ArmAngle1 = 120.0f;
+    public float ArmhingeMass = 1.0f;
     public float ArmhingeDiameter = 0.08f;
     public float ArmhingeWidth = 0.0115f * 2;/*mul 2 for cylinder*/
     public float ArmWidth = 0.03f;
     public float ArmLength = 0.9f;
+    public float HolderMass = 1.0f;
     public float HolderWidth = 0.03f;
     public float HolderLength = 0.14f;
     public float HoldersDistance = 2 * 0.0895f;
+    public float WheelhingeMass = 1.0f;
     public float WheelhingeWidth = 0.023f * 2;/*mul 2 for cylinder*/
+    public float WheelMass = 1.0f;
     public float WheelDiameter = 0.32f;
     public float WheelWidth = 0.0115f * 2;/*mul 2 for cylinder*/
     public float WheelLever = 0.12f;
@@ -116,17 +124,20 @@ public class manipulator2 : device
         }
 
         {
+            rotatingplatform.GetComponent<Rigidbody>().mass = config.RotatingplatformMass;
             var b = rotatingplatform.GetComponent<rotatingplatformmanipulator2>();
             b.diameter = config.RotatingplatformDiameter;
             b.width = config.RotatingplatformWidth / 2;/*div 2 for cylinder*/
         }
 
         {
+            leverhinge.GetComponent<Rigidbody>().mass = config.LeverhingeMass;
             var b = leverhinge.GetComponent<leverhingemanipulator2>();
             b.diameter = config.LeverhingeDiameter;
         }
 
         {
+            lever.GetComponent<Rigidbody>().mass = config.LeverMass;
             var b = lever.GetComponent<levermanipulator2>();
             b.width = config.LeverWidth;
             b.length = config.LeverLength;
@@ -135,18 +146,21 @@ public class manipulator2 : device
         }
 
         {
+            armhinge.GetComponent<Rigidbody>().mass = config.ArmhingeMass;
             var b = armhinge.GetComponent<armhingemanipulator2>();
             b.diameter = config.ArmhingeDiameter;
             b.width = config.ArmhingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
+            arm.GetComponent<Rigidbody>().mass = config.ArmMass;
             var b = arm.GetComponent<armmanipulator2>();
             b.width = config.ArmWidth;
             b.length = config.ArmLength;
         }
 
         {
+            holder1.GetComponent<Rigidbody>().mass = config.HolderMass;
             var b = holder1.GetComponent<holder1manipulator2>();
             b.width = config.HolderWidth;
             b.length = config.HolderLength;
@@ -156,12 +170,14 @@ public class manipulator2 : device
         }
 
         {
+            wheelhinge1.GetComponent<Rigidbody>().mass = config.WheelhingeMass;
             var b = wheelhinge1.GetComponent<wheelhinge1manipulator2>();
             b.diameter = config.LeverhingeDiameter;
             b.width = config.WheelhingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
+            wheel1.GetComponent<Rigidbody>().mass = config.WheelMass;
             var b = wheel1.GetComponent<wheel1manipulator2>();
             b.diameter = config.WheelDiameter;
             b.width = config.WheelWidth / 2;/*div 2 for cylinder*/
@@ -169,23 +185,27 @@ public class manipulator2 : device
         }
 
         {
+            leverhinge1.GetComponent<Rigidbody>().mass = config.LeverhingeMass;
             var b = leverhinge1.GetComponent<leverhinge1manipulator2>();
             b.diameter = config.LeverhingeDiameter;
         }
 
         {
+            lever1.GetComponent<Rigidbody>().mass = config.LeverMass;
             var b = lever1.GetComponent<lever1manipulator2>();
             b.width = config.LeverWidth;
             b.length = config.LeverLength;
         }
 
         {
+            armhinge1.GetComponent<Rigidbody>().mass = config.ArmhingeMass;
             var b = armhinge1.GetComponent<armhinge1manipulator2>();
             b.diameter = config.ArmhingeDiameter;
             b.width = config.ArmhingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
+            holder2.GetComponent<Rigidbody>().mass = config.HolderMass;
             var b = holder2.GetComponent<holder2manipulator2>();
             b.width = config.HolderWidth;
             b.length = config.HolderLength;
@@ -195,12 +215,14 @@ public class manipulator2 : device
         }
 
         {
+            wheelhinge2.GetComponent<Rigidbody>().mass = config.WheelhingeMass;
             var b = wheelhinge2.GetComponent<wheelhinge2manipulator2>();
             b.diameter = config.LeverhingeDiameter;
             b.width = config.WheelhingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
+            wheel2.GetComponent<Rigidbody>().mass = config.WheelMass;
             var b = wheel2.GetComponent<wheel2manipulator2>();
             b.diameter = config.WheelDiameter;
             b.width = config.WheelWidth / 2;/*div 2 for cylinder*/
