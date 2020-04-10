@@ -105,7 +105,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
@@ -137,5 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 200470270ee0a5144adb21076172ae42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wheel1object: {fileID: 0}
+  armhinge1object: {fileID: 0}
   diameter: 0.08
   width: 0.0115
