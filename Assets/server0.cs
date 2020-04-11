@@ -20,7 +20,8 @@ public class Context
     public TcpClient client;
     public string buffer;
     public Status status;
-    public Queue<PacketHeader> packetdeque = new Queue<PacketHeader>();
+    public Queue<Packet> packetdeque = new Queue<Packet>();
+    public Dictionary<int, Packet> packetdict = new Dictionary<int, Packet>();
 }
 
 [System.Serializable]
@@ -118,18 +119,6 @@ public class PacketClearReady : Packet
 }
 
 [System.Serializable]
-public class PacketSetposReady : Packet
-{
-    public int ok;
-
-    public PacketSetposReady(int ok_)
-    {
-        packet = "ready";
-        ok = ok_;
-    }
-}
-
-[System.Serializable]
 public class PacketSetcameraReady : Packet
 {
     public int ok;
@@ -156,7 +145,7 @@ public class Calldata
     public Mutex mutex = new Mutex();
     public ManualResetEvent manualevent = new ManualResetEvent(false);
     public Calltype type = Calltype.None;
-    public PacketHeader inputpacket = null;
+    public Packet inputpacket = null;
     public Packet outputpacket = null;
 }
 
@@ -175,7 +164,7 @@ public class Server0
     static private bool stopped = false;
     static private TcpListener Listener = null;
 
-    static private void async(Calltype type, PacketHeader inputpacket)
+    static private void async(Calltype type, Packet inputpacket)
     {
         calldata.mutex.WaitOne();
         calldata.type = type;
@@ -184,7 +173,7 @@ public class Server0
         calldata.mutex.ReleaseMutex();
     }
 
-    static private Packet call(Calltype type, PacketHeader inputpacket)
+    static private Packet call(Calltype type, Packet inputpacket)
     {
         calldata.mutex.WaitOne();
         calldata.type = type;
@@ -252,12 +241,10 @@ public class Server0
     }
 
     // вызывается из потока собыйти unity
-    static private PacketSetposReady setpos(PacketHeader packet)
+    static private void setpos(PacketSetpos setpos)
     {
-        PacketSetpos setpos = UnityEngine.JsonUtility.FromJson<PacketSetpos>(packet.json_data);
-
         if (!devices.ContainsKey(setpos.id))
-            return new PacketSetposReady(0);
+            return;
 
         switch (devices[setpos.id].GetType().ToString())
         {
@@ -280,10 +267,10 @@ public class Server0
                 break;
 
             default:
-                return new PacketSetposReady(0);
+                return;
         }
 
-        return new PacketSetposReady(1);
+        return;
     }
 
     // вызывается из потока собыйти unity
@@ -339,7 +326,7 @@ public class Server0
         }
     }
 
-    static private PacketHeader receive_packet(Context context, bool blocking = true)
+    static private Packet receive_packet(Context context, bool blocking = true)
     {
         var start = Process.GetCurrentProcess().TotalProcessorTime;
 
@@ -409,16 +396,17 @@ public class Server0
                     break;
                 }
 
-                PacketHeader data = UnityEngine.JsonUtility.FromJson<PacketHeader>(packet);
+                PacketHeader header = UnityEngine.JsonUtility.FromJson<PacketHeader>(packet);
+                header.json_data = packet;
 
-                if (context.packetdeque.Count > 0 && context.packetdeque.Peek().packet == "setpos" && data.packet == "setpos")
+                if (header.packet == "setpos")
                 {
-                    context.packetdeque.Peek().json_data = packet;
+                    PacketSetpos setpos = UnityEngine.JsonUtility.FromJson<PacketSetpos>(header.json_data);
+                    context.packetdict[setpos.id] = setpos;
                 }
                 else
                 {
-                    data.json_data = packet;
-                    context.packetdeque.Enqueue(data);
+                    context.packetdeque.Enqueue(header);
                 }
 
                 var check = Process.GetCurrentProcess().TotalProcessorTime;
@@ -436,13 +424,26 @@ public class Server0
 
         if (context.packetdeque.Count == 0)
         {
-            return null;
+            if (context.packetdict.Count == 0)
+            {
+                return null;
+            }
+
+            Random rand = new Random();
+            int r = rand.Next(context.packetdict.Count);
+            int i = 0;
+            foreach (var item in context.packetdict)
+            {
+                if (i == r)
+                {
+                    context.packetdict.Remove(item.Key);
+                    return item.Value;
+                }
+                i++;
+            }
         }
 
-        if (context.packetdeque.Peek().packet != "setpos")
-        {
-            Log("received " + context.packetdeque.Peek().json_data);
-        }
+        Log("received " + ((PacketHeader)context.packetdeque.Peek()).json_data);
 
         return context.packetdeque.Dequeue();
     }
@@ -488,26 +489,26 @@ public class Server0
         switch (calldata.type)
         {
             case Calltype.Create:
-                calldata.outputpacket = create(calldata.inputpacket);
+                calldata.outputpacket = create((PacketHeader)calldata.inputpacket);
                 calldata.manualevent.Set();
                 break;
 
             case Calltype.Delete:
-                calldata.outputpacket = delete(calldata.inputpacket);
+                calldata.outputpacket = delete((PacketHeader)calldata.inputpacket);
                 calldata.manualevent.Set();
                 break;
 
             case Calltype.Clear:
-                calldata.outputpacket = clear(calldata.inputpacket);
+                calldata.outputpacket = clear((PacketHeader)calldata.inputpacket);
                 calldata.manualevent.Set();
                 break;
 
             case Calltype.Setpos:
-                calldata.outputpacket = setpos(calldata.inputpacket);//async
+                setpos((PacketSetpos)calldata.inputpacket);//async
                 break;
 
             case Calltype.Setcamera:
-                calldata.outputpacket = setcamera(calldata.inputpacket);
+                calldata.outputpacket = setcamera((PacketHeader)calldata.inputpacket);
                 calldata.manualevent.Set();
                 break;
 
@@ -586,7 +587,7 @@ public class Server0
 
                 if (context.status == Status.Working)
                 {
-                    PacketHeader packet = receive_packet(context);
+                    Packet packet = receive_packet(context);
 
                     if (packet == null)
                     {
