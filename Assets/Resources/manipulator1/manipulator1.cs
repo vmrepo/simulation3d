@@ -178,9 +178,9 @@ public class manipulator1 : device
         lever = null;
         armhinge = null;
         arm = null;
-}
+    }
 
-public void SetPos0(float angle)
+    public void SetPos0(float angle)
     {
         chassis.GetComponent<chassis>().drive.SetTargetAngle(angle);
     }

@@ -302,9 +302,9 @@ public class manipulator2 : device
         holder2 = null;
         wheelhinge2 = null;
         wheel2 = null;
-}
+    }
 
-public void SetPos0(float angle)
+    public void SetPos0(float angle)
     {
         DriveJoint drive = chassis.GetComponent<chassismanipulator2>().drive;
         drive.SetTargetAngle(angle);

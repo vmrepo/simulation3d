@@ -7,7 +7,7 @@ public class lever1manipulator2 : MonoBehaviour
     public float width = 0.03f;
     public float length = 0.6f;
 
-    public void Init(float angle)
+    public void Init(Vector3 position, float angle)
     {
         {
             //соединённое звено
@@ -25,7 +25,7 @@ public class lever1manipulator2 : MonoBehaviour
 
         //поворачиваем вокруг вертикальной оси
         //именно здесь т.к. эта цепочка звеньев смыкается с другой уже инициализированной цепочкой звеньев
-        transform.RotateAround(Vector3.zero, Vector3.down, angle);
+        transform.RotateAround(position, Vector3.down, angle);
 
         {
             //ещё соединённое звено (из другой цепочки звеньев)

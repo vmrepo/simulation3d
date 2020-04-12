@@ -11,7 +11,7 @@ public class levermanipulator2 : MonoBehaviour
     public float angle0 = 60.0f;
     public float angle1 = 120.0f;
 
-    public void Init(float angle)
+    public void Init(Vector3 position, float angle)
     {
         //следующее звено
         HingeJoint hinge = GetComponent<HingeJoint>();
@@ -31,10 +31,10 @@ public class levermanipulator2 : MonoBehaviour
         drive.SetTargetAngle(-90 + angle0);
 
         //инициализируем следующие звенья
-        nextbehavior.Init(angle);
+        nextbehavior.Init(position, angle);
 
         //поворачиваем вокруг вертикальной оси
-        transform.RotateAround(Vector3.zero, Vector3.down, angle);
+        transform.RotateAround(position, Vector3.down, angle);
     }
 
     // Start is called before the first frame update

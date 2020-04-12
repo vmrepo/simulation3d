@@ -8,7 +8,7 @@ public class armhinge : MonoBehaviour
     public float width = 0.0115f;
     //remember for cylinder, width (y - scale) is half of real
 
-    public void Init(float angle)
+    public void Init(Vector3 position, float angle)
     {
         //следующее звено
         FixedJoint fixedjoint = GetComponent<FixedJoint>();
@@ -23,10 +23,10 @@ public class armhinge : MonoBehaviour
         fixedjoint.anchor = new Vector3(0.0f, 0.5f, 0.0f);
 
         //инициализируем следующие звенья
-        nextbehavior.Init(angle);
+        nextbehavior.Init(position, angle);
 
         //поворачиваем вокруг вертикальной оси
-        transform.RotateAround(Vector3.zero, Vector3.down, angle);
+        transform.RotateAround(position, Vector3.down, angle);
     }
 
     // Start is called before the first frame update

@@ -7,7 +7,7 @@ public class armmanipulator2 : MonoBehaviour
     public float width = 0.03f;
     public float length = 0.9f;
 
-    public void Init(float angle)
+    public void Init(Vector3 position, float angle)
     {
         //следующее звено
         HingeJoint hinge = GetComponent<HingeJoint>();
@@ -22,10 +22,10 @@ public class armmanipulator2 : MonoBehaviour
         hinge.anchor = new Vector3(0.0f, -0.5f - nextbehavior.diameter / length / 2, 0.0f);
 
         //инициализируем следующие звенья
-        nextbehavior.Init(angle);
+        nextbehavior.Init(position, angle);
 
         //поворачиваем вокруг вертикальной оси
-        transform.RotateAround(Vector3.zero, Vector3.down, angle);
+        transform.RotateAround(position, Vector3.down, angle);
     }
 
     // Start is called before the first frame update

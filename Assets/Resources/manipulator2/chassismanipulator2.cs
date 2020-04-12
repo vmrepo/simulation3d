@@ -57,10 +57,10 @@ public class chassismanipulator2 : MonoBehaviour
         drive.SetTargetAngle(angle0);
 
         //инициализируем следующие звенья
-        nextbehavior.Init(angle);
+        nextbehavior.Init(position, angle);
 
         //поворачиваем вокруг вертикальной оси
-        transform.RotateAround(Vector3.zero, Vector3.down, angle);
+        transform.RotateAround(position, Vector3.down, angle);
     }
 
     // Start is called before the first frame update
