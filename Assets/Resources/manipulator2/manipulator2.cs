@@ -9,6 +9,7 @@ public class configmanipulator2
     public float y = 0.0f;
     public float z = 0.0f;
     public float angle = 0.0f;
+    public bool UseGravity = false;
     public float ChassisHeight = 1.0f;
     public float ChassisWidth = 0.5f;
     public float RotatingplatformMass = 1.0f;
@@ -249,6 +250,21 @@ public class manipulator2 : device
             b.width = config.WheelWidth / 2;/*div 2 for cylinder*/
         }
 
+        chassis.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        rotatingplatform.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        leverhinge.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        lever.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        armhinge.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        arm.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        holder1.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        wheelhinge1.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        wheel1.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        leverhinge1.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        lever1.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        holder2.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        wheelhinge2.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        wheel2.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+
         chassis.GetComponent<chassismanipulator2>().Init();
     }
 
@@ -326,6 +342,12 @@ public void SetPos0(float angle)
 
     public float GetPos2()
     {
-        return lever.GetComponent<levermanipulator2>().drive.GetTargetAngle();
+        float angle = lever.GetComponent<levermanipulator2>().drive.GetTargetAngle() + 90;
+
+        angle = angle % 360;
+        if (angle < 0)
+            angle += 360;
+
+        return angle;
     }
 }

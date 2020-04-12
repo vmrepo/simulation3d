@@ -9,6 +9,7 @@ public class configmanipulator1
     public float y = 0.0f;
     public float z = 0.0f;
     public float angle = 0.0f;
+    public bool UseGravity = false;
     public float ChassisHeight = 1.0f;
     public float ChassisWidth = 0.5f;
     public float RotatingplatformMass = 1.0f;
@@ -147,6 +148,14 @@ public class manipulator1 : device
             b.width = config.ArmWidth;
             b.length = config.ArmLength;
         }
+
+        chassis.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        rotatingplatform.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        holder.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        leverhinge.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        lever.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        armhinge.GetComponent<Rigidbody>().useGravity = config.UseGravity;
+        arm.GetComponent<Rigidbody>().useGravity = config.UseGravity;
 
         chassis.GetComponent<chassis>().Init();
     }
