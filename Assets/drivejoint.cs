@@ -149,9 +149,9 @@ public class DriveJoint
         float kD = Differential;
 
         JointMotor motor = hinge.motor;
-        motor.targetVelocity = -Mathf.Sign(deltaAngle) * 1000000000;
+        motor.targetVelocity = -Mathf.Sign(deltaAngle) * 1000;
         motor.force = kP * Mathf.Abs(deltaAngle) + kI * deltaSAngle + kD * deltaVelocity;
-        motor.freeSpin = true;
+        motor.freeSpin = false;
         hinge.motor = motor;
         hinge.useMotor = true;
     }
