@@ -50,6 +50,17 @@ public class rotatingplatformmanipulator2 : MonoBehaviour
         transform.RotateAround(position, Vector3.down, angle);
     }
 
+    public void Kinematic(float angle0delta, float angle1delta, float angle2delta)
+    {
+        transform.RotateAround(transform.position, Vector3.up, angle0delta);
+
+        GameObject next1 = GetComponents<FixedJoint>()[1].connectedBody.gameObject;
+        next1.GetComponent<holder2manipulator2>().Kinematic(transform.position, Vector3.up, angle0delta, angle1delta, angle2delta);
+
+        GameObject next0 = GetComponents<FixedJoint>()[0].connectedBody.gameObject;
+        next0.GetComponent<holder1manipulator2>().Kinematic(transform.position, Vector3.up, angle0delta, angle1delta, angle2delta);
+    }
+
     // Start is called before the first frame update
     void Start()
     {

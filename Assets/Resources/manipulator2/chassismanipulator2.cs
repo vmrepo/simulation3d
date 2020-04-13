@@ -53,14 +53,20 @@ public class chassismanipulator2 : MonoBehaviour
 
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
-        drive.SetAngleLimits(angle0, angle1);
-        drive.SetTargetAngle(angle0);
+        drive.AngleRange.SetLimits(angle0, angle1);
+        drive.AngleRange.SetTarget(angle0);
 
         //инициализируем следующие звенья
         nextbehavior.Init(position, angle);
 
         //поворачиваем вокруг вертикальной оси
         transform.RotateAround(position, Vector3.down, angle);
+    }
+
+    public void Kinematic(float angle0delta, float angle1delta, float angle2delta)
+    {
+        GameObject next = GetComponent<HingeJoint>().connectedBody.gameObject;
+        next.GetComponent<rotatingplatformmanipulator2>().Kinematic(angle0delta, angle1delta, angle2delta);
     }
 
     // Start is called before the first frame update
@@ -72,6 +78,9 @@ public class chassismanipulator2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        drive.Update();
+        if (!GetComponent<HingeJoint>().connectedBody.GetComponent<Rigidbody>().isKinematic)
+        {
+            drive.Update();
+        }
     }
 }

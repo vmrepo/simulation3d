@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DriveJoint
 {
+    public AngleRange AngleRange = new AngleRange();
     public float Proportional = 1.5f;
     public float Integral = 0.0f;
     public float Differential = 1.1f;
@@ -12,97 +13,10 @@ public class DriveJoint
     private bool isInit = false;
     private Quaternion rotationInit = Quaternion.identity;
     private float deltaSAngle = 0.0f;
-    private float targetangle = 0;
-    private float downlimit = 0;
-    private float uplimit = 360;
 
     public void AttachGameObject(GameObject obj)
     {
         gameObject = obj;
-    }
-
-    private float checkrange(float angle)
-    {
-        //приводим к даиапазону [0, 360)
-
-        angle = angle % 360;
-        if (angle < 0)
-            angle += 360;
-
-        return angle;
-    }
-
-    private void checklimits()
-    {
-        //контролируем ограничение для targetangle
-
-        if (downlimit < uplimit)
-        {
-            if (targetangle < downlimit || uplimit <= targetangle)
-            {
-                if (DistanceAngle(targetangle, downlimit) < DistanceAngle(targetangle, uplimit))
-                    targetangle = downlimit < 360 ? downlimit : 0;
-                else
-                    targetangle = uplimit < 360 ? uplimit : 0;
-            }
-        }
-        else
-        {
-            if (targetangle < downlimit && uplimit <= targetangle)
-            {
-                if (DistanceAngle(targetangle, downlimit) < DistanceAngle(targetangle, uplimit))
-                    targetangle = downlimit < 360 ? downlimit : 0;
-                else
-                    targetangle = uplimit < 360 ? uplimit : 0;
-            }
-        }
-    }
-
-    public bool SetAngleLimits(float angle1, float angle2)
-    {
-        downlimit = checkrange(angle1);
-        uplimit = checkrange(angle2);
-
-        if (uplimit == 0)
-            uplimit = 360;
-
-        checklimits();
-
-        return true;
-    }
-
-    public float GetAngleDownLimit()
-    {
-        return downlimit;
-    }
-
-    public float GetAngleUpLimit()
-    {
-        return uplimit;
-    }
-
-    public float DistanceAngle(float angle1, float angle2)
-    {
-        angle1 = checkrange(angle1);
-        angle2 = checkrange(angle2);
-
-        float distance = Mathf.Abs(angle2 - angle1);
-
-        if (distance > 180)
-            distance = 360 - distance;
-
-        return distance;
-    }
-
-    public void SetTargetAngle(float angle)
-    {
-        targetangle = checkrange(angle);
-        checklimits();
-    }
-
-    public float GetTargetAngle()
-    {
-        return targetangle;
     }
 
     public void Update()
@@ -125,7 +39,7 @@ public class DriveJoint
         Vector3 axis = new Vector3(0, 1, 0);//cylinder axis
         float angle = Vector3.Dot(rotation.eulerAngles, axis);
 
-        float deltaAngle = targetangle - angle;
+        float deltaAngle = AngleRange.GetTarget() - angle;
 
         if (deltaAngle < -180)
             deltaAngle = 360 + deltaAngle;

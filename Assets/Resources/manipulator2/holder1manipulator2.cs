@@ -29,14 +29,21 @@ public class holder1manipulator2 : MonoBehaviour
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
         //нужно согласовать с углами holder2 и lever: A = Aholder2 + Alever
-        drive.SetAngleLimits(-90 + angle0, -90 + angle1);
-        drive.SetTargetAngle(-90 + angle0);
+        drive.AngleRange.SetLimits(-90 + angle0, -90 + angle1);
+        drive.AngleRange.SetTarget(-90 + angle0);
 
         //инициализируем следующие звенья
         nextbehavior.Init(position, angle);
 
         //поворачиваем вокруг вертикальной оси
         transform.RotateAround(position, Vector3.down, angle);
+    }
+
+    public void Kinematic(Vector3 position0, Vector3 axis0, float angle0delta, float angle1delta, float angle2delta)
+    {
+        transform.RotateAround(position0, axis0, angle0delta);
+        GameObject next = GetComponent<HingeJoint>().connectedBody.gameObject;
+        next.GetComponent<wheelhinge1manipulator2>().Kinematic(position0, axis0, angle0delta, angle1delta, angle2delta);
     }
 
     // Start is called before the first frame update
@@ -48,6 +55,9 @@ public class holder1manipulator2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        drive.Update();
+        if (!GetComponent<Rigidbody>().isKinematic)
+	    {
+	        drive.Update();
+	    }
     }
 }

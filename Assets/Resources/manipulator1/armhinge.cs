@@ -29,6 +29,15 @@ public class armhinge : MonoBehaviour
         transform.RotateAround(position, Vector3.down, angle);
     }
 
+    public void Kinematic(Vector3 position0, Vector3 axis0, float angle0delta, Vector3 position1, Vector3 axis1, float angle1delta, float angle2delta)
+    {
+        transform.RotateAround(position0, axis0, angle0delta);
+        transform.RotateAround(position1, axis1, angle1delta);
+        transform.RotateAround(transform.position, transform.rotation * Vector3.down, angle2delta);
+        GameObject next = GetComponent<FixedJoint>().connectedBody.gameObject;
+        next.GetComponent<arm>().Kinematic(position0, axis0, angle0delta, position1, axis1, angle1delta, transform.position, transform.rotation * Vector3.down, angle2delta);
+    }
+
     // Start is called before the first frame update
     void Start()
     {

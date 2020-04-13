@@ -29,6 +29,13 @@ public class rotatingplatform : MonoBehaviour
         transform.RotateAround(position, Vector3.down, angle);
     }
 
+    public void Kinematic(float angle0delta, float angle1delta, float angle2delta)
+    {
+        GameObject next = GetComponent<FixedJoint>().connectedBody.gameObject;
+        transform.RotateAround(transform.position, Vector3.up, angle0delta);
+        next.GetComponent<holder>().Kinematic(transform.position, Vector3.up, angle0delta, angle1delta, angle2delta);
+    }
+
     // Start is called before the first frame update
     void Start()
     {
