@@ -31,8 +31,8 @@ public class rotatingplatform : MonoBehaviour
 
     public void Kinematic(float angle0delta, float angle1delta, float angle2delta)
     {
-        GameObject next = GetComponent<FixedJoint>().connectedBody.gameObject;
         transform.RotateAround(transform.position, Vector3.up, angle0delta);
+        GameObject next = GetComponent<FixedJoint>().connectedBody.gameObject;
         next.GetComponent<holder>().Kinematic(transform.position, Vector3.up, angle0delta, angle1delta, angle2delta);
     }
 

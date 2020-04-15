@@ -251,18 +251,14 @@ public class Server0
             case "manipulator1":
                 {
                     manipulator1 manipulator = (manipulator1)devices[setpos.id];
-                    manipulator.SetPos0(setpos.a0);
-                    manipulator.SetPos1(setpos.a1);
-                    manipulator.SetPos2(setpos.a2);
+                    manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2);
                 }
                 break;
 
             case "manipulator2":
                 {
                     manipulator2 manipulator = (manipulator2)devices[setpos.id];
-                    manipulator.SetPos0(setpos.a0);
-                    manipulator.SetPos1(setpos.a1);
-                    manipulator.SetPos2(setpos.a2);
+                    manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2);
                 }
                 break;
 
@@ -505,6 +501,7 @@ public class Server0
 
             case Calltype.Setpos:
                 setpos((PacketSetpos)calldata.inputpacket);//async
+                calldata.type = Calltype.None;
                 break;
 
             case Calltype.Setcamera:

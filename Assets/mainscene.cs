@@ -44,7 +44,6 @@ public class mainscene : MonoBehaviour
 
         manipulator1 = new manipulator2();
         manipulator1.config.x = 2;
-        manipulator1.config.angle = 180;
         manipulator1.config.Kinematic = true;
         manipulator1.Place();*/
 
@@ -57,65 +56,47 @@ public class mainscene : MonoBehaviour
     {
         Server0.Update();
 
-        /*if (Input.GetKeyDown(KeyCode.F10))
+        if (Input.GetKeyDown(KeyCode.F10))
         {
             Application.Quit();
         }
 
-        float delta = 10.0f;
+        /*float delta = 10.0f;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            manipulator0.SetPos0(manipulator0.GetPos0() - delta);
-            manipulator1.SetPos0(manipulator1.GetPos0() - delta);
-
-            manipulator0.SetKinematic(manipulator0.GetKinematicAngle0() - delta, manipulator0.GetKinematicAngle1(), manipulator0.GetKinematicAngle2());
-            manipulator1.SetKinematic(manipulator1.GetKinematicAngle0() - delta, manipulator1.GetKinematicAngle1(), manipulator1.GetKinematicAngle2());
+            manipulator0.SetPos(manipulator0.GetPos0() - delta, manipulator0.GetPos1(), manipulator0.GetPos2());
+            manipulator1.SetPos(manipulator1.GetPos0() - delta, manipulator1.GetPos1(), manipulator1.GetPos2());
         }
 
         if (Input.GetKeyDown(KeyCode.W))
         {
-            manipulator0.SetPos0(manipulator0.GetPos0() + delta);
-            manipulator1.SetPos0(manipulator1.GetPos0() + delta);
-
-            manipulator0.SetKinematic(manipulator0.GetKinematicAngle0() + delta, manipulator0.GetKinematicAngle1(), manipulator0.GetKinematicAngle2());
-            manipulator1.SetKinematic(manipulator1.GetKinematicAngle0() + delta, manipulator1.GetKinematicAngle1(), manipulator1.GetKinematicAngle2());
+            manipulator0.SetPos(manipulator0.GetPos0() + delta, manipulator0.GetPos1(), manipulator0.GetPos2());
+            manipulator1.SetPos(manipulator1.GetPos0() + delta, manipulator1.GetPos1(), manipulator1.GetPos2());
         }
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            manipulator0.SetPos1(manipulator0.GetPos1() - delta);
-            manipulator1.SetPos1(manipulator1.GetPos1() - delta);
-
-            manipulator0.SetKinematic(manipulator0.GetKinematicAngle0(), manipulator0.GetKinematicAngle1() - delta, manipulator0.GetKinematicAngle2());
-            manipulator1.SetKinematic(manipulator1.GetKinematicAngle0(), manipulator1.GetKinematicAngle1() - delta, manipulator1.GetKinematicAngle2());
+            manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1() - delta, manipulator0.GetPos2());
+            manipulator1.SetPos(manipulator1.GetPos0(), manipulator1.GetPos1() - delta, manipulator1.GetPos2());
         }
 
         if (Input.GetKeyDown(KeyCode.S))
         {
-            manipulator0.SetPos1(manipulator0.GetPos1() + delta);
-            manipulator1.SetPos1(manipulator1.GetPos1() + delta);
-
-            manipulator0.SetKinematic(manipulator0.GetKinematicAngle0(), manipulator0.GetKinematicAngle1() + delta, manipulator0.GetKinematicAngle2());
-            manipulator1.SetKinematic(manipulator1.GetKinematicAngle0(), manipulator1.GetKinematicAngle1() + delta, manipulator1.GetKinematicAngle2());
+            manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1() + delta, manipulator0.GetPos2());
+            manipulator1.SetPos(manipulator1.GetPos0(), manipulator1.GetPos1() + delta, manipulator1.GetPos2());
         }
 
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            manipulator0.SetPos2(manipulator0.GetPos2() - delta);
-            manipulator1.SetPos2(manipulator1.GetPos2() - delta);
-
-            manipulator0.SetKinematic(manipulator0.GetKinematicAngle0(), manipulator0.GetKinematicAngle1(), manipulator0.GetKinematicAngle2() - delta);
-            manipulator1.SetKinematic(manipulator1.GetKinematicAngle0(), manipulator1.GetKinematicAngle1(), manipulator1.GetKinematicAngle2() - delta);
+            manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1(), manipulator0.GetPos2() - delta);
+            manipulator1.SetPos(manipulator1.GetPos0(), manipulator1.GetPos1(), manipulator1.GetPos2() - delta);
         }
 
         if (Input.GetKeyDown(KeyCode.X))
         {
-            manipulator0.SetPos2(manipulator0.GetPos2() + delta);
-            manipulator1.SetPos2(manipulator1.GetPos2() + delta);
-
-            manipulator0.SetKinematic(manipulator0.GetKinematicAngle0(), manipulator0.GetKinematicAngle1(), manipulator0.GetKinematicAngle2() + delta);
-            manipulator1.SetKinematic(manipulator1.GetKinematicAngle0(), manipulator1.GetKinematicAngle1(), manipulator1.GetKinematicAngle2() + delta);
+            manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1(), manipulator0.GetPos2() + delta);
+            manipulator1.SetPos(manipulator1.GetPos0(), manipulator1.GetPos1(), manipulator1.GetPos2() + delta);
         }*/
     }
 

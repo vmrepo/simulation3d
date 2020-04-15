@@ -287,14 +287,14 @@ public class manipulator2 : device
 
         chassis.GetComponent<chassismanipulator2>().Init();
 
-        kinematicanglerange0.SetLimits(config.RotatingplatformAngle0, config.RotatingplatformAngle1);
-        kinematicanglerange1.SetLimits(config.LeverAngle0, config.LeverAngle1);
-        kinematicanglerange2.SetLimits(-90 + config.ArmAngle0, -90 + config.ArmAngle1);
-        kinematicanglerange0.SetTarget(config.RotatingplatformAngle0);
-        kinematicanglerange1.SetTarget(config.LeverAngle0);
-        kinematicanglerange2.SetTarget(-90 + config.ArmAngle0);
         if (config.Kinematic)
         {
+            kinematicanglerange0.SetLimits(config.RotatingplatformAngle0, config.RotatingplatformAngle1);
+            kinematicanglerange1.SetLimits(config.LeverAngle0, config.LeverAngle1);
+            kinematicanglerange2.SetLimits(-90 + config.ArmAngle0, -90 + config.ArmAngle1);
+            kinematicanglerange0.SetTarget(config.RotatingplatformAngle0);
+            kinematicanglerange1.SetTarget(config.LeverAngle0);
+            kinematicanglerange2.SetTarget(-90 + config.ArmAngle0);
             chassis.GetComponent<chassismanipulator2>().Kinematic(kinematicanglerange0.GetTarget(), kinematicanglerange1.GetTarget(), kinematicanglerange2.GetTarget());
         }
     }
@@ -335,86 +335,75 @@ public class manipulator2 : device
         wheel2 = null;
     }
 
-    public void SetKinematic(float angle0, float angle1, float angle2)
+    public void SetPos(float angle0, float angle1, float angle2)
     {
-        float angle0delta = kinematicanglerange0.GetTarget();
-        float angle1delta = kinematicanglerange1.GetTarget();
-        float angle2delta = kinematicanglerange2.GetTarget();
-
-        kinematicanglerange0.SetTarget(angle0);
-        kinematicanglerange1.SetTarget(angle1);
-        kinematicanglerange2.SetTarget(-90 + angle2);
-
-        angle0delta = kinematicanglerange0.GetTarget() - angle0delta;
-        angle1delta = kinematicanglerange1.GetTarget() - angle1delta;
-        angle2delta = kinematicanglerange2.GetTarget() - angle2delta;
-
         if (config.Kinematic)
         {
+            float angle0delta = kinematicanglerange0.GetTarget();
+            float angle1delta = kinematicanglerange1.GetTarget();
+            float angle2delta = kinematicanglerange2.GetTarget();
+
+            kinematicanglerange0.SetTarget(angle0);
+            kinematicanglerange1.SetTarget(angle1);
+            kinematicanglerange2.SetTarget(-90 + angle2);
+
+            angle0delta = kinematicanglerange0.GetTarget() - angle0delta;
+            angle1delta = kinematicanglerange1.GetTarget() - angle1delta;
+            angle2delta = kinematicanglerange2.GetTarget() - angle2delta;
+
             chassis.GetComponent<chassismanipulator2>().Kinematic(angle0delta, angle1delta, angle2delta);
         }
-    }
+        else
+        {
+            DriveJoint drive0 = chassis.GetComponent<chassismanipulator2>().drive;
+            DriveJoint drive1 = lever.GetComponent<levermanipulator2>().drive;
+            DriveJoint drive2 = holder1.GetComponent<holder1manipulator2>().drive;
+            DriveJoint drive3 = holder2.GetComponent<holder2manipulator2>().drive;
 
-    public float GetKinematicAngle0()
-    {
-        return kinematicanglerange0.GetTarget();
-    }
-
-    public float GetKinematicAngle1()
-    {
-        return kinematicanglerange1.GetTarget();
-    }
-
-    public float GetKinematicAngle2()
-    {
-        float angle = kinematicanglerange2.GetTarget() + 90;
-
-        angle = angle % 360;
-        if (angle < 0)
-            angle += 360;
-
-        return angle;
-    }
-
-    public void SetPos0(float angle)
-    {
-        DriveJoint drive = chassis.GetComponent<chassismanipulator2>().drive;
-        drive.AngleRange.SetTarget(angle);
-    }
-
-    public void SetPos1(float angle)
-    {
-        DriveJoint drive = lever.GetComponent<levermanipulator2>().drive;
-        DriveJoint drive1 = holder1.GetComponent<holder1manipulator2>().drive;
-        DriveJoint drive2 = holder2.GetComponent<holder2manipulator2>().drive;
-
-        drive2.AngleRange.SetTarget(angle);
-        drive1.AngleRange.SetTarget(drive2.AngleRange.GetTarget() + drive.AngleRange.GetTarget());
-    }
-
-    public void SetPos2(float angle)
-    {
-        DriveJoint drive = lever.GetComponent<levermanipulator2>().drive;
-        DriveJoint drive1 = holder1.GetComponent<holder1manipulator2>().drive;
-        DriveJoint drive2 = holder2.GetComponent<holder2manipulator2>().drive;
-
-        drive.AngleRange.SetTarget(-90 + angle);
-        drive1.AngleRange.SetTarget(drive2.AngleRange.GetTarget() + drive.AngleRange.GetTarget());
+            drive0.AngleRange.SetTarget(angle0);
+            drive3.AngleRange.SetTarget(angle1);
+            drive2.AngleRange.SetTarget(drive3.AngleRange.GetTarget() + drive1.AngleRange.GetTarget());
+            drive1.AngleRange.SetTarget(-90 + angle2);
+            drive2.AngleRange.SetTarget(drive3.AngleRange.GetTarget() + drive1.AngleRange.GetTarget());
+        }
     }
 
     public float GetPos0()
     {
-        return chassis.GetComponent<chassismanipulator2>().drive.AngleRange.GetTarget();
+        if (config.Kinematic)
+        {
+            return kinematicanglerange0.GetTarget();
+        }
+        else
+        {
+            return chassis.GetComponent<chassismanipulator2>().drive.AngleRange.GetTarget();
+        }
     }
 
     public float GetPos1()
     {
-        return holder2.GetComponent<holder2manipulator2>().drive.AngleRange.GetTarget();
+        if (config.Kinematic)
+        {
+            return kinematicanglerange1.GetTarget();
+        }
+        else
+        {
+            return holder2.GetComponent<holder2manipulator2>().drive.AngleRange.GetTarget();
+        }
     }
 
     public float GetPos2()
     {
-        float angle = lever.GetComponent<levermanipulator2>().drive.AngleRange.GetTarget() + 90;
+        float angle;
+
+        if (config.Kinematic)
+        {
+            angle = kinematicanglerange2.GetTarget() + 90;
+        }
+        else
+        {
+            angle = lever.GetComponent<levermanipulator2>().drive.AngleRange.GetTarget() + 90;
+        }
 
         angle = angle % 360;
         if (angle < 0)
