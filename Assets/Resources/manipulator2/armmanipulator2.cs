@@ -28,12 +28,13 @@ public class armmanipulator2 : MonoBehaviour
         transform.RotateAround(position, Vector3.down, angle);
     }
 
-    public void Kinematic(Vector3 position0, Vector3 axis0, float angle0delta, Vector3 position1, Vector3 axis1, float angle1delta, float angle2delta)
+    public void Kinematic(Vector3 position0, Vector3 axis0, float angle0delta, Vector3 position1, Vector3 axis1, float angle1delta, Vector3 position2, Vector3 axis2, float angle2delta)
     {
         transform.RotateAround(position0, axis0, angle0delta);
         transform.RotateAround(position1, axis1, angle1delta);
+        transform.RotateAround(position2, axis2, angle2delta);
         GameObject next = GetComponent<HingeJoint>().connectedBody.gameObject;
-        next.GetComponent<armhinge1manipulator2>().Kinematic(position0, axis0, angle0delta, position1, axis1, angle1delta, angle2delta);
+        next.GetComponent<armhinge1manipulator2>().Kinematic(position0, axis0, angle0delta, position1, axis1, angle1delta, position2, axis2, angle2delta);
     }
 
     // Start is called before the first frame update

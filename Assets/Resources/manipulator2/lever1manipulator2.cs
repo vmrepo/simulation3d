@@ -41,7 +41,10 @@ public class lever1manipulator2 : MonoBehaviour
     public void Kinematic(Vector3 position0, Vector3 axis0, float angle0delta, Vector3 position1, Vector3 axis1, float angle1delta, float angle2delta)
     {
         transform.RotateAround(position0, axis0, angle0delta);
-        transform.RotateAround(position1, axis1, angle1delta /*- angle2delta*/);
+        transform.RotateAround(position1, axis1, angle1delta);
+        Vector3 vec0 = GetComponents<HingeJoint>()[0].connectedBody.transform.position;
+        Vector3 vec1 = GetComponents<HingeJoint>()[1].connectedBody.transform.position;
+        transform.position = vec0 + (vec1 - vec0) / 2;
     }
 
     // Start is called before the first frame update

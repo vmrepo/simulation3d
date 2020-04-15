@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class mainscene : MonoBehaviour
 {
-    private manipulator1 manipulator0 = null;
-    private manipulator2 manipulator1 = null;
+    /*private manipulator1 manipulator0 = null;
+    private manipulator2 manipulator1 = null;*/
 
     // Start is called before the first frame update
     void Start()
@@ -37,8 +37,7 @@ public class mainscene : MonoBehaviour
         }
 
 #endif
-
-        manipulator0 = new manipulator1();
+        /*manipulator0 = new manipulator1();
         manipulator0.config.x = -2;
         manipulator0.config.Kinematic = false;
         manipulator0.Place();
@@ -47,7 +46,7 @@ public class mainscene : MonoBehaviour
         manipulator1.config.x = 2;
         manipulator1.config.angle = 180;
         manipulator1.config.Kinematic = true;
-        manipulator1.Place();
+        manipulator1.Place();*/
 
         GameObject.Find("Main Camera").GetComponent<camera>().targetposition = new Vector3(0, 0, 0);
         Server0.Start();
@@ -58,7 +57,7 @@ public class mainscene : MonoBehaviour
     {
         Server0.Update();
 
-        if (Input.GetKeyDown(KeyCode.F10))
+        /*if (Input.GetKeyDown(KeyCode.F10))
         {
             Application.Quit();
         }
@@ -107,6 +106,7 @@ public class mainscene : MonoBehaviour
             manipulator1.SetPos2(manipulator1.GetPos2() - delta);
 
             manipulator0.SetKinematic(manipulator0.GetKinematicAngle0(), manipulator0.GetKinematicAngle1(), manipulator0.GetKinematicAngle2() - delta);
+            manipulator1.SetKinematic(manipulator1.GetKinematicAngle0(), manipulator1.GetKinematicAngle1(), manipulator1.GetKinematicAngle2() - delta);
         }
 
         if (Input.GetKeyDown(KeyCode.X))
@@ -115,7 +115,8 @@ public class mainscene : MonoBehaviour
             manipulator1.SetPos2(manipulator1.GetPos2() + delta);
 
             manipulator0.SetKinematic(manipulator0.GetKinematicAngle0(), manipulator0.GetKinematicAngle1(), manipulator0.GetKinematicAngle2() + delta);
-        }
+            manipulator1.SetKinematic(manipulator1.GetKinematicAngle0(), manipulator1.GetKinematicAngle1(), manipulator1.GetKinematicAngle2() + delta);
+        }*/
     }
 
     void OnApplicationQuit()

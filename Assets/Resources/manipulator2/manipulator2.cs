@@ -289,10 +289,10 @@ public class manipulator2 : device
 
         kinematicanglerange0.SetLimits(config.RotatingplatformAngle0, config.RotatingplatformAngle1);
         kinematicanglerange1.SetLimits(config.LeverAngle0, config.LeverAngle1);
-        kinematicanglerange2.SetLimits(config.ArmAngle0, config.ArmAngle1);
+        kinematicanglerange2.SetLimits(-90 + config.ArmAngle0, -90 + config.ArmAngle1);
         kinematicanglerange0.SetTarget(config.RotatingplatformAngle0);
         kinematicanglerange1.SetTarget(config.LeverAngle0);
-        kinematicanglerange2.SetTarget(config.ArmAngle0);
+        kinematicanglerange2.SetTarget(-90 + config.ArmAngle0);
         if (config.Kinematic)
         {
             chassis.GetComponent<chassismanipulator2>().Kinematic(kinematicanglerange0.GetTarget(), kinematicanglerange1.GetTarget(), kinematicanglerange2.GetTarget());
@@ -343,7 +343,7 @@ public class manipulator2 : device
 
         kinematicanglerange0.SetTarget(angle0);
         kinematicanglerange1.SetTarget(angle1);
-        kinematicanglerange2.SetTarget(angle2);
+        kinematicanglerange2.SetTarget(-90 + angle2);
 
         angle0delta = kinematicanglerange0.GetTarget() - angle0delta;
         angle1delta = kinematicanglerange1.GetTarget() - angle1delta;
@@ -367,7 +367,13 @@ public class manipulator2 : device
 
     public float GetKinematicAngle2()
     {
-        return kinematicanglerange2.GetTarget();
+        float angle = kinematicanglerange2.GetTarget() + 90;
+
+        angle = angle % 360;
+        if (angle < 0)
+            angle += 360;
+
+        return angle;
     }
 
     public void SetPos0(float angle)
