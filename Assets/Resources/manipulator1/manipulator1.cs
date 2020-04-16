@@ -10,6 +10,7 @@ public class configmanipulator1
     public float z = 0.0f;
     public float angle = 0.0f;
     public bool Kinematic = false;
+    public float KinematicAngularVelocity = 100.0f;
     public bool UseGravity = false;
     public float ChassisHeight = 1.0f;
     public float ChassisWidth = 0.5f;
@@ -180,6 +181,7 @@ public class manipulator1 : device
             kinematicanglerange0.SetTarget(config.RotatingplatformAngle0);
             kinematicanglerange1.SetTarget(config.LeverAngle0);
             kinematicanglerange2.SetTarget(config.ArmAngle0);
+            chassis.GetComponent<chassis>().kinematicangularvelocity = config.KinematicAngularVelocity;
             chassis.GetComponent<chassis>().Kinematic(kinematicanglerange0.GetTarget(), kinematicanglerange1.GetTarget(), kinematicanglerange2.GetTarget());
         }
     }
@@ -208,19 +210,19 @@ public class manipulator1 : device
     {
         if (config.Kinematic)
         {
-            float angle0delta = kinematicanglerange0.GetTarget();
-            float angle1delta = kinematicanglerange1.GetTarget();
-            float angle2delta = kinematicanglerange2.GetTarget();
+            float deltaangle0 = kinematicanglerange0.GetTarget() - chassis.GetComponent<chassis>().GetKinematicRestDeltaAngle0();
+            float deltaangle1 = kinematicanglerange1.GetTarget() - chassis.GetComponent<chassis>().GetKinematicRestDeltaAngle1();
+            float deltaangle2 = kinematicanglerange2.GetTarget() - chassis.GetComponent<chassis>().GetKinematicRestDeltaAngle2();
 
             kinematicanglerange0.SetTarget(angle0);
             kinematicanglerange1.SetTarget(angle1);
             kinematicanglerange2.SetTarget(angle2);
 
-            angle0delta = kinematicanglerange0.GetTarget() - angle0delta;
-            angle1delta = kinematicanglerange1.GetTarget() - angle1delta;
-            angle2delta = kinematicanglerange2.GetTarget() - angle2delta;
+            deltaangle0 = kinematicanglerange0.Delta(deltaangle0, kinematicanglerange0.GetTarget());
+            deltaangle1 = kinematicanglerange0.Delta(deltaangle1, kinematicanglerange1.GetTarget());
+            deltaangle2 = kinematicanglerange0.Delta(deltaangle2, kinematicanglerange2.GetTarget());
 
-            chassis.GetComponent<chassis>().Kinematic(angle0delta, angle1delta, angle2delta);
+            chassis.GetComponent<chassis>().SetKinematicTargetDeltaAngles(deltaangle0, deltaangle1, deltaangle2);
         }
         else
         {

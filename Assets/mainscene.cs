@@ -44,7 +44,7 @@ public class mainscene : MonoBehaviour
 
         manipulator1 = new manipulator2();
         manipulator1.config.x = 2;
-        manipulator1.config.Kinematic = true;
+        manipulator1.config.Kinematic = false;
         manipulator1.Place();*/
 
         GameObject.Find("Main Camera").GetComponent<camera>().targetposition = new Vector3(0, 0, 0);

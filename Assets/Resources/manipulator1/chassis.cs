@@ -14,6 +14,11 @@ public class chassis : MonoBehaviour
     public float width = 0.5f;
     public float angle0 = 0.0f;
     public float angle1 = 360.0f;
+    public float kinematicangularvelocity = 100.0f;
+
+    private float kinematicrestdeltaangle0 = 0.0f;
+    private float kinematicrestdeltaangle1 = 0.0f;
+    private float kinematicrestdeltaangle2 = 0.0f;
 
     public void Init()
     {
@@ -48,6 +53,28 @@ public class chassis : MonoBehaviour
         transform.RotateAround(position, Vector3.down, angle);
     }
 
+    public void SetKinematicTargetDeltaAngles(float angle0delta, float angle1delta, float angle2delta)
+    {
+        kinematicrestdeltaangle0 = angle0delta;
+        kinematicrestdeltaangle1 = angle1delta;
+        kinematicrestdeltaangle2 = angle2delta;
+    }
+
+    public float GetKinematicRestDeltaAngle0()
+    {
+        return kinematicrestdeltaangle0;
+    }
+
+    public float GetKinematicRestDeltaAngle1()
+    {
+        return kinematicrestdeltaangle1;
+    }
+
+    public float GetKinematicRestDeltaAngle2()
+    {
+        return kinematicrestdeltaangle2;
+    }
+
     public void Kinematic(float angle0delta, float angle1delta, float angle2delta)
     {
         GameObject next = GetComponent<HingeJoint>().connectedBody.gameObject;
@@ -63,9 +90,31 @@ public class chassis : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!GetComponent<HingeJoint>().connectedBody.GetComponent<Rigidbody>().isKinematic)
+
+    }
+
+    void FixedUpdate()
+    {
+        if (GetComponent<HingeJoint>().connectedBody.GetComponent<Rigidbody>().isKinematic)
+        {
+            float angle0delta = Mathf.Sign(kinematicrestdeltaangle0) * Time.deltaTime * kinematicangularvelocity;
+            float angle1delta = Mathf.Sign(kinematicrestdeltaangle1) * Time.deltaTime * kinematicangularvelocity;
+            float angle2delta = Mathf.Sign(kinematicrestdeltaangle2) * Time.deltaTime * kinematicangularvelocity;
+
+            angle0delta = Mathf.Sign(kinematicrestdeltaangle0) == Mathf.Sign(kinematicrestdeltaangle0 - angle0delta) ? angle0delta : kinematicrestdeltaangle0;
+            angle1delta = Mathf.Sign(kinematicrestdeltaangle1) == Mathf.Sign(kinematicrestdeltaangle1 - angle1delta) ? angle1delta : kinematicrestdeltaangle1;
+            angle2delta = Mathf.Sign(kinematicrestdeltaangle2) == Mathf.Sign(kinematicrestdeltaangle2 - angle2delta) ? angle2delta : kinematicrestdeltaangle2;
+
+            kinematicrestdeltaangle0 -= angle0delta;
+            kinematicrestdeltaangle1 -= angle1delta;
+            kinematicrestdeltaangle2 -= angle2delta;
+
+            Kinematic(angle0delta, angle1delta, angle2delta);
+        }
+        else
         {
             drive.Update();
         }
     }
+
 }

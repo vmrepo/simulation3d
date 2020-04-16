@@ -63,6 +63,20 @@ public class AngleRange
         return uplimit;
     }
 
+    //возвращает кратчайшую дистанцию со знаком направления от 1-ого угла ко 2-му
+    public float Delta(float angle1, float angle2)
+    {
+        angle1 = checkrange(angle1);
+        angle2 = checkrange(angle2);
+
+        float delta = angle2 - angle1;
+
+        if (UnityEngine.Mathf.Abs(delta) > 180)
+            delta -= UnityEngine.Mathf.Sign(delta) * 360;
+
+        return delta;
+    }
+
     public float Distance(float angle1, float angle2)
     {
         angle1 = checkrange(angle1);

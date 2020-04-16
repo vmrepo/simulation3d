@@ -54,9 +54,14 @@ public class holder2manipulator2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+    }
+
+    void FixedUpdate()
+    {
         if (!GetComponent<Rigidbody>().isKinematic)
-	    {
-	        drive.Update();
-	    }
+        {
+            drive.Update();
+        }
     }
 }
