@@ -42,7 +42,7 @@ public class armcapture1 : MonoBehaviour
         }
         else
         {
-            drive.Update();
+            //drive.Update();
         }
     }
 }

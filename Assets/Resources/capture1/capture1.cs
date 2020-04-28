@@ -36,8 +36,9 @@ public class capture1 : device
 {
     public configcapture1 config = new configcapture1();
 
-    FixedJoint fixedjoint = null;
-    Vector3 initpoint = Vector3.zero;
+    public FixedJoint fixedjoint = null;
+    public Vector3 initpoint = Vector3.zero;
+    public Quaternion initrotation = Quaternion.identity;
 
     private bool isinited = false;
     private GameObject connector = null;
@@ -74,22 +75,25 @@ public class capture1 : device
             b.drive.Proportional = config.ArmACSProportional;
             b.drive.Integral = config.ArmACSIntegral;
             b.drive.Differential = config.ArmACSDifferential;
+            b.fixedjoint = fixedjoint;
+            b.initpoint = initpoint;
+            b.initrotation = initrotation;
             b.diameter = config.ConnectorDiameter;
-            b.width = config.ConnectorWidth / 4;/*div 2 for cylinder*/
+            b.width = config.ConnectorWidth / 2 / 2;/*div 2 for cylinder*/
             b.angle0 = config.ArmAngle0;
             b.angle1 = config.ArmAngle1;
         }
 
         {
             armhinge.GetComponent<Rigidbody>().mass = config.ConnectorMass / 2;
-            var b = connector.GetComponent<armhingecapture1>();
+            var b = armhinge.GetComponent<armhingecapture1>();
             b.diameter = config.ConnectorDiameter;
-            b.width = config.ConnectorWidth / 4;/*div 2 for cylinder*/
+            b.width = config.ConnectorWidth / 2 / 2;/*div 2 for cylinder*/
         }
 
         {
             arm.GetComponent<Rigidbody>().mass = config.ArmMass;
-            var b = connector.GetComponent<armcapture1>();
+            var b = arm.GetComponent<armcapture1>();
             b.drive.Proportional = config.ClampACSProportional;
             b.drive.Integral = config.ClampACSIntegral;
             b.drive.Differential = config.ClampACSDifferential;
@@ -101,14 +105,14 @@ public class capture1 : device
 
         {
             clamphinge.GetComponent<Rigidbody>().mass = config.ClamphingeMass;
-            var b = connector.GetComponent<clamphingecapture1>();
+            var b = clamphinge.GetComponent<clamphingecapture1>();
             b.diameter = config.ClamphingeDiameter;
             b.width = config.ClamphingeWidth / 2;/*div 2 for cylinder*/
         }
 
         {
             clamp.GetComponent<Rigidbody>().mass = config.ClampMass;
-            var b = connector.GetComponent<clampcapture1>();
+            var b = clamp.GetComponent<clampcapture1>();
             b.diameter = config.ClampDiameter;
             b.width = config.ClampWidth / 2;/*div 2 for cylinder*/
         }
@@ -125,7 +129,7 @@ public class capture1 : device
         clamphinge.GetComponent<Rigidbody>().isKinematic = config.Kinematic;
         clamp.GetComponent<Rigidbody>().isKinematic = config.Kinematic;
 
-        connector.GetComponent<chassis>().Init();
+        connector.GetComponent<connectorcapture1>().Init();
 
         if (config.Kinematic)
         {

@@ -123,8 +123,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c78eb0c7cf9d27049817ee9b67ee4194, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  initposition: {x: 0, y: 0, z: 0}
+  initrotation: {x: 0, y: 0, z: 0, w: 1}
   diameter: 0.1
   width: 0.005
+  angle0: 0
+  angle1: 360
 --- !u!59 &59981520495779748
 HingeJoint:
   m_ObjectHideFlags: 0
@@ -136,7 +140,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 1, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: 0, z: 0}
+  m_ConnectedAnchor: {x: 0, y: 1.005, z: 0}
   m_UseSpring: 0
   m_Spring:
     spring: 0
