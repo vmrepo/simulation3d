@@ -12,24 +12,24 @@ public class configcapture1
     public float ConnectorDiameter = 0.1f;
     public float ConnectorWidth = 0.02f;
     public float ArmMass = 0.2f;
-    public float ArmACSProportional = 1.5f;
+    public float ArmACSProportional = 0.3f;
     public float ArmACSIntegral = 0.0f;
-    public float ArmACSDifferential = 1.1f;
+    public float ArmACSDifferential = 0.2f;
     public float ArmAngle0 = 0.0f;
     public float ArmAngle1 = 360.0f;
     public float ArmDiameter = 0.03f;
-    public float ArmLength = 0.2f;
+    public float ArmLength = 0.4f;
     public float ClamphingeMass = 0.2f;
     public float ClamphingeDiameter = 0.1f;
-    public float ClamphingeWidth = 0.015f;
+    public float ClamphingeWidth = 0.03f;
     public float ClampMass = 0.1f;
-    public float ClampACSProportional = 1.5f;
+    public float ClampACSProportional = 0.3f;
     public float ClampACSIntegral = 0.0f;
-    public float ClampACSDifferential = 1.1f;
-    public float ClampAngle0 = 30.0f;
-    public float ClampAngle1 = 330.0f;
+    public float ClampACSDifferential = 0.2f;
+    public float ClampAngle0 = 60.0f;
+    public float ClampAngle1 = 300.0f;
     public float ClampDiameter = 0.06f;
-    public float ClampWidth = 0.014f;
+    public float ClampWidth = 0.028f;
 }
 
 public class capture1 : device
@@ -79,7 +79,7 @@ public class capture1 : device
             b.initpoint = initpoint;
             b.initrotation = initrotation;
             b.diameter = config.ConnectorDiameter;
-            b.width = config.ConnectorWidth / 2 / 2;/*div 2 for cylinder*/
+            b.width = config.ConnectorWidth / 2 / b.CylinderFullHeight;
             b.angle0 = config.ArmAngle0;
             b.angle1 = config.ArmAngle1;
         }
@@ -88,7 +88,7 @@ public class capture1 : device
             armhinge.GetComponent<Rigidbody>().mass = config.ConnectorMass / 2;
             var b = armhinge.GetComponent<armhingecapture1>();
             b.diameter = config.ConnectorDiameter;
-            b.width = config.ConnectorWidth / 2 / 2;/*div 2 for cylinder*/
+            b.width = config.ConnectorWidth / 2 / b.CylinderFullHeight;
         }
 
         {
@@ -98,7 +98,7 @@ public class capture1 : device
             b.drive.Integral = config.ClampACSIntegral;
             b.drive.Differential = config.ClampACSDifferential;
             b.diameter = config.ArmDiameter;
-            b.length = config.ArmLength / 2;/*div 2 for cylinder*/
+            b.length = config.ArmLength / b.CylinderFullHeight;
             b.angle0 = config.ClampAngle0;
             b.angle1 = config.ClampAngle1;
         }
@@ -107,14 +107,14 @@ public class capture1 : device
             clamphinge.GetComponent<Rigidbody>().mass = config.ClamphingeMass;
             var b = clamphinge.GetComponent<clamphingecapture1>();
             b.diameter = config.ClamphingeDiameter;
-            b.width = config.ClamphingeWidth / 2;/*div 2 for cylinder*/
+            b.width = config.ClamphingeWidth / b.CylinderFullHeight;
         }
 
         {
             clamp.GetComponent<Rigidbody>().mass = config.ClampMass;
             var b = clamp.GetComponent<clampcapture1>();
             b.diameter = config.ClampDiameter;
-            b.width = config.ClampWidth / 2;/*div 2 for cylinder*/
+            b.width = config.ClampWidth / b.CylinderFullHeight;
         }
 
         connector.GetComponent<Rigidbody>().useGravity = config.UseGravity;

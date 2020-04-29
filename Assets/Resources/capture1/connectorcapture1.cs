@@ -6,22 +6,25 @@ public class connectorcapture1 : MonoBehaviour
 {
     public DriveJoint drive = new DriveJoint();
 
+    public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
     public FixedJoint fixedjoint = null;
     public Vector3 initpoint = Vector3.zero;
     public Quaternion initrotation = Quaternion.identity;
     public float diameter = 0.1f;
     public float width = 0.005f;
-    //remember for cylinder, width (y - scale) is half of real
     public float angle0 = 0.0f;
     public float angle1 = 360.0f;
 
     public void Init()
     {
-        //размещаем, устанавливаем размеры и соединяем звено
-        transform.position = initrotation * (Vector3.down * width / 2 * 2/*mul 2 for cylinder*/) + initpoint;
-        transform.rotation = initrotation;
-        transform.localScale = new Vector3(diameter, width, diameter);
+        //соединяем, размещаем
         fixedjoint.connectedBody = GetComponent<Rigidbody>();
+        transform.localScale = new Vector3(diameter, width, diameter);
+        transform.position = initrotation * (Vector3.down * width * CylinderFullHeight / 2) + initpoint;
+        transform.rotation = initrotation;
+        //ось и якорь
+        fixedjoint.axis = Vector3.down;
+        fixedjoint.anchor = new Vector3(0.0f, 0.0f, 0.0f);
 
         //следующее звено
         HingeJoint hinge = GetComponent<HingeJoint>();
@@ -30,12 +33,12 @@ public class connectorcapture1 : MonoBehaviour
 
         //размещаем следующее звено
         next.transform.localScale = new Vector3(nextbehavior.diameter, nextbehavior.width, nextbehavior.diameter);
-        next.transform.position = transform.rotation * (Vector3.down * (width / 2 * 2/*mul 2 for cylinder*/ + nextbehavior.width / 2 * 2/*mul 2 for cylinder*/)) + transform.position;
+        next.transform.position = transform.rotation * (Vector3.down * (width * CylinderFullHeight / 2 + nextbehavior.width * nextbehavior.CylinderFullHeight / 2)) + transform.position;
         next.transform.rotation = transform.rotation;
 
         //ось и якорь шарнира
         hinge.axis = Vector3.down;
-        hinge.anchor = new Vector3(0.0f, 0.5f, 0.0f);
+        hinge.anchor = new Vector3(0.0f, -0.5f * CylinderFullHeight, 0.0f);
 
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
@@ -71,7 +74,7 @@ public class connectorcapture1 : MonoBehaviour
         }
         else
         {
-            //drive.Update();
+            drive.Update();
         }
     }
 }

@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class clampcapture1 : MonoBehaviour
 {
+    public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
     public float diameter = 0.06f;
     public float width = 0.014f;
-    //remember for cylinder, width (y - scale) is half of real
 
     public void Init()
     {
-        //...
+
     }
 
     public void Kinematic()
