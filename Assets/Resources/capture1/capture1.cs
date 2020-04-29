@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class configcapture1
 {
-    public bool Kinematic = false;
+    public bool Kinematic = true;
     public float KinematicAngularVelocity = 100.0f;
     public bool UseGravity = false;
     public float ConnectorMass = 0.2f;
@@ -36,9 +36,9 @@ public class capture1 : device
 {
     public configcapture1 config = new configcapture1();
 
-    public FixedJoint fixedjoint = null;
-    public Vector3 initpoint = Vector3.zero;
-    public Quaternion initrotation = Quaternion.identity;
+    public GameObject holder = null;
+    public Vector3 anchorposition = Vector3.zero;
+    public Quaternion anchorrotation = Quaternion.identity;
 
     private bool isinited = false;
     private GameObject connector = null;
@@ -46,9 +46,6 @@ public class capture1 : device
     private GameObject arm = null;
     private GameObject clamphinge = null;
     private GameObject clamp = null;
-
-    private AngleRange kinematicanglerange0 = new AngleRange();
-    private AngleRange kinematicanglerange1 = new AngleRange();
 
     public override void Place()
     {
@@ -72,12 +69,13 @@ public class capture1 : device
         {
             connector.GetComponent<Rigidbody>().mass = config.ConnectorMass / 2;
             var b = connector.GetComponent<connectorcapture1>();
+            b.drive.KinematicAngularVelocity = config.KinematicAngularVelocity;
             b.drive.Proportional = config.ArmACSProportional;
             b.drive.Integral = config.ArmACSIntegral;
             b.drive.Differential = config.ArmACSDifferential;
-            b.fixedjoint = fixedjoint;
-            b.initpoint = initpoint;
-            b.initrotation = initrotation;
+            b.holder = holder;
+            b.anchorposition = anchorposition;
+            b.anchorrotation = anchorrotation;
             b.diameter = config.ConnectorDiameter;
             b.width = config.ConnectorWidth / 2 / b.CylinderFullHeight;
             b.angle0 = config.ArmAngle0;
@@ -94,6 +92,7 @@ public class capture1 : device
         {
             arm.GetComponent<Rigidbody>().mass = config.ArmMass;
             var b = arm.GetComponent<armcapture1>();
+            b.drive.KinematicAngularVelocity = config.KinematicAngularVelocity;
             b.drive.Proportional = config.ClampACSProportional;
             b.drive.Integral = config.ClampACSIntegral;
             b.drive.Differential = config.ClampACSDifferential;
@@ -130,16 +129,6 @@ public class capture1 : device
         clamp.GetComponent<Rigidbody>().isKinematic = config.Kinematic;
 
         connector.GetComponent<connectorcapture1>().Init();
-
-        if (config.Kinematic)
-        {
-            kinematicanglerange0.SetLimits(config.ArmAngle0, config.ArmAngle1);
-            kinematicanglerange1.SetLimits(config.ClampAngle0, config.ClampAngle1);
-            kinematicanglerange0.SetTarget(config.ArmAngle0);
-            kinematicanglerange1.SetTarget(config.ClampAngle0);
-
-            //...
-        }
     }
 
     public override void Remove()
@@ -160,38 +149,17 @@ public class capture1 : device
 
     public void SetPos(float angle0, float angle1)
     {
-        if (config.Kinematic)
-        {
-            //...
-        }
-        else
-        {
-            connector.GetComponent<connectorcapture1>().drive.AngleRange.SetTarget(angle0);
-            arm.GetComponent<armcapture1>().drive.AngleRange.SetTarget(angle1);
-        }
+        connector.GetComponent<connectorcapture1>().drive.AngleRange.SetTarget(angle0);
+        arm.GetComponent<armcapture1>().drive.AngleRange.SetTarget(angle1);
     }
 
     public float GetPos0()
     {
-        if (config.Kinematic)
-        {
-            return kinematicanglerange0.GetTarget();
-        }
-        else
-        {
-            return connector.GetComponent<connectorcapture1>().drive.AngleRange.GetTarget();
-        }
+        return connector.GetComponent<connectorcapture1>().drive.AngleRange.GetTarget();
     }
 
     public float GetPos1()
     {
-        if (config.Kinematic)
-        {
-            return kinematicanglerange1.GetTarget();
-        }
-        else
-        {
-            return arm.GetComponent<armcapture1>().drive.AngleRange.GetTarget();
-        }
+        return arm.GetComponent<armcapture1>().drive.AngleRange.GetTarget();
     }
 }

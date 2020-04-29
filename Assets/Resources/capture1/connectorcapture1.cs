@@ -7,9 +7,9 @@ public class connectorcapture1 : MonoBehaviour
     public DriveJoint drive = new DriveJoint();
 
     public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
-    public FixedJoint fixedjoint = null;
-    public Vector3 initpoint = Vector3.zero;
-    public Quaternion initrotation = Quaternion.identity;
+    public GameObject holder = null;
+    public Vector3 anchorposition = Vector3.zero;
+    public Quaternion anchorrotation = Quaternion.identity;
     public float diameter = 0.1f;
     public float width = 0.005f;
     public float angle0 = 0.0f;
@@ -18,10 +18,11 @@ public class connectorcapture1 : MonoBehaviour
     public void Init()
     {
         //соединяем, размещаем
+        FixedJoint fixedjoint = holder.GetComponent<FixedJoint>();
         fixedjoint.connectedBody = GetComponent<Rigidbody>();
         transform.localScale = new Vector3(diameter, width, diameter);
-        transform.position = initrotation * (Vector3.down * width * CylinderFullHeight / 2) + initpoint;
-        transform.rotation = initrotation;
+        transform.position = holder.transform.rotation * anchorposition + holder.transform.position;
+        transform.rotation = holder.transform.rotation * anchorrotation;
         //ось и якорь
         fixedjoint.axis = Vector3.down;
         fixedjoint.anchor = new Vector3(0.0f, 0.0f, 0.0f);
@@ -49,11 +50,6 @@ public class connectorcapture1 : MonoBehaviour
         nextbehavior.Init();
     }
 
-    public void Kinematic()
-    {
-        //...
-    }
-
     // Start is called before the first frame update
     void Start()
     {
@@ -68,13 +64,6 @@ public class connectorcapture1 : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (GetComponent<Rigidbody>().isKinematic)
-        {
-            //...
-        }
-        else
-        {
-            drive.Update();
-        }
+        drive.Update();
     }
 }

@@ -28,11 +28,6 @@ public class armhingecapture1 : MonoBehaviour
         nextbehavior.Init();
     }
 
-    public void Kinematic()
-    {
-        //...
-    }
-
     // Start is called before the first frame update
     void Start()
     {

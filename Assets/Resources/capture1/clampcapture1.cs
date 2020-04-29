@@ -13,11 +13,6 @@ public class clampcapture1 : MonoBehaviour
 
     }
 
-    public void Kinematic()
-    {
-        //...
-    }
-
     // Start is called before the first frame update
     void Start()
     {

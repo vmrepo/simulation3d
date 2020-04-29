@@ -37,11 +37,6 @@ public class armcapture1 : MonoBehaviour
         nextbehavior.Init();
     }
 
-    public void Kinematic()
-    {
-        //...
-    }
-
     // Start is called before the first frame update
     void Start()
     {
@@ -56,13 +51,6 @@ public class armcapture1 : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (GetComponent<Rigidbody>().isKinematic)
-        {
-            //...
-        }
-        else
-        {
-            drive.Update();
-        }
+        //drive.Update();
     }
 }
