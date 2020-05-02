@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class armcapture1 : MonoBehaviour
 {
+    public KinematicJoint kinematic = new KinematicJoint();
     public DriveJoint drive = new DriveJoint();
 
     public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
@@ -28,13 +29,13 @@ public class armcapture1 : MonoBehaviour
         joint.axis = Quaternion.AngleAxis(90, Vector3.forward) * Vector3.down;
         joint.anchor = new Vector3(0.0f, -(0.5f * CylinderFullHeight + nextbehavior.diameter / length / 2), 0.0f);
 
+        //кинематическая связь
+        kinematic.AttachGameObject(gameObject);
+
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
         drive.AngleRange.SetLimits(angle0, angle1);
         drive.AngleRange.SetTarget(angle0);
-
-        //инициализируем следующие звенья
-        nextbehavior.Init();
     }
 
     // Start is called before the first frame update
@@ -52,5 +53,10 @@ public class armcapture1 : MonoBehaviour
     void FixedUpdate()
     {
         drive.Update();
+    }
+
+    public void KinematicUpdate()
+    {
+        kinematic.Update();
     }
 }

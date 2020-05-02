@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class armhingecapture1 : MonoBehaviour
 {
+    public KinematicJoint kinematic = new KinematicJoint();
+
     public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
     public float diameter = 0.1f;
     public float width = 0.005f;
@@ -24,8 +26,8 @@ public class armhingecapture1 : MonoBehaviour
         joint.axis = Vector3.down;
         joint.anchor = new Vector3(0.0f, 0.0f, 0.0f);
 
-        //инициализируем следующие звенья
-        nextbehavior.Init();
+        //кинематическая связь
+        kinematic.AttachGameObject(gameObject);
     }
 
     // Start is called before the first frame update
@@ -38,5 +40,15 @@ public class armhingecapture1 : MonoBehaviour
     void Update()
     {
         
+    }
+
+    void FixedUpdate()
+    {
+
+    }
+
+    public void KinematicUpdate()
+    {
+        kinematic.Update();
     }
 }

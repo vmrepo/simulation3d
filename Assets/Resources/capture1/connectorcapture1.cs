@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class connectorcapture1 : MonoBehaviour
 {
+    public KinematicJoint kinematicHolder = new KinematicJoint();
+    public KinematicJoint kinematic = new KinematicJoint();
     public DriveJoint drive = new DriveJoint();
 
     public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
@@ -17,12 +19,12 @@ public class connectorcapture1 : MonoBehaviour
 
     public void Init()
     {
-        //соединяем, размещаем
         {
+            //соединяем, размещаем
             Joint joint = holder.GetComponent<Joint>();
             joint.connectedBody = GetComponent<Rigidbody>();
             transform.localScale = new Vector3(diameter, width, diameter);
-            transform.position = holder.transform.rotation * anchorposition + holder.transform.position;
+            transform.position = holder.transform.rotation * (anchorposition + Vector3.down * (width * CylinderFullHeight / 2)) + holder.transform.position;
             transform.rotation = holder.transform.rotation * anchorrotation;
             //ось и якорь
             joint.axis = Vector3.down;
@@ -44,13 +46,14 @@ public class connectorcapture1 : MonoBehaviour
             joint.axis = Vector3.down;
             joint.anchor = new Vector3(0.0f, -0.5f * CylinderFullHeight, 0.0f);
 
+            //кинематическая связь
+            kinematicHolder.AttachGameObject(holder);
+            kinematic.AttachGameObject(gameObject);
+
             //настраиваем привод шарнира
             drive.AttachGameObject(gameObject);
             drive.AngleRange.SetLimits(angle0, angle1);
             drive.AngleRange.SetTarget(angle0);
-
-            //инициализируем следующие звенья
-            nextbehavior.Init();
         }
     }
 
@@ -69,5 +72,11 @@ public class connectorcapture1 : MonoBehaviour
     void FixedUpdate()
     {
         drive.Update();
+    }
+
+    public void KinematicUpdate()
+    {
+        kinematicHolder.Update();
+        kinematic.Update();
     }
 }

@@ -24,4 +24,14 @@ public class clampcapture1 : MonoBehaviour
     {
         
     }
+
+    void FixedUpdate()
+    {
+
+    }
+
+    public void KinematicUpdate()
+    {
+
+    }
 }

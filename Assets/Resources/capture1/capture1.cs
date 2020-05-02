@@ -129,6 +129,10 @@ public class capture1 : device
         clamp.GetComponent<Rigidbody>().isKinematic = config.Kinematic;
 
         connector.GetComponent<connectorcapture1>().Init();
+        armhinge.GetComponent<armhingecapture1>().Init();
+        arm.GetComponent<armcapture1>().Init();
+        clamphinge.GetComponent<clamphingecapture1>().Init();
+        clamp.GetComponent<clampcapture1>().Init();
     }
 
     public override void Remove()
@@ -145,6 +149,15 @@ public class capture1 : device
         arm = null;
         clamphinge = null;
         clamp = null;
+    }
+
+    public override void KinematicUpdate()
+    {
+        connector.GetComponent<connectorcapture1>().KinematicUpdate();
+        armhinge.GetComponent<armhingecapture1>().KinematicUpdate();
+        arm.GetComponent<armcapture1>().KinematicUpdate();
+        clamphinge.GetComponent<clamphingecapture1>().KinematicUpdate();
+        clamp.GetComponent<clampcapture1>().KinematicUpdate();
     }
 
     public void SetPos(float angle0, float angle1)
