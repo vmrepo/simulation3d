@@ -52,8 +52,8 @@ public class connectorcapture1 : MonoBehaviour
         kinematicAnchor.AttachGameObject(device.anchor.gameobject);
         kinematic.AttachGameObject(gameObject);
 
-        //настраиваем привод шарнира
-        drive.AttachGameObject(gameObject);
+        //привод шарнира
+        drive.AttachKinematic(kinematic);
         drive.AngleRange.SetLimits(device.config.ArmAngle0, device.config.ArmAngle1);
         drive.AngleRange.SetTarget(device.config.ArmAngle0);
     }

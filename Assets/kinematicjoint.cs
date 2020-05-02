@@ -6,35 +6,37 @@ public class KinematicJoint
 {
     private GameObject gameObject = null;
     private GameObject nextObject = null;
-    private bool isInit = false;
-    private Vector3 prevPosition = Vector3.zero;
-    private Quaternion prevRotation = Quaternion.identity;
+    private Vector3 positionInit = Vector3.zero;
+    private Quaternion rotationInit = Quaternion.identity;
+    private Quaternion rotationExtra = Quaternion.identity;
+
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
 
     public void AttachGameObject(GameObject obj)
     {
         gameObject = obj;
         nextObject = gameObject.GetComponent<Joint>().connectedBody.gameObject;
+        positionInit = Quaternion.Inverse(gameObject.transform.rotation) * (nextObject.transform.position - gameObject.transform.position);
+        rotationInit = Quaternion.Inverse(gameObject.transform.rotation) * nextObject.transform.rotation;
+    }
+
+    public void Rotate(Quaternion rotation)
+    {
+        rotationExtra = rotation;
     }
 
     public void Update()
     {
-        if (gameObject == null || nextObject == null)
+        if (gameObject == null)
             return;
 
-        if (!isInit)
+        if (nextObject.GetComponent<Rigidbody>().isKinematic)
         {
-            prevPosition = gameObject.transform.position;
-            prevRotation = gameObject.transform.rotation;
-            isInit = true;
+            nextObject.transform.position = gameObject.transform.rotation * positionInit + gameObject.transform.position;
+            nextObject.transform.rotation = gameObject.transform.rotation * rotationInit * rotationExtra;
         }
-
-        Quaternion rotation = Quaternion.Inverse(prevRotation) * gameObject.transform.rotation;
-        Vector3 position = rotation * (nextObject.transform.position - prevPosition);
-
-        nextObject.transform.position = gameObject.transform.position + position;
-        nextObject.transform.rotation = nextObject.transform.rotation * rotation;
-
-        prevPosition = gameObject.transform.position;
-        prevRotation = gameObject.transform.rotation;
     }
 }

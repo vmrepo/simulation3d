@@ -36,8 +36,8 @@ public class armcapture1 : MonoBehaviour
         //кинематическая связь
         kinematic.AttachGameObject(gameObject);
 
-        //настраиваем привод шарнира
-        drive.AttachGameObject(gameObject);
+        //привод шарнира
+        drive.AttachKinematic(kinematic);
         drive.AngleRange.SetLimits(device.config.ClampAngle0, device.config.ClampAngle1);
         drive.AngleRange.SetTarget(device.config.ClampAngle0);
     }
