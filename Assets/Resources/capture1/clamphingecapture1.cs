@@ -11,18 +11,18 @@ public class clamphingecapture1 : MonoBehaviour
     public void Init()
     {
         //следующее звено
-        FixedJoint fixedjoint = GetComponent<FixedJoint>();
-        GameObject next = fixedjoint.connectedBody.gameObject;
-        clampcapture1 nextbehavior = fixedjoint.connectedBody.GetComponent<clampcapture1>();
+        Joint joint = GetComponent<Joint>();
+        GameObject next = joint.connectedBody.gameObject;
+        clampcapture1 nextbehavior = joint.connectedBody.GetComponent<clampcapture1>();
 
         //размещаем следующее звено
         next.transform.localScale = new Vector3(nextbehavior.diameter, nextbehavior.width, nextbehavior.diameter);
         next.transform.position = Quaternion.AngleAxis(90, Vector3.back) * transform.rotation * (Vector3.down * (diameter / 2 + nextbehavior.width * nextbehavior.CylinderFullHeight / 2)) + transform.position;
         next.transform.rotation = Quaternion.AngleAxis(90, Vector3.back) * transform.rotation;
 
-        //ось и якорь шарнира
-        fixedjoint.axis = Vector3.down;
-        fixedjoint.anchor = new Vector3(0.0f, 0.0f, 0.0f);
+        //ось и якорь шарнира, требуются для инициализации, но значение базе разницы т.к. FixedJoint
+        joint.axis = Vector3.down;
+        joint.anchor = new Vector3(0.0f, 0.0f, 0.0f);
 
         //инициализируем следующие звенья
         nextbehavior.Init();

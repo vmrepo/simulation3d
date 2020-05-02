@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class configcapture1
 {
-    public bool Kinematic = true;
+    public bool Kinematic = false;
     public float KinematicAngularVelocity = 100.0f;
     public bool UseGravity = false;
     public float ConnectorMass = 0.2f;
@@ -58,10 +58,10 @@ public class capture1 : device
             clamphinge = GameObject.Instantiate(Resources.Load("capture1/clamphinge", typeof(GameObject)) as GameObject);
             clamp = GameObject.Instantiate(Resources.Load("capture1/clamp", typeof(GameObject)) as GameObject);
 
-            connector.GetComponent<HingeJoint>().connectedBody = armhinge.GetComponent<Rigidbody>();
-            armhinge.GetComponent<FixedJoint>().connectedBody = arm.GetComponent<Rigidbody>();
-            arm.GetComponent<HingeJoint>().connectedBody = clamphinge.GetComponent<Rigidbody>();
-            clamphinge.GetComponent<FixedJoint>().connectedBody = clamp.GetComponent<Rigidbody>();
+            connector.GetComponent<Joint>().connectedBody = armhinge.GetComponent<Rigidbody>();
+            armhinge.GetComponent<Joint>().connectedBody = arm.GetComponent<Rigidbody>();
+            arm.GetComponent<Joint>().connectedBody = clamphinge.GetComponent<Rigidbody>();
+            clamphinge.GetComponent<Joint>().connectedBody = clamp.GetComponent<Rigidbody>();
 
             isinited = true;
         }

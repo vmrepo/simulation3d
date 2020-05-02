@@ -15,9 +15,9 @@ public class armcapture1 : MonoBehaviour
     public void Init()
     {
         //следующее звено
-        HingeJoint hinge = GetComponent<HingeJoint>();
-        GameObject next = hinge.connectedBody.gameObject;
-        clamphingecapture1 nextbehavior = hinge.connectedBody.GetComponent<clamphingecapture1>();
+        Joint joint = GetComponent<Joint>();
+        GameObject next = joint.connectedBody.gameObject;
+        clamphingecapture1 nextbehavior = joint.connectedBody.GetComponent<clamphingecapture1>();
 
         //размещаем следующее звено
         next.transform.localScale = new Vector3(nextbehavior.diameter, nextbehavior.width, nextbehavior.diameter);
@@ -25,8 +25,8 @@ public class armcapture1 : MonoBehaviour
         next.transform.rotation = transform.rotation * Quaternion.AngleAxis(90, Vector3.forward);
 
         //ось и якорь шарнира
-        hinge.axis = Quaternion.AngleAxis(90, Vector3.forward) * Vector3.down;
-        hinge.anchor = new Vector3(0.0f, -(0.5f * CylinderFullHeight + nextbehavior.diameter / length / 2), 0.0f);
+        joint.axis = Quaternion.AngleAxis(90, Vector3.forward) * Vector3.down;
+        joint.anchor = new Vector3(0.0f, -(0.5f * CylinderFullHeight + nextbehavior.diameter / length / 2), 0.0f);
 
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
@@ -51,6 +51,6 @@ public class armcapture1 : MonoBehaviour
 
     void FixedUpdate()
     {
-        //drive.Update();
+        drive.Update();
     }
 }
