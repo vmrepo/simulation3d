@@ -4,38 +4,42 @@ using UnityEngine;
 
 public class armcapture1 : MonoBehaviour
 {
+    public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
     public KinematicJoint kinematic = new KinematicJoint();
     public DriveJoint drive = new DriveJoint();
 
-    public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
-    public float diameter = 0.03f;
-    public float length = 0.2f;
-    public float angle0 = 30.0f;
-    public float angle1 = 330.0f;
-
-    public void Init()
+    public void Init(capture1 device)
     {
+        GetComponent<Rigidbody>().mass = device.config.ArmMass;
+        GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
+        GetComponent<Rigidbody>().isKinematic = device.config.Kinematic;
+
+        drive.KinematicAngularVelocity = device.config.KinematicAngularVelocity;
+        drive.Proportional = device.config.ClampACSProportional;
+        drive.Integral = device.config.ClampACSIntegral;
+        drive.Differential = device.config.ClampACSDifferential;
+
         //следующее звено
         Joint joint = GetComponent<Joint>();
         GameObject next = joint.connectedBody.gameObject;
         clamphingecapture1 nextbehavior = joint.connectedBody.GetComponent<clamphingecapture1>();
 
         //размещаем следующее звено
-        next.transform.localScale = new Vector3(nextbehavior.diameter, nextbehavior.width, nextbehavior.diameter);
-        next.transform.position = transform.rotation * (Vector3.down * (length * CylinderFullHeight / 2 + nextbehavior.diameter / 2)) + transform.position;
+        next.transform.localScale = new Vector3(device.config.ClamphingeDiameter, device.config.ClamphingeWidth / nextbehavior.CylinderFullHeight, device.config.ClamphingeDiameter);
+        next.transform.position = transform.rotation * (Vector3.down * (device.config.ArmLength / 2 + device.config.ClamphingeDiameter / 2)) + transform.position;
         next.transform.rotation = transform.rotation * Quaternion.AngleAxis(90, Vector3.forward);
 
         //ось и якорь шарнира
         joint.axis = Quaternion.AngleAxis(90, Vector3.forward) * Vector3.down;
-        joint.anchor = new Vector3(0.0f, -(0.5f * CylinderFullHeight + nextbehavior.diameter / length / 2), 0.0f);
+        joint.anchor = new Vector3(0.0f, -(0.5f + device.config.ClamphingeDiameter / 2 / device.config.ArmLength) * CylinderFullHeight, 0.0f);
 
         //кинематическая связь
         kinematic.AttachGameObject(gameObject);
 
         //настраиваем привод шарнира
         drive.AttachGameObject(gameObject);
-        drive.AngleRange.SetLimits(angle0, angle1);
-        drive.AngleRange.SetTarget(angle0);
+        drive.AngleRange.SetLimits(device.config.ClampAngle0, device.config.ClampAngle1);
+        drive.AngleRange.SetTarget(device.config.ClampAngle0);
     }
 
     // Start is called before the first frame update

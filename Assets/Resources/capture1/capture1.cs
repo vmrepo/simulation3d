@@ -2,10 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class anchor
+{
+    public GameObject gameobject = null;//объект прикрепления
+    public Vector3 position = Vector3.zero;//позиция точки прикрепления в локальных координатах объекта прикрепления    
+    public Quaternion rotation = Quaternion.identity;//направление прикрепления в локальных координатах объекта прикрепления
+}
+
 [System.Serializable]
 public class configcapture1
 {
-    public bool Kinematic = false;
+    public bool Kinematic = true;
     public float KinematicAngularVelocity = 100.0f;
     public bool UseGravity = false;
     public float ConnectorMass = 0.2f;
@@ -34,13 +41,10 @@ public class configcapture1
 
 public class capture1 : device
 {
+    public anchor anchor = new anchor();
     public configcapture1 config = new configcapture1();
 
-    public GameObject holder = null;
-    public Vector3 anchorposition = Vector3.zero;
-    public Quaternion anchorrotation = Quaternion.identity;
-
-    private bool isinited = false;
+    private bool iscreated = false;
     private GameObject connector = null;
     private GameObject armhinge = null;
     private GameObject arm = null;
@@ -49,7 +53,7 @@ public class capture1 : device
 
     public override void Place()
     {
-        if (!isinited)
+        if (!iscreated)
         {
             //создание из префабов и связи объектов
             connector = GameObject.Instantiate(Resources.Load("capture1/connector", typeof(GameObject)) as GameObject);
@@ -63,76 +67,14 @@ public class capture1 : device
             arm.GetComponent<Joint>().connectedBody = clamphinge.GetComponent<Rigidbody>();
             clamphinge.GetComponent<Joint>().connectedBody = clamp.GetComponent<Rigidbody>();
 
-            isinited = true;
+            iscreated = true;
         }
 
-        {
-            connector.GetComponent<Rigidbody>().mass = config.ConnectorMass / 2;
-            var b = connector.GetComponent<connectorcapture1>();
-            b.drive.KinematicAngularVelocity = config.KinematicAngularVelocity;
-            b.drive.Proportional = config.ArmACSProportional;
-            b.drive.Integral = config.ArmACSIntegral;
-            b.drive.Differential = config.ArmACSDifferential;
-            b.holder = holder;
-            b.anchorposition = anchorposition;
-            b.anchorrotation = anchorrotation;
-            b.diameter = config.ConnectorDiameter;
-            b.width = config.ConnectorWidth / 2 / b.CylinderFullHeight;
-            b.angle0 = config.ArmAngle0;
-            b.angle1 = config.ArmAngle1;
-        }
-
-        {
-            armhinge.GetComponent<Rigidbody>().mass = config.ConnectorMass / 2;
-            var b = armhinge.GetComponent<armhingecapture1>();
-            b.diameter = config.ConnectorDiameter;
-            b.width = config.ConnectorWidth / 2 / b.CylinderFullHeight;
-        }
-
-        {
-            arm.GetComponent<Rigidbody>().mass = config.ArmMass;
-            var b = arm.GetComponent<armcapture1>();
-            b.drive.KinematicAngularVelocity = config.KinematicAngularVelocity;
-            b.drive.Proportional = config.ClampACSProportional;
-            b.drive.Integral = config.ClampACSIntegral;
-            b.drive.Differential = config.ClampACSDifferential;
-            b.diameter = config.ArmDiameter;
-            b.length = config.ArmLength / b.CylinderFullHeight;
-            b.angle0 = config.ClampAngle0;
-            b.angle1 = config.ClampAngle1;
-        }
-
-        {
-            clamphinge.GetComponent<Rigidbody>().mass = config.ClamphingeMass;
-            var b = clamphinge.GetComponent<clamphingecapture1>();
-            b.diameter = config.ClamphingeDiameter;
-            b.width = config.ClamphingeWidth / b.CylinderFullHeight;
-        }
-
-        {
-            clamp.GetComponent<Rigidbody>().mass = config.ClampMass;
-            var b = clamp.GetComponent<clampcapture1>();
-            b.diameter = config.ClampDiameter;
-            b.width = config.ClampWidth / b.CylinderFullHeight;
-        }
-
-        connector.GetComponent<Rigidbody>().useGravity = config.UseGravity;
-        armhinge.GetComponent<Rigidbody>().useGravity = config.UseGravity;
-        arm.GetComponent<Rigidbody>().useGravity = config.UseGravity;
-        clamphinge.GetComponent<Rigidbody>().useGravity = config.UseGravity;
-        clamp.GetComponent<Rigidbody>().useGravity = config.UseGravity;
-
-        connector.GetComponent<Rigidbody>().isKinematic = config.Kinematic;
-        armhinge.GetComponent<Rigidbody>().isKinematic = config.Kinematic;
-        arm.GetComponent<Rigidbody>().isKinematic = config.Kinematic;
-        clamphinge.GetComponent<Rigidbody>().isKinematic = config.Kinematic;
-        clamp.GetComponent<Rigidbody>().isKinematic = config.Kinematic;
-
-        connector.GetComponent<connectorcapture1>().Init();
-        armhinge.GetComponent<armhingecapture1>().Init();
-        arm.GetComponent<armcapture1>().Init();
-        clamphinge.GetComponent<clamphingecapture1>().Init();
-        clamp.GetComponent<clampcapture1>().Init();
+        connector.GetComponent<connectorcapture1>().Init(this);
+        armhinge.GetComponent<armhingecapture1>().Init(this);
+        arm.GetComponent<armcapture1>().Init(this);
+        clamphinge.GetComponent<clamphingecapture1>().Init(this);
+        clamp.GetComponent<clampcapture1>().Init(this);
     }
 
     public override void Remove()
@@ -143,7 +85,7 @@ public class capture1 : device
         MonoBehaviour.Destroy(clamphinge);
         MonoBehaviour.Destroy(clamp);
 
-        isinited = false;
+        iscreated = false;
         connector = null;
         armhinge = null;
         arm = null;

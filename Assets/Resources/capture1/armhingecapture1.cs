@@ -4,22 +4,23 @@ using UnityEngine;
 
 public class armhingecapture1 : MonoBehaviour
 {
+    public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
     public KinematicJoint kinematic = new KinematicJoint();
 
-    public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
-    public float diameter = 0.1f;
-    public float width = 0.005f;
-
-    public void Init()
+    public void Init(capture1 device)
     {
+        GetComponent<Rigidbody>().mass = device.config.ConnectorMass / 2;
+        GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
+        GetComponent<Rigidbody>().isKinematic = device.config.Kinematic;
+
         //следующее звено
         Joint joint = GetComponent<Joint>();
         GameObject next = joint.connectedBody.gameObject;
         armcapture1 nextbehavior = joint.connectedBody.GetComponent<armcapture1>();
 
         //размещаем следующее звено
-        next.transform.localScale = new Vector3(nextbehavior.diameter, nextbehavior.length, nextbehavior.diameter);
-        next.transform.position = transform.rotation * (Vector3.down * (width * CylinderFullHeight / 2 + nextbehavior.length * nextbehavior.CylinderFullHeight / 2)) + transform.position;
+        next.transform.localScale = new Vector3(device.config.ArmDiameter, device.config.ArmLength / nextbehavior.CylinderFullHeight, device.config.ArmDiameter);
+        next.transform.position = transform.rotation * (Vector3.down * (device.config.ConnectorWidth / 4 + device.config.ArmLength / 2)) + transform.position;
         next.transform.rotation = transform.rotation;
 
         //ось и якорь шарнира, требуются для инициализации, но значение базе разницы т.к. FixedJoint

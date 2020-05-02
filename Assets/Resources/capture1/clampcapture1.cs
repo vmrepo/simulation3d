@@ -5,12 +5,12 @@ using UnityEngine;
 public class clampcapture1 : MonoBehaviour
 {
     public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
-    public float diameter = 0.06f;
-    public float width = 0.014f;
 
-    public void Init()
+    public void Init(capture1 device)
     {
-
+        GetComponent<Rigidbody>().mass = device.config.ClampMass;
+        GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
+        GetComponent<Rigidbody>().isKinematic = device.config.Kinematic;
     }
 
     // Start is called before the first frame update

@@ -4,28 +4,29 @@ using UnityEngine;
 
 public class connectorcapture1 : MonoBehaviour
 {
-    public KinematicJoint kinematicHolder = new KinematicJoint();
+    public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
+    public KinematicJoint kinematicAnchor = new KinematicJoint();
     public KinematicJoint kinematic = new KinematicJoint();
     public DriveJoint drive = new DriveJoint();
 
-    public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
-    public GameObject holder = null;
-    public Vector3 anchorposition = Vector3.zero;
-    public Quaternion anchorrotation = Quaternion.identity;
-    public float diameter = 0.1f;
-    public float width = 0.005f;
-    public float angle0 = 0.0f;
-    public float angle1 = 360.0f;
-
-    public void Init()
+    public void Init(capture1 device)
     {
+        GetComponent<Rigidbody>().mass = device.config.ConnectorMass / 2;
+        GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
+        GetComponent<Rigidbody>().isKinematic = device.config.Kinematic;
+
+        drive.KinematicAngularVelocity = device.config.KinematicAngularVelocity;
+        drive.Proportional = device.config.ArmACSProportional;
+        drive.Integral = device.config.ArmACSIntegral;
+        drive.Differential = device.config.ArmACSDifferential;
+
         {
             //соединяем, размещаем
-            Joint joint = holder.GetComponent<Joint>();
+            Joint joint = device.anchor.gameobject.GetComponent<Joint>();
             joint.connectedBody = GetComponent<Rigidbody>();
-            transform.localScale = new Vector3(diameter, width, diameter);
-            transform.position = holder.transform.rotation * (anchorposition + Vector3.down * (width * CylinderFullHeight / 2)) + holder.transform.position;
-            transform.rotation = holder.transform.rotation * anchorrotation;
+            transform.localScale = new Vector3(device.config.ConnectorDiameter, device.config.ConnectorWidth / 2 / CylinderFullHeight, device.config.ConnectorDiameter);
+            transform.position = device.anchor.gameobject.transform.rotation * (device.anchor.position + Vector3.down * device.config.ConnectorWidth / 4) + device.anchor.gameobject.transform.position;
+            transform.rotation = device.anchor.gameobject.transform.rotation * device.anchor.rotation;
             //ось и якорь
             joint.axis = Vector3.down;
             joint.anchor = new Vector3(0.0f, 0.0f, 0.0f);
@@ -38,23 +39,23 @@ public class connectorcapture1 : MonoBehaviour
             armhingecapture1 nextbehavior = joint.connectedBody.GetComponent<armhingecapture1>();
 
             //размещаем следующее звено
-            next.transform.localScale = new Vector3(nextbehavior.diameter, nextbehavior.width, nextbehavior.diameter);
-            next.transform.position = transform.rotation * (Vector3.down * (width * CylinderFullHeight / 2 + nextbehavior.width * nextbehavior.CylinderFullHeight / 2)) + transform.position;
+            next.transform.localScale = new Vector3(device.config.ConnectorDiameter, device.config.ConnectorWidth / 2 / nextbehavior.CylinderFullHeight, device.config.ConnectorDiameter);
+            next.transform.position = transform.rotation * (Vector3.down * device.config.ConnectorWidth / 2) + transform.position;
             next.transform.rotation = transform.rotation;
 
             //ось и якорь шарнира
             joint.axis = Vector3.down;
             joint.anchor = new Vector3(0.0f, -0.5f * CylinderFullHeight, 0.0f);
-
-            //кинематическая связь
-            kinematicHolder.AttachGameObject(holder);
-            kinematic.AttachGameObject(gameObject);
-
-            //настраиваем привод шарнира
-            drive.AttachGameObject(gameObject);
-            drive.AngleRange.SetLimits(angle0, angle1);
-            drive.AngleRange.SetTarget(angle0);
         }
+
+        //кинематическая связь
+        kinematicAnchor.AttachGameObject(device.anchor.gameobject);
+        kinematic.AttachGameObject(gameObject);
+
+        //настраиваем привод шарнира
+        drive.AttachGameObject(gameObject);
+        drive.AngleRange.SetLimits(device.config.ArmAngle0, device.config.ArmAngle1);
+        drive.AngleRange.SetTarget(device.config.ArmAngle0);
     }
 
     // Start is called before the first frame update
@@ -76,7 +77,7 @@ public class connectorcapture1 : MonoBehaviour
 
     public void KinematicUpdate()
     {
-        kinematicHolder.Update();
+        kinematicAnchor.Update();
         kinematic.Update();
     }
 }
