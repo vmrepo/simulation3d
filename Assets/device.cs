@@ -11,4 +11,8 @@ public class device
     public virtual void Remove()
     {
     }
+
+    public virtual void KinematicUpdate()
+    {
+    }
 }

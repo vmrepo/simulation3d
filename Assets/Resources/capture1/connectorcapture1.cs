@@ -28,7 +28,7 @@ public class connectorcapture1 : MonoBehaviour
             transform.position = device.anchor.gameobject.transform.rotation * (device.anchor.position + Vector3.down * device.config.ConnectorWidth / 4) + device.anchor.gameobject.transform.position;
             transform.rotation = device.anchor.gameobject.transform.rotation * device.anchor.rotation;
             //ось и якорь
-            joint.axis = Vector3.down;
+            joint.axis = Vector3.up;
             joint.anchor = new Vector3(0.0f, 0.0f, 0.0f);
         }
 
@@ -44,7 +44,7 @@ public class connectorcapture1 : MonoBehaviour
             next.transform.rotation = transform.rotation;
 
             //ось и якорь шарнира
-            joint.axis = Vector3.down;
+            joint.axis = Vector3.up;
             joint.anchor = new Vector3(0.0f, -0.5f * CylinderFullHeight, 0.0f);
         }
 

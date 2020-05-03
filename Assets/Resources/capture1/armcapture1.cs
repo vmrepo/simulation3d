@@ -30,7 +30,7 @@ public class armcapture1 : MonoBehaviour
         next.transform.rotation = transform.rotation * Quaternion.AngleAxis(90, Vector3.forward);
 
         //ось и якорь шарнира
-        joint.axis = Quaternion.AngleAxis(90, Vector3.forward) * Vector3.down;
+        joint.axis = Quaternion.AngleAxis(90, Vector3.forward) * Vector3.up;
         joint.anchor = new Vector3(0.0f, -(0.5f + device.config.ClamphingeDiameter / 2 / device.config.ArmLength) * CylinderFullHeight, 0.0f);
 
         //кинематическая связь

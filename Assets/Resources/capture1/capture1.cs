@@ -30,9 +30,9 @@ public class configcapture1
     public float ClamphingeDiameter = 0.1f;
     public float ClamphingeWidth = 0.03f;
     public float ClampMass = 0.1f;
-    public float ClampACSProportional = 0.3f;
+    public float ClampACSProportional = 1.5f;
     public float ClampACSIntegral = 0.0f;
-    public float ClampACSDifferential = 0.2f;
+    public float ClampACSDifferential = 1.1f;
     public float ClampAngle0 = 240.0f;
     public float ClampAngle1 = 120.0f;
     public float ClampDiameter = 0.06f;

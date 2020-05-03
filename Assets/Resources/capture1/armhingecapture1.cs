@@ -24,7 +24,7 @@ public class armhingecapture1 : MonoBehaviour
         next.transform.rotation = transform.rotation;
 
         //ось и якорь шарнира, требуются для инициализации, но значение базе разницы т.к. FixedJoint
-        joint.axis = Vector3.down;
+        joint.axis = Vector3.up;
         joint.anchor = new Vector3(0.0f, 0.0f, 0.0f);
 
         //кинематическая связь
