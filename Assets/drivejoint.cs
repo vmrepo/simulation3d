@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//направление axis для joint обязано совпадать с локальным направлением вверх для шарнира(чаще цилиндра) т.е. Vector3.up
+//иначе мотор для физики неправильно будет управляться и изменятся направления в кинематике
+
 public class DriveJoint
 {
     public AngleRange AngleRange = new AngleRange();
@@ -43,23 +46,20 @@ public class DriveJoint
         if (gameObject == null)
             return;
 
-        if (hingeJoint.connectedBody.isKinematic)
-        {
-            kinematicJoint.Rotate(Quaternion.AngleAxis(AngleRange.GetTarget(), Vector3.up));
-            return;
-        }
-
         Quaternion localRotation = Quaternion.Inverse(gameObject.transform.rotation) * hingeJoint.connectedBody.transform.rotation;
         Quaternion rotation = Quaternion.Inverse(rotationInit) * localRotation;
 
-        float angle = Vector3.Dot(rotation.eulerAngles, Vector3.up);//Vector3.up - cylinder axis
+        float angle = AngleRange.CheckRange(Vector3.Dot(rotation.eulerAngles, Vector3.up));//Vector3.up - cylinder axis
 
-        float deltaAngle = AngleRange.GetTarget() - angle;
+        float deltaAngle = AngleRange.Delta(angle, AngleRange.GetTarget());
 
-        if (deltaAngle < -180)
-            deltaAngle = 360 + deltaAngle;
-        else if (deltaAngle > 180)
-            deltaAngle = -360 + deltaAngle;
+        if (hingeJoint.connectedBody.isKinematic)
+        {
+            float step = Time.deltaTime * KinematicAngularVelocity * Mathf.Sign(deltaAngle);
+            angle = Mathf.Abs(deltaAngle) < Mathf.Abs(step) ? AngleRange.GetTarget() : angle + step;
+            kinematicJoint.Rotate(Quaternion.AngleAxis(angle, Vector3.up));
+            return;
+        }
 
         if (Mathf.Sign(deltaAngle) > 0)
             deltaSAngle += deltaAngle;
