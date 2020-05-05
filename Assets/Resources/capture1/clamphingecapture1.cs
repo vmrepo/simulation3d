@@ -20,8 +20,8 @@ public class clamphingecapture1 : MonoBehaviour
 
         //размещаем следующее звено
         next.transform.localScale = new Vector3(device.config.ClampDiameter, device.config.ClampWidth / nextbehavior.CylinderFullHeight, device.config.ClampDiameter);
-        next.transform.position = Quaternion.AngleAxis(90, Vector3.back) * transform.rotation * (Vector3.down * (device.config.ClamphingeDiameter / 2 + device.config.ClampWidth / 2)) + transform.position;
-        next.transform.rotation = Quaternion.AngleAxis(90, Vector3.back) * transform.rotation;
+        next.transform.position = transform.rotation * Quaternion.AngleAxis(90, Vector3.back) * (Vector3.down * (device.config.ClamphingeDiameter / 2 + device.config.ClampWidth / 2)) + transform.position;
+        next.transform.rotation = transform.rotation * Quaternion.AngleAxis(90, Vector3.back);
 
         //ось и якорь шарнира, требуются для инициализации, но значение базе разницы т.к. FixedJoint
         joint.axis = Vector3.up;

@@ -5,6 +5,7 @@ using UnityEngine;
 public class anchor
 {
     public GameObject gameobject = null;//объект прикрепления
+    public FixedJoint fixedjoint;//шарнир прикрепления
     public Vector3 position = Vector3.zero;//позиция точки прикрепления в локальных координатах объекта прикрепления    
     public Quaternion rotation = Quaternion.identity;//направление прикрепления в локальных координатах объекта прикрепления
 }

@@ -22,7 +22,7 @@ public class connectorcapture1 : MonoBehaviour
 
         {
             //соединяем, размещаем
-            Joint joint = device.anchor.gameobject.GetComponent<Joint>();
+            Joint joint = device.anchor.fixedjoint;
             joint.connectedBody = GetComponent<Rigidbody>();
             transform.localScale = new Vector3(device.config.ConnectorDiameter, device.config.ConnectorWidth / 2 / CylinderFullHeight, device.config.ConnectorDiameter);
             transform.position = device.anchor.gameobject.transform.rotation * (device.anchor.position + Vector3.down * device.config.ConnectorWidth / 4) + device.anchor.gameobject.transform.position;
@@ -49,7 +49,7 @@ public class connectorcapture1 : MonoBehaviour
         }
 
         //кинематическая связь
-        kinematicAnchor.AttachGameObject(device.anchor.gameobject);
+        kinematicAnchor.AttachGameObject(device.anchor.gameobject, gameObject);
         kinematic.AttachGameObject(gameObject);
 
         //привод шарнира

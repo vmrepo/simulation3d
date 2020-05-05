@@ -15,10 +15,10 @@ public class KinematicJoint
         return gameObject;
     }
 
-    public void AttachGameObject(GameObject obj)
+    public void AttachGameObject(GameObject obj, GameObject next = null)
     {
         gameObject = obj;
-        nextObject = gameObject.GetComponent<Joint>().connectedBody.gameObject;
+        nextObject = (next == null) ? gameObject.GetComponent<Joint>().connectedBody.gameObject : next;
         positionInit = Quaternion.Inverse(gameObject.transform.rotation) * (nextObject.transform.position - gameObject.transform.position);
         rotationInit = Quaternion.Inverse(gameObject.transform.rotation) * nextObject.transform.rotation;
     }
