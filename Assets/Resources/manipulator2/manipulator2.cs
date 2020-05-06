@@ -10,11 +10,12 @@ public class configmanipulator2
     public float z = 0.0f;
     public float angle = 0.0f;
     public bool Kinematic = false;
-    public float KinematicAngularVelocity = 100.0f;
+    public float KinematicAngularVelocity = 0.0f;//for compatible
     public bool UseGravity = false;
     public float ChassisHeight = 1.0f;
     public float ChassisWidth = 0.5f;
     public float RotatingplatformMass = 1.0f;
+    public float RotatingplatformKinematicAngularVelocity = 100.0f;
     public float RotatingplatformACSProportional = 1.5f;
     public float RotatingplatformACSIntegral = 0.0f;
     public float RotatingplatformACSDifferential = 1.1f;
@@ -25,12 +26,14 @@ public class configmanipulator2
     public float LeverhingeMass = 1.0f;
     public float LeverhingeDiameter = 0.08f;
     public float LeverMass = 1.0f;
+    public float LeverKinematicAngularVelocity = 100.0f;
     public float LeverACSProportional = 1.5f;
     public float LeverACSIntegral = 0.0f;
     public float LeverACSDifferential = 1.1f;
     public float LeverWidth = 0.03f;
     public float LeverLength = 0.6f;
     public float ArmMass = 1.0f;
+    public float ArmKinematicAngularVelocity = 100.0f;
     public float ArmACSProportional = 1.5f;
     public float ArmACSIntegral = 0.0f;
     public float ArmACSDifferential = 1.1f;
@@ -40,7 +43,7 @@ public class configmanipulator2
     public float ArmhingeDiameter = 0.08f;
     public float ArmhingeWidth = 0.0115f * 2;/*mul 2 for cylinder*/
     public float ArmWidth = 0.03f;
-    public float ArmLength = 0.9f;
+    public float ArmLength = 0.25f;
     public float HolderMass = 1.0f;
     public float HolderWidth = 0.03f;
     public float HolderLength = 0.14f;
@@ -53,6 +56,30 @@ public class configmanipulator2
     public float WheelLever = 0.12f;
     public float LeverAngle0 = 10.0f;
     public float LeverAngle1 = 60.0f;
+    public float CaptureConnectorMass = 0.2f;
+    public float CaptureConnectorDiameter = 0.1f;
+    public float CaptureConnectorWidth = 0.02f;
+    public float CaptureArmMass = 0.2f;
+    public float CaptureArmKinematicAngularVelocity = 100.0f;
+    public float CaptureArmACSProportional = 0.3f;
+    public float CaptureArmACSIntegral = 0.0f;
+    public float CaptureArmACSDifferential = 0.2f;
+    public float CaptureArmAngle0 = 0.0f;
+    public float CaptureArmAngle1 = 360.0f;
+    public float CaptureArmDiameter = 0.03f;
+    public float CaptureArmLength = 0.4f;
+    public float CaptureClamphingeMass = 0.2f;
+    public float CaptureClamphingeDiameter = 0.1f;
+    public float CaptureClamphingeWidth = 0.03f;
+    public float CaptureClampMass = 0.1f;
+    public float CaptureClampKinematicAngularVelocity = 100.0f;
+    public float CaptureClampACSProportional = 1.5f;
+    public float CaptureClampACSIntegral = 0.0f;
+    public float CaptureClampACSDifferential = 1.1f;
+    public float CaptureClampAngle0 = 240.0f;
+    public float CaptureClampAngle1 = 120.0f;
+    public float CaptureClampDiameter = 0.06f;
+    public float CaptureClampWidth = 0.028f;
 }
 
 public class manipulator2 : device
@@ -75,6 +102,8 @@ public class manipulator2 : device
     private GameObject holder2 = null;
     private GameObject wheelhinge2 = null;
     private GameObject wheel2 = null;
+
+    public capture1 capture = null;
 
     private AngleRange kinematicanglerange0 = new AngleRange();
     private AngleRange kinematicanglerange1 = new AngleRange();
@@ -124,11 +153,14 @@ public class manipulator2 : device
             wheel2.GetComponent<wheel2manipulator2>().leverobject = lever;
             wheel2.GetComponent<wheel2manipulator2>().rotatingplatformobject = rotatingplatform;
 
+            capture = new capture1();
+
             isinited = true;
         }
 
         {
             var b = chassis.GetComponent<chassismanipulator2>();
+            b.capture = capture;
             b.drive.Proportional = config.RotatingplatformACSProportional;
             b.drive.Integral = config.RotatingplatformACSIntegral;
             b.drive.Differential = config.RotatingplatformACSDifferential;
@@ -288,6 +320,40 @@ public class manipulator2 : device
 
         chassis.GetComponent<chassismanipulator2>().Init();
 
+        {
+            capture.config.Kinematic = config.Kinematic;
+            capture.config.UseGravity = config.UseGravity;
+            capture.config.ConnectorMass = config.CaptureConnectorMass;
+            capture.config.ConnectorDiameter = config.CaptureConnectorDiameter;
+            capture.config.ConnectorWidth = config.CaptureConnectorWidth;
+            capture.config.ArmMass = config.CaptureArmMass;
+            capture.config.ArmKinematicAngularVelocity = config.CaptureArmKinematicAngularVelocity;
+            capture.config.ArmACSProportional = config.CaptureArmACSProportional;
+            capture.config.ArmACSIntegral = config.CaptureArmACSIntegral;
+            capture.config.ArmACSDifferential = config.CaptureArmACSDifferential;
+            capture.config.ArmAngle0 = config.CaptureArmAngle0;
+            capture.config.ArmAngle1 = config.CaptureArmAngle1;
+            capture.config.ArmDiameter = config.CaptureArmDiameter;
+            capture.config.ArmLength = config.CaptureArmLength;
+            capture.config.ClamphingeMass = config.CaptureClamphingeMass;
+            capture.config.ClamphingeDiameter = config.CaptureClamphingeDiameter;
+            capture.config.ClamphingeWidth = config.CaptureClamphingeWidth;
+            capture.config.ClampMass = config.CaptureClampMass;
+            capture.config.ClampKinematicAngularVelocity = config.CaptureClampKinematicAngularVelocity;
+            capture.config.ClampACSProportional = config.CaptureClampACSProportional;
+            capture.config.ClampACSIntegral = config.CaptureClampACSIntegral;
+            capture.config.ClampACSDifferential = config.CaptureClampACSDifferential;
+            capture.config.ClampAngle0 = config.CaptureClampAngle0;
+            capture.config.ClampAngle1 = config.CaptureClampAngle1;
+            capture.config.ClampDiameter = config.CaptureClampDiameter;
+            capture.config.ClampWidth = config.CaptureClampWidth;
+            capture.anchor.gameobject = arm;
+            capture.anchor.fixedjoint = arm.GetComponent<FixedJoint>();
+            capture.anchor.position = Vector3.up * arm.transform.localScale.y / 2;
+            capture.anchor.rotation = Quaternion.AngleAxis(180, Vector3.forward) * Quaternion.AngleAxis(90, Vector3.down);
+            capture.Place();
+        }
+
         if (config.Kinematic)
         {
             kinematicanglerange0.SetLimits(config.RotatingplatformAngle0, config.RotatingplatformAngle1);
@@ -296,7 +362,9 @@ public class manipulator2 : device
             kinematicanglerange0.SetTarget(config.RotatingplatformAngle0);
             kinematicanglerange1.SetTarget(config.LeverAngle0);
             kinematicanglerange2.SetTarget(-90 + config.ArmAngle0);
-            chassis.GetComponent<chassismanipulator2>().kinematicangularvelocity = config.KinematicAngularVelocity;
+            chassis.GetComponent<chassismanipulator2>().rotatingplatformkinematicangularvelocity = config.KinematicAngularVelocity != 0 ? config.KinematicAngularVelocity : config.RotatingplatformKinematicAngularVelocity;
+            chassis.GetComponent<chassismanipulator2>().leverkinematicangularvelocity = config.KinematicAngularVelocity != 0 ? config.KinematicAngularVelocity : config.LeverKinematicAngularVelocity;
+            chassis.GetComponent<chassismanipulator2>().armkinematicangularvelocity = config.KinematicAngularVelocity != 0 ? config.KinematicAngularVelocity : config.ArmKinematicAngularVelocity;
             chassis.GetComponent<chassismanipulator2>().Kinematic(kinematicanglerange0.GetTarget(), kinematicanglerange1.GetTarget(), kinematicanglerange2.GetTarget());
         }
     }
@@ -319,6 +387,8 @@ public class manipulator2 : device
         MonoBehaviour.Destroy(wheelhinge2);
         MonoBehaviour.Destroy(wheel2);
 
+        capture.Remove();
+
         isinited = false;
         chassis = null;
         rotatingplatform = null;
@@ -335,6 +405,8 @@ public class manipulator2 : device
         holder2 = null;
         wheelhinge2 = null;
         wheel2 = null;
+
+        capture = null;
     }
 
     public void SetPos(float angle0, float angle1, float angle2)

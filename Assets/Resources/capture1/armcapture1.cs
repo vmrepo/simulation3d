@@ -14,7 +14,7 @@ public class armcapture1 : MonoBehaviour
         GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
         GetComponent<Rigidbody>().isKinematic = device.config.Kinematic;
 
-        drive.KinematicAngularVelocity = device.config.KinematicAngularVelocity;
+        drive.KinematicAngularVelocity = device.config.ClampKinematicAngularVelocity;
         drive.Proportional = device.config.ClampACSProportional;
         drive.Integral = device.config.ClampACSIntegral;
         drive.Differential = device.config.ClampACSDifferential;

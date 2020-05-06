@@ -21,6 +21,8 @@ public class chassismanipulator2 : MonoBehaviour
 
     public DriveJoint drive = new DriveJoint();
 
+    public capture1 capture = null;
+
     public float x = 0.0f;
     public float y = 0.0f;
     public float z = 0.0f;
@@ -29,7 +31,9 @@ public class chassismanipulator2 : MonoBehaviour
     public float width = 0.5f;
     public float angle0 = 0.0f;
     public float angle1 = 360.0f;
-    public float kinematicangularvelocity = 100.0f;
+    public float rotatingplatformkinematicangularvelocity = 100.0f;
+    public float leverkinematicangularvelocity = 100.0f;
+    public float armkinematicangularvelocity = 100.0f;
 
     private float kinematicrestdeltaangle0 = 0.0f;
     private float kinematicrestdeltaangle1 = 0.0f;
@@ -112,9 +116,9 @@ public class chassismanipulator2 : MonoBehaviour
     {
         if (GetComponent<HingeJoint>().connectedBody.GetComponent<Rigidbody>().isKinematic)
         {
-            float angle0delta = Mathf.Sign(kinematicrestdeltaangle0) * Time.deltaTime * kinematicangularvelocity;
-            float angle1delta = Mathf.Sign(kinematicrestdeltaangle1) * Time.deltaTime * kinematicangularvelocity;
-            float angle2delta = Mathf.Sign(kinematicrestdeltaangle2) * Time.deltaTime * kinematicangularvelocity;
+            float angle0delta = Mathf.Sign(kinematicrestdeltaangle0) * Time.deltaTime * rotatingplatformkinematicangularvelocity;
+            float angle1delta = Mathf.Sign(kinematicrestdeltaangle1) * Time.deltaTime * leverkinematicangularvelocity;
+            float angle2delta = Mathf.Sign(kinematicrestdeltaangle2) * Time.deltaTime * armkinematicangularvelocity;
 
             angle0delta = Mathf.Sign(kinematicrestdeltaangle0) == Mathf.Sign(kinematicrestdeltaangle0 - angle0delta) ? angle0delta : kinematicrestdeltaangle0;
             angle1delta = Mathf.Sign(kinematicrestdeltaangle1) == Mathf.Sign(kinematicrestdeltaangle1 - angle1delta) ? angle1delta : kinematicrestdeltaangle1;
@@ -130,5 +134,7 @@ public class chassismanipulator2 : MonoBehaviour
         {
             drive.Update();
         }
+
+        capture.KinematicUpdate();
     }
 }

@@ -15,7 +15,7 @@ public class connectorcapture1 : MonoBehaviour
         GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
         GetComponent<Rigidbody>().isKinematic = device.config.Kinematic;
 
-        drive.KinematicAngularVelocity = device.config.KinematicAngularVelocity;
+        drive.KinematicAngularVelocity = device.config.ArmKinematicAngularVelocity;
         drive.Proportional = device.config.ArmACSProportional;
         drive.Integral = device.config.ArmACSIntegral;
         drive.Differential = device.config.ArmACSDifferential;
