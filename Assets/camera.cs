@@ -4,37 +4,25 @@ using UnityEngine;
 
 public class camera : MonoBehaviour
 {
-    [SerializeField]
-    public Vector3 targetposition; //невидимая цель для камеры
-    public float zoomSpeed = 5.0f; //скорость приближения камеры
-    public float mouseSensRotatiton = 0.6f;
-    public float mouseSensTranslatiton = 0.2f;
-    public Camera cam_holder;
+    public Vector3 targetposition;
 
-    private Vector3 _offset;
-    private Quaternion _rotation;
+    [SerializeField]
+    public float mouseSensitivity = 0.5f;
+    public float zoomSpeed = 5.0f;
 
     public void Init()
     {
         transform.LookAt(targetposition);
-        _rotation = Quaternion.identity;
-        _offset = targetposition - transform.position;
     }
 
     void Start()
     {
-        Init();
-    }
-
-    void LookAtTarget()
-    {
-        transform.position = targetposition - (_rotation * _offset);
         transform.LookAt(targetposition);
     }
 
     void LateUpdate()
     {
-        float input = Input.GetAxis("Mouse ScrollWheel"); //крутится колесико
+        float input = Input.GetAxis("Mouse ScrollWheel"); //крутится колесико - движение по курсу
         if (input != 0) 
         {
             Vector3 v = (targetposition - transform.position).normalized;
@@ -43,28 +31,34 @@ public class camera : MonoBehaviour
             targetposition += v * input;
         }
 
-        if (Input.GetMouseButton(0)) //левая кнопка
+        if (Input.GetMouseButton(0)) //левая кнопка - смещение
         {
-            //вращение
-            float rotX = Input.GetAxis("Mouse X") * mouseSensRotatiton;
-            float rotY = Input.GetAxis("Mouse Y") * mouseSensRotatiton;
-
-            _rotation *= Quaternion.Euler(rotY, rotX, 0);
-            
-            LookAtTarget();
-        }
-
-        if (Input.GetMouseButton(1)) //правая кнопка
-        {
-            //смещение
-            float x_axis = -Input.GetAxis("Mouse X") * mouseSensTranslatiton;
-            float y_axis = -Input.GetAxis("Mouse Y") * mouseSensTranslatiton;
+            float x_axis = -Input.GetAxis("Mouse X") * mouseSensitivity;
+            float y_axis = -Input.GetAxis("Mouse Y") * mouseSensitivity;
 
             Vector3 v0 =  transform.rotation * Vector3.right * x_axis;
             Vector3 v1 = transform.rotation * Vector3.up * y_axis;
+
+            Vector3 targetposition_ = targetposition;
+
             targetposition = new Vector3(targetposition.x + v0.x + v1.x, targetposition.y + v0.y + v1.y, targetposition.z + v0.z + v1.z);
 
-            LookAtTarget();
+            transform.position += targetposition - targetposition_;
+
+            transform.LookAt(targetposition);
+        }
+
+        if (Input.GetMouseButton(1)) //правая кнопка - вращение
+        {
+            float x_axis = Input.GetAxis("Mouse X") * mouseSensitivity;
+            float y_axis = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+            Vector3 v0 = transform.rotation * Vector3.right * x_axis;
+            Vector3 v1 = transform.rotation * Vector3.up * y_axis;
+
+            targetposition = new Vector3(targetposition.x + v0.x + v1.x, targetposition.y + v0.y + v1.y, targetposition.z + v0.z + v1.z);
+
+            transform.LookAt(targetposition);
         }
     }
 }
