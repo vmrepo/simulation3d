@@ -4,31 +4,29 @@ using UnityEngine;
 
 public class clamphingecapture1 : MonoBehaviour
 {
-    public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
-    public KinematicJoint kinematic = new KinematicJoint();
+    public const int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
+    public GameObject pivotObject = null;
+    public CommonJoint joint = new CommonJoint();
+    public DriveJoint drive = new DriveJoint();
 
     public void Init(capture1 device)
     {
         GetComponent<Rigidbody>().mass = device.config.ClamphingeMass;
         GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
-        GetComponent<Rigidbody>().isKinematic = device.config.Kinematic;
 
-        //следующее звено
-        Joint joint = GetComponent<Joint>();
-        GameObject next = joint.connectedBody.gameObject;
-        clampcapture1 nextbehavior = joint.connectedBody.GetComponent<clampcapture1>();
+        transform.localScale = new Vector3(device.config.ClamphingeDiameter, device.config.ClamphingeWidth / CylinderFullHeight, device.config.ClamphingeDiameter);
+        transform.position = pivotObject.transform.rotation * (Vector3.down * (device.config.ArmLength / 2 + device.config.ClamphingeDiameter / 2)) + pivotObject.transform.position;
+        transform.rotation = pivotObject.transform.rotation * Quaternion.AngleAxis(90, Vector3.forward);
 
-        //размещаем следующее звено
-        next.transform.localScale = new Vector3(device.config.ClampDiameter, device.config.ClampWidth / nextbehavior.CylinderFullHeight, device.config.ClampDiameter);
-        next.transform.position = transform.rotation * Quaternion.AngleAxis(90, Vector3.back) * (Vector3.down * (device.config.ClamphingeDiameter / 2 + device.config.ClampWidth / 2)) + transform.position;
-        next.transform.rotation = transform.rotation * Quaternion.AngleAxis(90, Vector3.back);
+        joint.Config(pivotObject, gameObject, device.config.ClampKinematic, JointPhysics.Hinge, Quaternion.AngleAxis(90, Vector3.forward) * Vector3.up, new Vector3(0.0f, -(0.5f + device.config.ClamphingeDiameter / 2 / device.config.ArmLength) * armcapture1.CylinderFullHeight, 0.0f));
 
-        //ось и якорь шарнира, требуются для инициализации, но значение базе разницы т.к. FixedJoint
-        joint.axis = Vector3.up;
-        joint.anchor = new Vector3(0.0f, 0.0f, 0.0f);
-
-        //кинематическая связь
-        kinematic.AttachGameObject(gameObject);
+        drive.KinematicAngularVelocity = device.config.ClampKinematicAngularVelocity;
+        drive.Proportional = device.config.ClampACSProportional;
+        drive.Integral = device.config.ClampACSIntegral;
+        drive.Differential = device.config.ClampACSDifferential;
+        drive.Attach(joint);
+        drive.AngleRange.SetLimits(device.config.ClampAngle0, device.config.ClampAngle1);
+        drive.AngleRange.SetTarget(device.config.ClampAngle0);
     }
 
     // Start is called before the first frame update
@@ -45,11 +43,11 @@ public class clamphingecapture1 : MonoBehaviour
 
     void FixedUpdate()
     {
-
+        drive.Update();
     }
 
     public void KinematicUpdate()
     {
-        kinematic.Update();
+        joint.KinematicUpdate();
     }
 }

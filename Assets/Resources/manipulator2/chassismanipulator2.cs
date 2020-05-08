@@ -61,7 +61,7 @@ public class chassismanipulator2 : MonoBehaviour
         hinge.anchor = new Vector3(0.0f, 0.5f, 0.0f);
 
         //настраиваем привод шарнира
-        drive.AttachGameObject(gameObject);
+        drive.Attach(gameObject, next);
         drive.AngleRange.SetLimits(angle0, angle1);
         drive.AngleRange.SetTarget(angle0);
 

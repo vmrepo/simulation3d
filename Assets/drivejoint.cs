@@ -14,53 +14,48 @@ public class DriveJoint
     public float Integral = 0.0f;
     public float Differential = 1.1f;
 
-    private KinematicJoint kinematicJoint = null;
+    private CommonJoint commonJoint = null;
+    private GameObject pivotObject = null;
     private GameObject gameObject = null;
-    private HingeJoint hingeJoint = null;
     private Quaternion rotationInit = Quaternion.identity;
 
     private float deltaSAngle = 0.0f;
 
-    public GameObject GetGameObject()
+    //deprecated, need for compatible, support phycisc only
+    public void Attach(GameObject pivot, GameObject obj)
     {
-        return gameObject;
-    }
-
-    public void AttachGameObject(GameObject obj)
-    {
-        kinematicJoint = null;
+        commonJoint = null;
+        pivotObject = pivot;
         gameObject = obj;
-        hingeJoint = gameObject.GetComponent<HingeJoint>();
-        rotationInit = Quaternion.Inverse(gameObject.transform.rotation) * hingeJoint.connectedBody.transform.rotation;
+        rotationInit = Quaternion.Inverse(pivotObject.transform.rotation) * gameObject.transform.rotation;
     }
 
-    public void AttachKinematic(KinematicJoint kinematic)
+    public void Attach(CommonJoint joint)
     {
-        kinematicJoint = kinematic;
-        gameObject = kinematic.GetGameObject();
-        hingeJoint = gameObject.GetComponent<HingeJoint>();
-        rotationInit = Quaternion.Inverse(gameObject.transform.rotation) * hingeJoint.connectedBody.transform.rotation;
+        commonJoint = joint;
+        pivotObject = joint.GetPivotObject();
+        gameObject = joint.GetGameObject();
+        rotationInit = Quaternion.Inverse(pivotObject.transform.rotation) * gameObject.transform.rotation;
     }
 
     public void Update()
     {
-        if (gameObject == null)
-            return;
-
-        Quaternion localRotation = Quaternion.Inverse(gameObject.transform.rotation) * hingeJoint.connectedBody.transform.rotation;
+        Quaternion localRotation = Quaternion.Inverse(pivotObject.transform.rotation) * gameObject.transform.rotation;
         Quaternion rotation = Quaternion.Inverse(rotationInit) * localRotation;
 
         float angle = AngleRange.CheckRange(Vector3.Dot(rotation.eulerAngles, Vector3.up));//Vector3.up - cylinder axis
 
         float deltaAngle = AngleRange.Delta(angle, AngleRange.GetTarget());
 
-        if (hingeJoint.connectedBody.isKinematic)
+        if (gameObject.GetComponent<Rigidbody>().isKinematic)
         {
             float step = Time.deltaTime * KinematicAngularVelocity * Mathf.Sign(deltaAngle);
             angle = Mathf.Abs(deltaAngle) < Mathf.Abs(step) ? AngleRange.GetTarget() : angle + step;
-            kinematicJoint.Rotate(Quaternion.AngleAxis(angle, Vector3.up));
+            commonJoint.KinematicRotate(Quaternion.AngleAxis(angle, Vector3.up));
             return;
         }
+
+        HingeJoint hingeJoint = pivotObject.GetComponent<HingeJoint>();
 
         if (Mathf.Sign(deltaAngle) > 0)
             deltaSAngle += deltaAngle;

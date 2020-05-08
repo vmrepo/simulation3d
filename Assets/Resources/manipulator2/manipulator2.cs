@@ -321,11 +321,11 @@ public class manipulator2 : device
         chassis.GetComponent<chassismanipulator2>().Init();
 
         {
-            capture.config.Kinematic = config.Kinematic;
             capture.config.UseGravity = config.UseGravity;
             capture.config.ConnectorMass = config.CaptureConnectorMass;
             capture.config.ConnectorDiameter = config.CaptureConnectorDiameter;
             capture.config.ConnectorWidth = config.CaptureConnectorWidth;
+            capture.config.ArmKinematic = config.Kinematic;
             capture.config.ArmMass = config.CaptureArmMass;
             capture.config.ArmKinematicAngularVelocity = config.CaptureArmKinematicAngularVelocity;
             capture.config.ArmACSProportional = config.CaptureArmACSProportional;
@@ -338,6 +338,7 @@ public class manipulator2 : device
             capture.config.ClamphingeMass = config.CaptureClamphingeMass;
             capture.config.ClamphingeDiameter = config.CaptureClamphingeDiameter;
             capture.config.ClamphingeWidth = config.CaptureClamphingeWidth;
+            capture.config.ClampKinematic = config.Kinematic;
             capture.config.ClampMass = config.CaptureClampMass;
             capture.config.ClampKinematicAngularVelocity = config.CaptureClampKinematicAngularVelocity;
             capture.config.ClampACSProportional = config.CaptureClampACSProportional;
@@ -347,10 +348,9 @@ public class manipulator2 : device
             capture.config.ClampAngle1 = config.CaptureClampAngle1;
             capture.config.ClampDiameter = config.CaptureClampDiameter;
             capture.config.ClampWidth = config.CaptureClampWidth;
-            capture.anchor.gameobject = arm;
-            capture.anchor.fixedjoint = arm.GetComponent<FixedJoint>();
-            capture.anchor.position = Vector3.up * arm.transform.localScale.y / 2;
-            capture.anchor.rotation = Quaternion.AngleAxis(180, Vector3.forward) * Quaternion.AngleAxis(90, Vector3.down);
+            capture.pivot.Object = arm;
+            capture.pivot.position = Vector3.up * arm.transform.localScale.y / 2;
+            capture.pivot.rotation = Quaternion.AngleAxis(180, Vector3.forward) * Quaternion.AngleAxis(90, Vector3.down);
             capture.Place();
         }
 

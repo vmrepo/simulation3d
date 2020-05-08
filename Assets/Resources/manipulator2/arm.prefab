@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 8987246511256258785}
   - component: {fileID: 8987246511256258784}
   - component: {fileID: 8987246511256258799}
-  - component: {fileID: 138206136936119142}
   m_Layer: 0
   m_Name: arm
   m_TagString: Untagged
@@ -154,20 +153,6 @@ HingeJoint:
     bounciness: 0
     bounceMinVelocity: 0.2
     contactDistance: 0
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 0
-  m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
---- !u!138 &138206136936119142
-FixedJoint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8987246511256258790}
-  m_ConnectedBody: {fileID: 0}
   m_BreakForce: Infinity
   m_BreakTorque: Infinity
   m_EnableCollision: 0

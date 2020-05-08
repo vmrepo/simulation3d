@@ -2,22 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class anchor
-{
-    public GameObject gameobject = null;//объект прикрепления
-    public FixedJoint fixedjoint;//шарнир прикрепления
-    public Vector3 position = Vector3.zero;//позиция точки прикрепления в локальных координатах объекта прикрепления    
-    public Quaternion rotation = Quaternion.identity;//направление прикрепления в локальных координатах объекта прикрепления
-}
-
 [System.Serializable]
 public class configcapture1
 {
-    public bool Kinematic = true;
     public bool UseGravity = false;
     public float ConnectorMass = 0.2f;
     public float ConnectorDiameter = 0.1f;
     public float ConnectorWidth = 0.02f;
+    public bool ArmKinematic = true;
     public float ArmMass = 0.2f;
     public float ArmKinematicAngularVelocity = 100.0f;
     public float ArmACSProportional = 0.3f;
@@ -30,6 +22,7 @@ public class configcapture1
     public float ClamphingeMass = 0.2f;
     public float ClamphingeDiameter = 0.1f;
     public float ClamphingeWidth = 0.03f;
+    public bool ClampKinematic = true;
     public float ClampMass = 0.1f;
     public float ClampKinematicAngularVelocity = 100.0f;
     public float ClampACSProportional = 1.5f;
@@ -43,7 +36,7 @@ public class configcapture1
 
 public class capture1 : device
 {
-    public anchor anchor = new anchor();
+    public pivot pivot = new pivot();
     public configcapture1 config = new configcapture1();
 
     private bool iscreated = false;
@@ -64,10 +57,10 @@ public class capture1 : device
             clamphinge = GameObject.Instantiate(Resources.Load("capture1/clamphinge", typeof(GameObject)) as GameObject);
             clamp = GameObject.Instantiate(Resources.Load("capture1/clamp", typeof(GameObject)) as GameObject);
 
-            connector.GetComponent<Joint>().connectedBody = armhinge.GetComponent<Rigidbody>();
-            armhinge.GetComponent<Joint>().connectedBody = arm.GetComponent<Rigidbody>();
-            arm.GetComponent<Joint>().connectedBody = clamphinge.GetComponent<Rigidbody>();
-            clamphinge.GetComponent<Joint>().connectedBody = clamp.GetComponent<Rigidbody>();
+            armhinge.GetComponent<armhingecapture1>().pivotObject = connector;
+            arm.GetComponent<armcapture1>().pivotObject = armhinge;
+            clamphinge.GetComponent<clamphingecapture1>().pivotObject = arm;
+            clamp.GetComponent<clampcapture1>().pivotObject = clamphinge;
 
             iscreated = true;
         }
@@ -106,17 +99,17 @@ public class capture1 : device
 
     public void SetPos(float angle0, float angle1)
     {
-        connector.GetComponent<connectorcapture1>().drive.AngleRange.SetTarget(angle0);
-        arm.GetComponent<armcapture1>().drive.AngleRange.SetTarget(angle1);
+        armhinge.GetComponent<armhingecapture1>().drive.AngleRange.SetTarget(angle0);
+        clamphinge.GetComponent<clamphingecapture1>().drive.AngleRange.SetTarget(angle1);
     }
 
     public float GetPos0()
     {
-        return connector.GetComponent<connectorcapture1>().drive.AngleRange.GetTarget();
+        return armhinge.GetComponent<armhingecapture1>().drive.AngleRange.GetTarget();
     }
 
     public float GetPos1()
     {
-        return arm.GetComponent<armcapture1>().drive.AngleRange.GetTarget();
+        return clamphinge.GetComponent<clamphingecapture1>().drive.AngleRange.GetTarget();
     }
 }

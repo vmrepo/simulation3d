@@ -27,7 +27,7 @@ public class holder1manipulator2 : MonoBehaviour
         hinge.anchor = new Vector3(0.0f, 0.5f + nextbehavior.diameter / length / 2, 0.0f);
 
         //настраиваем привод шарнира
-        drive.AttachGameObject(gameObject);
+        drive.Attach(gameObject, next);
         //нужно согласовать с углами holder2 и lever: A = Aholder2 + Alever
         drive.AngleRange.SetLimits(-90 + angle0, -90 + angle1);
         drive.AngleRange.SetTarget(-90 + angle0);

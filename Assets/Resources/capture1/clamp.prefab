@@ -122,3 +122,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01d05d4185f527c4ab1eb92e9cf43891, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pivotObject: {fileID: 0}

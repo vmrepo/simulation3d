@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 7564182208189860988}
   - component: {fileID: 7564182208189860991}
   - component: {fileID: 114199408715125698}
-  - component: {fileID: 138801171437884674}
   m_Layer: 0
   m_Name: clamphinge
   m_TagString: Untagged
@@ -123,17 +122,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1d16ee0253347a44bef4411b3a26618, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!138 &138801171437884674
-FixedJoint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7564182208189860985}
-  m_ConnectedBody: {fileID: 0}
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 0
-  m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
+  pivotObject: {fileID: 0}

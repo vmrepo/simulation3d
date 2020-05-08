@@ -4,13 +4,20 @@ using UnityEngine;
 
 public class clampcapture1 : MonoBehaviour
 {
-    public int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
+    public const int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
+    public GameObject pivotObject = null;
+    public CommonJoint joint = new CommonJoint();
 
     public void Init(capture1 device)
     {
         GetComponent<Rigidbody>().mass = device.config.ClampMass;
         GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
-        GetComponent<Rigidbody>().isKinematic = device.config.Kinematic;
+
+        transform.localScale = new Vector3(device.config.ClampDiameter, device.config.ClampWidth / CylinderFullHeight, device.config.ClampDiameter);
+        transform.position = pivotObject.transform.rotation * Quaternion.AngleAxis(90, Vector3.back) * (Vector3.down * (device.config.ClamphingeDiameter / 2 + device.config.ClampWidth / 2)) + pivotObject.transform.position;
+        transform.rotation = pivotObject.transform.rotation * Quaternion.AngleAxis(90, Vector3.back);
+
+        joint.Config(pivotObject, gameObject, device.config.ClampKinematic, JointPhysics.Fixed, Vector3.up, Vector3.zero);
     }
 
     // Start is called before the first frame update
@@ -32,6 +39,6 @@ public class clampcapture1 : MonoBehaviour
 
     public void KinematicUpdate()
     {
-
+        joint.KinematicUpdate();
     }
 }

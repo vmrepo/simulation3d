@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 6958361140911266706}
   - component: {fileID: 6958361140911266707}
   - component: {fileID: 114602787483562634}
-  - component: {fileID: 138689082328359232}
   m_Layer: 0
   m_Name: armhinge
   m_TagString: Untagged
@@ -123,17 +122,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 354079e85c129364c92d8a9d1576848c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!138 &138689082328359232
-FixedJoint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6958361140911266705}
-  m_ConnectedBody: {fileID: 0}
-  m_BreakForce: Infinity
-  m_BreakTorque: Infinity
-  m_EnableCollision: 0
-  m_EnablePreprocessing: 1
-  m_MassScale: 1
-  m_ConnectedMassScale: 1
+  pivotObject: {fileID: 0}
