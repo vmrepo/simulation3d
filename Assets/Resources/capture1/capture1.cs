@@ -12,9 +12,9 @@ public class configcapture1
     public bool ArmKinematic = true;
     public float ArmMass = 0.2f;
     public float ArmKinematicAngularVelocity = 100.0f;
-    public float ArmACSProportional = 0.3f;
+    public float ArmACSProportional = 1.5f;
     public float ArmACSIntegral = 0.0f;
-    public float ArmACSDifferential = 0.2f;
+    public float ArmACSDifferential = 1.1f;
     public float ArmAngle0 = 0.0f;
     public float ArmAngle1 = 360.0f;
     public float ArmDiameter = 0.03f;
