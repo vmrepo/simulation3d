@@ -13,10 +13,11 @@ public class connectorcapture1 : MonoBehaviour
         GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
 
         transform.localScale = new Vector3(device.config.ConnectorDiameter, device.config.ConnectorWidth / 2 / CylinderFullHeight, device.config.ConnectorDiameter);
-        transform.position = device.pivot.Object.transform.rotation * (device.pivot.position + Vector3.down * device.config.ConnectorWidth / 4) + device.pivot.Object.transform.position;
+        Vector3 ofs = device.pivot.rotation * Vector3.down* device.config.ConnectorWidth / 4;
+        transform.position = device.pivot.Object.transform.rotation * (device.pivot.position + ofs) + device.pivot.Object.transform.position;
         transform.rotation = device.pivot.Object.transform.rotation * device.pivot.rotation;
 
-        joint.Config(device.pivot.Object, gameObject, device.config.ArmKinematic, JointPhysics.Fixed, Vector3.up, Vector3.zero);
+        joint.Config(device.pivot.Object, gameObject, device.config.ArmKinematic, JointPhysics.Fixed);
     }
 
     // Start is called before the first frame update

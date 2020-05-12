@@ -17,7 +17,7 @@ public class armcapture1 : MonoBehaviour
         transform.position = pivotObject.transform.rotation * (Vector3.down * (device.config.ConnectorWidth / 4 + device.config.ArmLength / 2)) + pivotObject.transform.position;
         transform.rotation = pivotObject.transform.rotation;
 
-        joint.Config(pivotObject, gameObject, device.config.ArmKinematic, JointPhysics.Fixed, Vector3.up, Vector3.zero);
+        joint.Config(pivotObject, gameObject, device.config.ArmKinematic, JointPhysics.Fixed);
     }
 
     // Start is called before the first frame update

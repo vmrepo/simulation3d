@@ -18,7 +18,7 @@ public class clamphingecapture1 : MonoBehaviour
         transform.position = pivotObject.transform.rotation * (Vector3.down * (device.config.ArmLength / 2 + device.config.ClamphingeDiameter / 2)) + pivotObject.transform.position;
         transform.rotation = pivotObject.transform.rotation * Quaternion.AngleAxis(90, Vector3.forward);
 
-        joint.Config(pivotObject, gameObject, device.config.ClampKinematic, JointPhysics.Hinge, Quaternion.AngleAxis(90, Vector3.forward) * Vector3.up, new Vector3(0.0f, -(0.5f + device.config.ClamphingeDiameter / 2 / device.config.ArmLength) * armcapture1.CylinderFullHeight, 0.0f));
+        joint.Config(pivotObject, gameObject, device.config.ClampKinematic, JointPhysics.Hinge);
 
         drive.KinematicAngularVelocity = device.config.ClampKinematicAngularVelocity;
         drive.Proportional = device.config.ClampACSProportional;

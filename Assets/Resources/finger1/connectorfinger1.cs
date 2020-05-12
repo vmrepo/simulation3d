@@ -15,7 +15,7 @@ public class connectorfinger1 : MonoBehaviour
         transform.position = device.pivot.Object.transform.rotation * (device.pivot.position + Vector3.down * device.config.ConnectorHeight / 2) + device.pivot.Object.transform.position;
         transform.rotation = device.pivot.Object.transform.rotation * device.pivot.rotation;
 
-        joint.Config(device.pivot.Object, gameObject, device.config.Kinematic, JointPhysics.Fixed, Vector3.up, Vector3.zero);
+        joint.Config(device.pivot.Object, gameObject, device.config.Kinematic, JointPhysics.Fixed);
     }
 
     // Start is called before the first frame update

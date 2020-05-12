@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//направление axis для joint обязано совпадать с локальным направлением вверх для шарнира(чаще цилиндра) т.е. Vector3.up
-//иначе мотор для физики неправильно будет управляться и изменятся направления в кинематике
-//у объекта должен быть единственный HingeJoint
-
 public class DriveJoint
 {
     public AngleRange AngleRange = new AngleRange();
@@ -21,7 +17,11 @@ public class DriveJoint
 
     private float deltaSAngle = 0.0f;
 
-    //deprecated, need for compatible, support phycisc only
+    //оставлено, чтобы поддержать старый вариант, поддерживает только физический тип соединения
+    //вручную создаётся Joint, ancjor и axis выставляются вручную, а не автоматически в CommonJoint    
+    //axis обязана совпадать с локальным направлением вверх для шарнира(чаще цилиндра) т.е. Vector3.up
+    //иначе мотор для физики неправильно будет управляться и изменятся направления в кинематике
+    //у объекта должен быть единственный HingeJoint
     public void Attach(GameObject pivot, GameObject obj)
     {
         commonJoint = null;
@@ -43,7 +43,7 @@ public class DriveJoint
         Quaternion localRotation = Quaternion.Inverse(pivotObject.transform.rotation) * gameObject.transform.rotation;
         Quaternion rotation = Quaternion.Inverse(rotationInit) * localRotation;
 
-        float angle = AngleRange.CheckRange(Vector3.Dot(rotation.eulerAngles, Vector3.up));//Vector3.up - cylinder axis
+        float angle = AngleRange.CheckRange(Vector3.Dot(rotation.eulerAngles, Vector3.up));
 
         float deltaAngle = AngleRange.Delta(angle, AngleRange.GetTarget());
 

@@ -18,7 +18,7 @@ public class armhingecapture1 : MonoBehaviour
         transform.position = pivotObject.transform.rotation * (Vector3.down * device.config.ConnectorWidth / 2) + pivotObject.transform.position;
         transform.rotation = pivotObject.transform.rotation;
 
-        joint.Config(pivotObject, gameObject, device.config.ArmKinematic, JointPhysics.Hinge, Vector3.up, new Vector3(0.0f, -0.5f * CylinderFullHeight, 0.0f));
+        joint.Config(pivotObject, gameObject, device.config.ArmKinematic, JointPhysics.Hinge);
 
         drive.KinematicAngularVelocity = device.config.ArmKinematicAngularVelocity;
         drive.Proportional = device.config.ArmACSProportional;

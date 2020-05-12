@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// физическое или кинематическое соединение секций, соединение может быть подвижным или фиксированным
+// для управления подвижным соединением нужно ещё ставить DriveJoint
+// подвижное соединение ассоиируется только с объектом, который должен вращаться вокруг своей локальной оси Vector3.up - чаще всего цилиндр
+// именно цилиндр вращается, а следующее звено соединяется к нему фиксированно
+// в случае физического варианта соединения будет создан HingeJoint у звена, к которому подсоединяется цилиндр
+
 public enum JointPhysics
 {
     Fixed,
@@ -27,7 +33,7 @@ public class CommonJoint
         return gameObject;
     }
 
-    public void Config(GameObject pivot, GameObject obj, bool kinematic, JointPhysics physics, Vector3 axis, Vector3 anchor)
+    public void Config(GameObject pivot, GameObject obj, bool kinematic, JointPhysics physics)
     {
         pivotObject = pivot;
         gameObject = obj;
@@ -58,8 +64,10 @@ public class CommonJoint
             }
 
             jointPhysics.connectedBody = gameObject.GetComponent<Rigidbody>();
-            jointPhysics.axis = axis;
-            jointPhysics.anchor = anchor;
+            jointPhysics.axis = Quaternion.Inverse(pivotObject.transform.rotation) * gameObject.transform.rotation * Vector3.up;
+            Vector3 localposition = Quaternion.Inverse(pivotObject.transform.rotation) * (gameObject.transform.position - pivotObject.transform.position);
+            Vector3 inversescale = new Vector3(1 / pivotObject.transform.localScale.x, 1 / pivotObject.transform.localScale.y, 1 / pivotObject.transform.localScale.z);
+            jointPhysics.anchor = Vector3.Scale(localposition, inversescale);
         }
     }
 

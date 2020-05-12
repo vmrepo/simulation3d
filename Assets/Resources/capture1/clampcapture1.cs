@@ -17,7 +17,7 @@ public class clampcapture1 : MonoBehaviour
         transform.position = pivotObject.transform.rotation * Quaternion.AngleAxis(90, Vector3.back) * (Vector3.down * (device.config.ClamphingeDiameter / 2 + device.config.ClampWidth / 2)) + pivotObject.transform.position;
         transform.rotation = pivotObject.transform.rotation * Quaternion.AngleAxis(90, Vector3.back);
 
-        joint.Config(pivotObject, gameObject, device.config.ClampKinematic, JointPhysics.Fixed, Vector3.up, Vector3.zero);
+        joint.Config(pivotObject, gameObject, device.config.ClampKinematic, JointPhysics.Fixed);
     }
 
     // Start is called before the first frame update
