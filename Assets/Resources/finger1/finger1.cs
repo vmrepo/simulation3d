@@ -73,11 +73,11 @@ public class finger1 : device
 
     public void SetPos(float angle0)
     {
-        section.GetComponent<sectionfinger1>().drive.AngleRange.SetTarget(angle0);
+        connection.GetComponent<connectionfinger1>().drive.AngleRange.SetTarget(angle0);
     }
 
     public float GetPos0()
     {
-        return section.GetComponent<sectionfinger1>().drive.AngleRange.GetTarget();
+        return connection.GetComponent<connectionfinger1>().drive.AngleRange.GetTarget();
     }
 }

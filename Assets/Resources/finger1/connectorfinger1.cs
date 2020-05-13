@@ -12,7 +12,9 @@ public class connectorfinger1 : MonoBehaviour
         GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
 
         transform.localScale = new Vector3(device.config.SectionThick, device.config.ConnectorHeight, device.config.SectionWidth);
-        transform.position = device.pivot.Object.transform.rotation * (device.pivot.position + Vector3.down * device.config.ConnectorHeight / 2) + device.pivot.Object.transform.position;
+        Vector3 ofs = device.pivot.rotation * Vector3.down * device.config.ConnectorHeight / 2;
+        transform.position = device.pivot.Object.transform.rotation * (device.pivot.position + ofs) + device.pivot.Object.transform.position;
+        transform.rotation = device.pivot.Object.transform.rotation * device.pivot.rotation;
         transform.rotation = device.pivot.Object.transform.rotation * device.pivot.rotation;
 
         joint.Config(device.pivot.Object, gameObject, device.config.Kinematic, JointPhysics.Fixed);
