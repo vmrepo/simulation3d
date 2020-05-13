@@ -6,6 +6,7 @@ public class AngleRange
     private float downlimit;
     private float uplimit;
     private float targetangle;
+    private bool controlallow = false;
 
     //приводит угол к диапазону от 0 включительно до 360 невключительно
     public float CheckRange(float angle)
@@ -22,7 +23,7 @@ public class AngleRange
     {
         if (downlimit < uplimit)
         {
-            if (targetangle < downlimit || uplimit <= targetangle)
+            if (targetangle < downlimit || LE(uplimit, targetangle))
             {
                 if (Distance(targetangle, downlimit) < Distance(targetangle, uplimit))
                     targetangle = downlimit < 360 ? downlimit : 0;
@@ -32,7 +33,7 @@ public class AngleRange
         }
         else
         {
-            if (targetangle < downlimit && uplimit <= targetangle)
+            if (targetangle < downlimit && LE(uplimit, targetangle))
             {
                 if (Distance(targetangle, downlimit) < Distance(targetangle, uplimit))
                     targetangle = downlimit < 360 ? downlimit : 0;
@@ -53,6 +54,8 @@ public class AngleRange
 
         checklimits();
 
+        controlallow = true;
+
         return true;
     }
 
@@ -68,6 +71,11 @@ public class AngleRange
         return uplimit;
     }
 
+    public bool LE(float v1, float v2)
+    {
+        return v1 < v2 || UnityEngine.Mathf.Abs(v2 - v1) < 0.01;
+    }
+
     //проверяет поападание угла в разрешённый диапазон
     public bool IsAllow(float angle)
     {
@@ -78,22 +86,36 @@ public class AngleRange
 
         angle = CheckRange(angle);
 
-        if  (downlimit < uplimit && downlimit <= angle && angle <= uplimit)
+        if  (downlimit < uplimit && LE(downlimit, angle) && LE(angle, uplimit))
             return true;
 
-        if (downlimit > uplimit && uplimit <= angle || angle <= downlimit)
+        if (downlimit > uplimit && LE(uplimit, angle) || LE(angle, downlimit))
             return true;
 
         return false;
     }
 
-    //возвращает кратчайшую дистанцию от 1-ого угла ко 2-му со знаком направления и с учётом разрешённого диапазона
+    //возвращает кратчайшую дистанцию от 1-ого угла ко 2-му со знаком направления
+    //если установлен controlallow, то путь не должен лежать через запрещённый участок
+    //controlallow устанавливается при установке лимитов, чтобы путь к границе был адекватен, затем сбрасывается
+    //в рабочем состоянии проверка пути, чаще всего не требуется
+    //и наоборот при его включении в физике иногда из-за погрешностей могут путаться разрешённые и запрещённые пути
     public float Delta(float angle1, float angle2)
     {
         angle1 = CheckRange(angle1);
         angle2 = CheckRange(angle2);
 
         float delta = angle2 - angle1;
+
+        if (!controlallow)
+        {
+            if (UnityEngine.Mathf.Abs(delta) > 180)
+            {
+                delta -= UnityEngine.Mathf.Sign(delta) * 360;
+            }
+
+            return delta;
+        }
 
         if ((downlimit == 0 && uplimit == 360) || !IsAllow(angle1) || !IsAllow(angle2))
         {
@@ -104,21 +126,23 @@ public class AngleRange
         }
         else
         {
-            if ((downlimit > uplimit) && (
-                ((downlimit < angle1 || UnityEngine.Mathf.Abs(downlimit - angle1) < 0.01) && 
+            if ((downlimit > uplimit && 
+                LE(downlimit, angle1) && 
                 angle1 < 360 && 
-                (0 < angle2 || UnityEngine.Mathf.Abs(angle2) < 0.01) && 
-                (angle2 < uplimit || UnityEngine.Mathf.Abs(uplimit - angle2) < 0.01))
+                LE(0, angle2) && 
+                LE(angle2, uplimit))
                 ||
-                ((downlimit < angle2 || UnityEngine.Mathf.Abs(downlimit - angle2) < 0.01) && 
+                (LE(downlimit, angle2) && 
                 angle2 < 360 && 
-                (0 < angle1 || UnityEngine.Mathf.Abs(angle1) < 0.01) && 
-                (angle1 < uplimit || UnityEngine.Mathf.Abs(uplimit - angle1) < 0.01))
-                ))
+                LE(0, angle1) && 
+                LE(angle1, uplimit))
+                )
             {
                 delta -= UnityEngine.Mathf.Sign(delta) * 360;
             }
         }
+
+        controlallow = false;
 
         return delta;
     }
