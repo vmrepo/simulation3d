@@ -56,18 +56,20 @@ public class CommonJoint
             if (physics == JointPhysics.Fixed)
             {
                 jointPhysics = pivotObject.AddComponent<FixedJoint>();
+                jointPhysics.axis = Vector3.up;
+                jointPhysics.anchor = Vector3.zero;
             }
 
             if (physics == JointPhysics.Hinge)
             {
                 jointPhysics = pivotObject.AddComponent<HingeJoint>();
+                jointPhysics.axis = Quaternion.Inverse(pivotObject.transform.rotation) * gameObject.transform.rotation * Vector3.up;
+                Vector3 localposition = Quaternion.Inverse(pivotObject.transform.rotation) * (gameObject.transform.position - pivotObject.transform.position);
+                Vector3 inversescale = new Vector3(1 / pivotObject.transform.localScale.x, 1 / pivotObject.transform.localScale.y, 1 / pivotObject.transform.localScale.z);
+                jointPhysics.anchor = Vector3.Scale(localposition, inversescale);
             }
 
             jointPhysics.connectedBody = gameObject.GetComponent<Rigidbody>();
-            jointPhysics.axis = Quaternion.Inverse(pivotObject.transform.rotation) * gameObject.transform.rotation * Vector3.up;
-            Vector3 localposition = Quaternion.Inverse(pivotObject.transform.rotation) * (gameObject.transform.position - pivotObject.transform.position);
-            Vector3 inversescale = new Vector3(1 / pivotObject.transform.localScale.x, 1 / pivotObject.transform.localScale.y, 1 / pivotObject.transform.localScale.z);
-            jointPhysics.anchor = Vector3.Scale(localposition, inversescale);
         }
     }
 
