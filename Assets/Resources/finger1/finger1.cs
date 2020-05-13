@@ -17,56 +17,46 @@ public class configfinger1
     public float SectionACSProportional = 1.5f;
     public float SectionACSIntegral = 0.0f;
     public float SectionACSDifferential = 1.1f;
-    public float SectionAngle0 = 315.0f;
-    public float SectionAngle1 = 45.0f;
+    public float SectionAngle0 = 340.0f;
+    public float SectionAngle1 = 10.0f;
     public int SectionCount = 5;
 }
 
-public class finger1 : device
+public class finger1section
 {
-    public pivot pivot = new pivot();
-    public configfinger1 config = new configfinger1();
+    public GameObject connection = null;
+    public GameObject section = null;
 
-    private bool iscreated = false;
-    private GameObject connector = null;
-    private GameObject connection = null;
-    private GameObject section = null;
-
-    public override void Place()
+    static public finger1section Create(GameObject pivotObject)
     {
-        if (!iscreated)
-        {
-            //создание из префабов и связи объектов
-            connector = GameObject.Instantiate(Resources.Load("finger1/connector", typeof(GameObject)) as GameObject);
-            connection = GameObject.Instantiate(Resources.Load("finger1/connection", typeof(GameObject)) as GameObject);
-            section = GameObject.Instantiate(Resources.Load("finger1/section", typeof(GameObject)) as GameObject);
+        finger1section section = new finger1section();
 
-            connection.GetComponent<connectionfinger1>().pivotObject = connector;
-            section.GetComponent<sectionfinger1>().pivotObject = connection;
+        section.connection = GameObject.Instantiate(Resources.Load("finger1/connection", typeof(GameObject)) as GameObject);
+        section.section = GameObject.Instantiate(Resources.Load("finger1/section", typeof(GameObject)) as GameObject);
 
-            iscreated = true;
-        }
+        section.connection.GetComponent<connectionfinger1>().pivotObject = pivotObject;
+        section.section.GetComponent<sectionfinger1>().pivotObject = section.connection;
 
-        connector.GetComponent<connectorfinger1>().Init(this);
-        connection.GetComponent<connectionfinger1>().Init(this);
-        section.GetComponent<sectionfinger1>().Init(this);
+        return section;
     }
 
-    public override void Remove()
+    public void Remove()
     {
-        MonoBehaviour.Destroy(connector);
         MonoBehaviour.Destroy(connection);
         MonoBehaviour.Destroy(section);
 
-        iscreated = false;
-        connector = null;
         connection = null;
         section = null;
     }
 
-    public override void KinematicUpdate()
+    public void Init(finger1 device)
     {
-        connector.GetComponent<connectorfinger1>().KinematicUpdate();
+        connection.GetComponent<connectionfinger1>().Init(device);
+        section.GetComponent<sectionfinger1>().Init(device);
+    }
+
+    public void KinematicUpdate()
+    {
         connection.GetComponent<connectionfinger1>().KinematicUpdate();
         section.GetComponent<sectionfinger1>().KinematicUpdate();
     }
@@ -79,5 +69,71 @@ public class finger1 : device
     public float GetPos0()
     {
         return connection.GetComponent<connectionfinger1>().drive.AngleRange.GetTarget();
+    }
+}
+
+public class finger1 : device
+{
+    public pivot pivot = new pivot();
+    public configfinger1 config = new configfinger1();
+
+    private bool iscreated = false;
+    private GameObject connector = null;
+
+    private List<finger1section> sections = new List<finger1section>();
+
+    public override void Place()
+    {
+        if (!iscreated)
+        {
+            //создание из префабов и связи объектов
+            connector = GameObject.Instantiate(Resources.Load("finger1/connector", typeof(GameObject)) as GameObject);
+
+            GameObject pivotObject = connector;
+            for (int i = 0; i < config.SectionCount; i++)
+            {
+                sections.Add(finger1section.Create(pivotObject));
+                pivotObject = sections[i].section;
+            }
+
+            iscreated = true;
+        }
+
+        connector.GetComponent<connectorfinger1>().Init(this);
+
+        for (int i = 0; i < config.SectionCount; i++)
+            sections[i].Init(this);
+    }
+
+    public override void Remove()
+    {
+        MonoBehaviour.Destroy(connector);
+
+        for (int i = 0; i < config.SectionCount; i++)
+            sections[i].Remove();
+
+        iscreated = false;
+        connector = null;
+
+        sections.Clear();
+    }
+
+    public override void KinematicUpdate()
+    {
+        connector.GetComponent<connectorfinger1>().KinematicUpdate();
+
+        for (int i = 0; i < config.SectionCount; i++)
+            sections[i].KinematicUpdate();
+    }
+
+    public void SetPos(float angle0)
+    {
+        for (int i = 0; i < config.SectionCount; i++)
+            sections[i].SetPos(angle0);
+    }
+
+    public float GetPos0()
+    {
+        return sections[0].GetPos0();
     }
 }
