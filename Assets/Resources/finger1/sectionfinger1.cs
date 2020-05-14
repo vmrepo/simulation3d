@@ -13,6 +13,8 @@ public class sectionfinger1 : MonoBehaviour
         GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
 
         transform.localScale = new Vector3(device.config.SectionThick, device.config.SectionHeight, device.config.SectionWidth);
+        transform.GetChild(0).localScale = new Vector3(device.config.RibHeight / device.config.SectionThick, 1.0f / 3, 1.0f);
+        transform.GetChild(0).localPosition = new Vector3(-0.5f * (1.0f + device.config.RibHeight / device.config.SectionThick), 0, 0);
         transform.position = pivotObject.transform.rotation * Quaternion.AngleAxis(90, Vector3.left) * (Vector3.down * device.config.SectionHeight / 2) + pivotObject.transform.position;
         transform.rotation = pivotObject.transform.rotation * Quaternion.AngleAxis(90, Vector3.left);
 

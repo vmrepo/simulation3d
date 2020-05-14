@@ -9,6 +9,7 @@ public class configfinger1
     public bool Kinematic = true;
     public float ConnectorMass = 0.01f;
     public float ConnectorHeight = 0.01f;
+    public float RibHeight = 0.01f;
     public float SectionMass = 0.01f;
     public float SectionHeight = 0.03f;
     public float SectionWidth = 0.015f;

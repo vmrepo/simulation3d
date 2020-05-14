@@ -367,6 +367,8 @@ public class manipulator2 : device
             chassis.GetComponent<chassismanipulator2>().armkinematicangularvelocity = config.KinematicAngularVelocity != 0 ? config.KinematicAngularVelocity : config.ArmKinematicAngularVelocity;
             chassis.GetComponent<chassismanipulator2>().Kinematic(kinematicanglerange0.GetTarget(), kinematicanglerange1.GetTarget(), kinematicanglerange2.GetTarget());
         }
+
+        capture.SetPos(0, GetPos1() + GetPos2() - 180);//схват вниз
     }
 
     public override void Remove()
@@ -440,6 +442,8 @@ public class manipulator2 : device
             drive1.AngleRange.SetTarget(-90 + angle2);
             drive2.AngleRange.SetTarget(drive3.AngleRange.GetTarget() + drive1.AngleRange.GetTarget());
         }
+
+        capture.SetPos(0, GetPos1() + GetPos2() - 180);//схват вниз
     }
 
     public float GetPos0()
