@@ -80,6 +80,21 @@ public class configmanipulator2
     public float CaptureClampAngle1 = 120.0f;
     public float CaptureClampDiameter = 0.06f;
     public float CaptureClampWidth = 0.028f;
+    public bool FingerKinematic = true;
+    public float FingerConnectorMass = 0.005f;
+    public float FingerConnectorHeight = 0.001f;
+    public float FingerRibHeight = 0.005f;
+    public float FingerSectionMass = 0.005f;
+    public float FingerSectionHeight = 0.03f;
+    public float FingerSectionWidth = 0.025f;
+    public float FingerSectionThick = 0.005f;
+    public float FingerSectionKinematicAngularVelocity = 100.0f;
+    public float FingerSectionACSProportional = 1.5f;
+    public float FingerSectionACSIntegral = 0.0f;
+    public float FingerSectionACSDifferential = 1.1f;
+    public float FingerSectionAngle0 = 340.0f;
+    public float FingerSectionAngle1 = 0.0f;
+    public int FingerSectionCount = 4;
 }
 
 public class manipulator2 : device
@@ -103,7 +118,8 @@ public class manipulator2 : device
     private GameObject wheelhinge2 = null;
     private GameObject wheel2 = null;
 
-    public capture1 capture = null;
+    private capture1 capture = null;
+    private List<finger1> fingers = new List<finger1>();
 
     private AngleRange kinematicanglerange0 = new AngleRange();
     private AngleRange kinematicanglerange1 = new AngleRange();
@@ -154,6 +170,8 @@ public class manipulator2 : device
             wheel2.GetComponent<wheel2manipulator2>().rotatingplatformobject = rotatingplatform;
 
             capture = new capture1();
+            for (int i = 0; i < 4; i++)
+                fingers.Add(new finger1());
 
             isinited = true;
         }
@@ -161,6 +179,7 @@ public class manipulator2 : device
         {
             var b = chassis.GetComponent<chassismanipulator2>();
             b.capture = capture;
+            b.fingers = fingers;
             b.drive.Proportional = config.RotatingplatformACSProportional;
             b.drive.Integral = config.RotatingplatformACSIntegral;
             b.drive.Differential = config.RotatingplatformACSDifferential;
@@ -354,6 +373,60 @@ public class manipulator2 : device
             capture.Place();
         }
 
+        {
+            for (int i = 0; i < fingers.Count; i++)
+            {
+                fingers[i].config.Kinematic = config.FingerKinematic;
+                fingers[i].config.ConnectorMass = config.FingerConnectorMass;
+                fingers[i].config.ConnectorHeight = config.FingerConnectorHeight;
+                fingers[i].config.RibHeight = config.FingerRibHeight;
+                fingers[i].config.SectionMass = config.FingerSectionMass;
+                fingers[i].config.SectionHeight = config.FingerSectionHeight;
+                fingers[i].config.SectionWidth = config.FingerSectionWidth;
+                fingers[i].config.SectionThick = config.FingerSectionThick;
+                fingers[i].config.SectionKinematicAngularVelocity = config.FingerSectionKinematicAngularVelocity;
+                fingers[i].config.SectionACSProportional = config.FingerSectionACSProportional;
+                fingers[i].config.SectionACSIntegral = config.FingerSectionACSIntegral;
+                fingers[i].config.SectionACSDifferential = config.FingerSectionACSDifferential;
+                fingers[i].config.SectionAngle0 = config.FingerSectionAngle0;
+                fingers[i].config.SectionAngle1 = config.FingerSectionAngle1;
+                fingers[i].config.SectionCount = config.FingerSectionCount;
+
+                GameObject clamp = capture.GetClamp();
+
+                fingers[i].pivot.Object = clamp;
+
+                switch (i)
+                {
+                    case 0:
+                        fingers[i].pivot.position = Vector3.down * clamp.transform.localScale.y / 2 * clampcapture1.CylinderFullHeight +
+                            Vector3.left * (config.CaptureClampDiameter / 2 - fingers[i].config.SectionThick / 2);
+                        fingers[i].pivot.rotation = Quaternion.identity;
+                        break;
+
+                    case 1:
+                        fingers[i].pivot.position = Vector3.down * clamp.transform.localScale.y / 2 * clampcapture1.CylinderFullHeight +
+                            Vector3.right * (config.CaptureClampDiameter / 2 - fingers[i].config.SectionThick / 2);
+                        fingers[i].pivot.rotation = Quaternion.AngleAxis(180, Vector3.up);
+                        break;
+
+                    case 2:
+                        fingers[i].pivot.position = Vector3.down * clamp.transform.localScale.y / 2 * clampcapture1.CylinderFullHeight +
+                            Vector3.forward * (config.CaptureClampDiameter / 2 - fingers[i].config.SectionThick / 2);
+                        fingers[i].pivot.rotation = Quaternion.AngleAxis(90, Vector3.up);
+                        break;
+
+                    case 3:
+                        fingers[i].pivot.position = Vector3.down * clamp.transform.localScale.y / 2 * clampcapture1.CylinderFullHeight +
+                            Vector3.back * (config.CaptureClampDiameter / 2 - fingers[i].config.SectionThick / 2);
+                        fingers[i].pivot.rotation = Quaternion.AngleAxis(-90, Vector3.up);
+                        break;
+                }
+
+                fingers[i].Place();
+            }
+        }
+
         if (config.Kinematic)
         {
             kinematicanglerange0.SetLimits(config.RotatingplatformAngle0, config.RotatingplatformAngle1);
@@ -390,6 +463,8 @@ public class manipulator2 : device
         MonoBehaviour.Destroy(wheel2);
 
         capture.Remove();
+        for (int i = 0; i < fingers.Count; i++)
+            fingers[i].Remove();
 
         isinited = false;
         chassis = null;
@@ -409,6 +484,7 @@ public class manipulator2 : device
         wheel2 = null;
 
         capture = null;
+        fingers.Clear();
     }
 
     public void SetPos(float angle0, float angle1, float angle2)
@@ -488,5 +564,16 @@ public class manipulator2 : device
             angle += 360;
 
         return angle;
+    }
+
+    public void SetGripper(float angle)
+    {
+        for (int i = 0; i < fingers.Count; i++)
+            fingers[i].SetPos(angle);
+    }
+
+    public float GetGripper()
+    {
+        return fingers[0].GetPos0();
     }
 }

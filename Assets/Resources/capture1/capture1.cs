@@ -46,6 +46,11 @@ public class capture1 : device
     private GameObject clamphinge = null;
     private GameObject clamp = null;
 
+    public GameObject GetClamp()
+    {
+        return clamp;
+    }
+
     public override void Place()
     {
         if (!iscreated)
