@@ -576,4 +576,21 @@ public class manipulator2 : device
     {
         return fingers[0].GetPos0();
     }
+
+    public int SetGripper(int gripped)
+    {
+        if (gripped == 0)
+        {
+            SetGripper(config.FingerSectionAngle0);
+            return gripped;
+        }
+
+        if (gripped == 1)
+        {
+            SetGripper(config.FingerSectionAngle1);
+            return gripped;
+        }
+
+        return -1;
+    }
 }

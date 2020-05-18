@@ -72,6 +72,13 @@ public class PacketSetpos : Packet
 }
 
 [System.Serializable]
+public class PacketSetgripper : Packet
+{
+    public int id;
+    public int gripped;
+}
+
+[System.Serializable]
 public class PacketSetcamera : Packet
 {
     public float x0;
@@ -119,6 +126,18 @@ public class PacketClearReady : Packet
 }
 
 [System.Serializable]
+public class PacketSetgripperReady : Packet
+{
+    public int ok;
+
+    public PacketSetgripperReady(int ok_)
+    {
+        packet = "ready";
+        ok = ok_;
+    }
+}
+
+[System.Serializable]
 public class PacketSetcameraReady : Packet
 {
     public int ok;
@@ -137,6 +156,7 @@ public enum Calltype
     Delete,
     Clear,
     Setpos,
+    Setgripper,
     Setcamera
 }
 
@@ -267,6 +287,32 @@ public class Server0
         }
 
         return;
+    }
+
+    // вызывается из потока собыйти unity
+    static private PacketSetgripperReady setgripper(PacketHeader packet)
+    {
+        PacketSetgripper setgripper = UnityEngine.JsonUtility.FromJson<PacketSetgripper>(packet.json_data);
+
+        if (!devices.ContainsKey(setgripper.id))
+            return new PacketSetgripperReady(-1);
+
+        int gripped;
+
+        switch (devices[setgripper.id].GetType().ToString())
+        {
+            case "manipulator2":
+                {
+                    manipulator2 manipulator = (manipulator2)devices[setgripper.id];
+                    gripped = manipulator.SetGripper(setgripper.gripped);
+                }
+                break;
+
+            default:
+                return new PacketSetgripperReady(-1);
+        }
+
+        return new PacketSetgripperReady(gripped);
     }
 
     // вызывается из потока собыйти unity
@@ -504,6 +550,11 @@ public class Server0
                 calldata.type = Calltype.None;
                 break;
 
+            case Calltype.Setgripper:
+                calldata.outputpacket = setgripper((PacketHeader)calldata.inputpacket);
+                calldata.manualevent.Set();
+                break;
+
             case Calltype.Setcamera:
                 calldata.outputpacket = setcamera((PacketHeader)calldata.inputpacket);
                 calldata.manualevent.Set();
@@ -611,6 +662,11 @@ public class Server0
                     else if (packet.packet == "setpos")
                     {
                         async(Calltype.Setpos, packet);
+                        continue;
+                    }
+                    else if (packet.packet == "setgripper")
+                    {
+                        send_packet(context, call(Calltype.Setgripper, packet));
                         continue;
                     }
                     else if (packet.packet == "setcamera")

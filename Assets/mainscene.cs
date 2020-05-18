@@ -101,22 +101,12 @@ public class mainscene : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            manipulator1.capture.SetPos(manipulator1.capture.GetPos0() - delta, manipulator1.capture.GetPos1());
+            manipulator1.SetGripper(manipulator1.GetGripper() - delta);
         }
 
         if (Input.GetKeyDown(KeyCode.F))
         {
-            manipulator1.capture.SetPos(manipulator1.capture.GetPos0() + delta, manipulator1.capture.GetPos1());
-        }
-
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            manipulator1.capture.SetPos(manipulator1.capture.GetPos0(), manipulator1.capture.GetPos1() - delta);
-        }
-
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            manipulator1.capture.SetPos(manipulator1.capture.GetPos0(), manipulator1.capture.GetPos1() + delta);
+            manipulator1.SetGripper(manipulator1.GetGripper() + delta);
         }*/
     }
 

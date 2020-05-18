@@ -382,7 +382,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetposition: {x: 0, y: 0, z: 0}
+  mouseSensitivity: 0.5
   zoomSpeed: 5
-  mouseSensRotatiton: 0.6
-  mouseSensTranslatiton: 0.2
-  cam_holder: {fileID: 534669904}
