@@ -61,9 +61,9 @@ public class configmanipulator2
     public float CaptureConnectorWidth = 0.02f;
     public float CaptureArmMass = 0.2f;
     public float CaptureArmKinematicAngularVelocity = 100.0f;
-    public float CaptureArmACSProportional = 0.3f;
+    public float CaptureArmACSProportional = 1.5f;
     public float CaptureArmACSIntegral = 0.0f;
-    public float CaptureArmACSDifferential = 0.2f;
+    public float CaptureArmACSDifferential = 1.1f;
     public float CaptureArmAngle0 = 0.0f;
     public float CaptureArmAngle1 = 360.0f;
     public float CaptureArmDiameter = 0.03f;
