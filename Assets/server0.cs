@@ -69,6 +69,8 @@ public class PacketSetpos : Packet
     public float a0;
     public float a1;
     public float a2;
+    public float a3;
+    public float a4;
 }
 
 [System.Serializable]
@@ -278,7 +280,7 @@ public class Server0
             case "manipulator2":
                 {
                     manipulator2 manipulator = (manipulator2)devices[setpos.id];
-                    manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2);
+                    manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4);
                 }
                 break;
 

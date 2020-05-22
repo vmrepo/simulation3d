@@ -95,6 +95,7 @@ public class configmanipulator2
     public float FingerSectionAngle0 = 340.0f;
     public float FingerSectionAngle1 = 0.0f;
     public int FingerSectionCount = 4;
+    public bool FingerDown = true;
 }
 
 public class manipulator2 : device
@@ -487,7 +488,7 @@ public class manipulator2 : device
         fingers.Clear();
     }
 
-    public void SetPos(float angle0, float angle1, float angle2)
+    public void SetPos(float angle0, float angle1, float angle2, float angle3, float angle4)
     {
         if (config.Kinematic)
         {
@@ -519,7 +520,14 @@ public class manipulator2 : device
             drive2.AngleRange.SetTarget(drive3.AngleRange.GetTarget() + drive1.AngleRange.GetTarget());
         }
 
-        capture.SetPos(0, GetPos1() + GetPos2() - 180);//схват вниз
+        if (config.FingerDown)
+        {
+            capture.SetPos(0, GetPos1() + GetPos2() - 180);
+        }
+        else
+        {
+            capture.SetPos(angle3, angle4);
+        }
     }
 
     public float GetPos0()
@@ -564,6 +572,16 @@ public class manipulator2 : device
             angle += 360;
 
         return angle;
+    }
+
+    public float GetPos3()
+    {
+        return capture.GetPos0();
+    }
+
+    public float GetPos4()
+    {
+        return capture.GetPos1();
     }
 
     public void SetGripper(float angle)

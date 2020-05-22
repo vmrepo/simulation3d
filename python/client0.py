@@ -94,13 +94,13 @@ def main():
         data = receive_packet(context)
         id1 = data['id']
 
-        send_packet(context, {'packet':'create', 'type':'manipulator2', 'x':1, 'y':0, 'z':0})
+        send_packet(context, {'packet':'create', 'type':'manipulator2', 'x':1, 'y':0, 'z':0, 'FingerDown':False})
         data = receive_packet(context)
         id2 = data['id']
 
         send_packet(context, {'packet':'setpos', 'id':id1, 'a0':90, 'a1':45, 'a2':90})
         time.sleep(0.2)
-        send_packet(context, {'packet':'setpos', 'id':id2, 'a0':90, 'a1':45, 'a2':90})
+        send_packet(context, {'packet':'setpos', 'id':id2, 'a0':90, 'a1':45, 'a2':90, 'a3':90, 'a4':0})
         time.sleep(0.2)
 
         send_packet(context, {'packet':'setgripper', 'id':id2, 'gripped':1})
