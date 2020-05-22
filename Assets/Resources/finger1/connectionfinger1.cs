@@ -6,6 +6,7 @@ public class connectionfinger1 : MonoBehaviour
 {
     public const int CylinderFullHeight = 2;//it is cylinder, remember for cylinder, local y (height) is half of real
     public GameObject pivotObject = null;
+    public bool isFirst = false;
     public CommonJoint joint = new CommonJoint();
     public DriveJoint drive = new DriveJoint();
 
@@ -15,7 +16,7 @@ public class connectionfinger1 : MonoBehaviour
         GetComponent<Rigidbody>().useGravity = device.config.UseGravity;
 
         transform.localScale = new Vector3(device.config.SectionThick, device.config.SectionWidth / CylinderFullHeight, device.config.SectionThick);
-        transform.position = pivotObject.transform.rotation * (Vector3.down * device.config.ConnectorHeight / 2) + pivotObject.transform.position;
+        transform.position = pivotObject.transform.rotation * (Vector3.down * (isFirst ? device.config.ConnectorHeight : device.config.SectionHeight) / 2) + pivotObject.transform.position;
         transform.rotation = pivotObject.transform.rotation * Quaternion.AngleAxis(90, Vector3.right);
 
         joint.Config(pivotObject, gameObject, device.config.Kinematic, JointPhysics.Hinge);

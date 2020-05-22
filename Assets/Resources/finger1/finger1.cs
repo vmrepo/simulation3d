@@ -28,7 +28,7 @@ public class finger1section
     public GameObject connection = null;
     public GameObject section = null;
 
-    static public finger1section Create(GameObject pivotObject)
+    static public finger1section Create(GameObject pivotObject, bool isFirst)
     {
         finger1section section = new finger1section();
 
@@ -36,6 +36,7 @@ public class finger1section
         section.section = GameObject.Instantiate(Resources.Load("finger1/section", typeof(GameObject)) as GameObject);
 
         section.connection.GetComponent<connectionfinger1>().pivotObject = pivotObject;
+        section.connection.GetComponent<connectionfinger1>().isFirst = isFirst;
         section.section.GetComponent<sectionfinger1>().pivotObject = section.connection;
 
         return section;
@@ -93,7 +94,7 @@ public class finger1 : device
             GameObject pivotObject = connector;
             for (int i = 0; i < config.SectionCount; i++)
             {
-                sections.Add(finger1section.Create(pivotObject));
+                sections.Add(finger1section.Create(pivotObject, i == 0));
                 pivotObject = sections[i].section;
             }
 

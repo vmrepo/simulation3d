@@ -5,8 +5,8 @@ using UnityEngine;
 
 public class mainscene : MonoBehaviour
 {
-    /*private manipulator1 manipulator0 = null;
-    private manipulator2 manipulator1 = null;*/
+    //private manipulator1 manipulator0 = null;
+    //private manipulator2 manipulator1 = null;
 
     // Start is called before the first frame update
     void Start()
@@ -40,9 +40,9 @@ public class mainscene : MonoBehaviour
         /*manipulator0 = new manipulator1();
         manipulator0.config.x = -2;
         manipulator0.config.Kinematic = false;
-        manipulator0.Place();
+        manipulator0.Place();*/
 
-        manipulator1 = new manipulator2();
+        /*manipulator1 = new manipulator2();
         manipulator1.config.x = 2;
         manipulator1.config.FingerDown = false;
         manipulator1.config.Kinematic = false;
@@ -66,37 +66,37 @@ public class mainscene : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            manipulator0.SetPos(manipulator0.GetPos0() - delta, manipulator0.GetPos1(), manipulator0.GetPos2());
+            //manipulator0.SetPos(manipulator0.GetPos0() - delta, manipulator0.GetPos1(), manipulator0.GetPos2());
             manipulator1.SetPos(manipulator1.GetPos0() - delta, manipulator1.GetPos1(), manipulator1.GetPos2(), manipulator1.GetPos3(), manipulator1.GetPos4());
         }
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            manipulator0.SetPos(manipulator0.GetPos0() + delta, manipulator0.GetPos1(), manipulator0.GetPos2());
+            //manipulator0.SetPos(manipulator0.GetPos0() + delta, manipulator0.GetPos1(), manipulator0.GetPos2());
             manipulator1.SetPos(manipulator1.GetPos0() + delta, manipulator1.GetPos1(), manipulator1.GetPos2(), manipulator1.GetPos3(), manipulator1.GetPos4());
         }
 
         if (Input.GetKeyDown(KeyCode.W))
         {
-            manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1() - delta, manipulator0.GetPos2());
+            //manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1() - delta, manipulator0.GetPos2());
             manipulator1.SetPos(manipulator1.GetPos0(), manipulator1.GetPos1() - delta, manipulator1.GetPos2(), manipulator1.GetPos3(), manipulator1.GetPos4());
         }
 
         if (Input.GetKeyDown(KeyCode.S))
         {
-            manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1() + delta, manipulator0.GetPos2());
+            //manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1() + delta, manipulator0.GetPos2());
             manipulator1.SetPos(manipulator1.GetPos0(), manipulator1.GetPos1() + delta, manipulator1.GetPos2(), manipulator1.GetPos3(), manipulator1.GetPos4());
         }
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1(), manipulator0.GetPos2() - delta);
+            //manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1(), manipulator0.GetPos2() - delta);
             manipulator1.SetPos(manipulator1.GetPos0(), manipulator1.GetPos1(), manipulator1.GetPos2() - delta, manipulator1.GetPos3(), manipulator1.GetPos4());
         }
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-            manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1(), manipulator0.GetPos2() + delta);
+            //manipulator0.SetPos(manipulator0.GetPos0(), manipulator0.GetPos1(), manipulator0.GetPos2() + delta);
             manipulator1.SetPos(manipulator1.GetPos0(), manipulator1.GetPos1(), manipulator1.GetPos2() + delta, manipulator1.GetPos3(), manipulator1.GetPos4());
         }
 

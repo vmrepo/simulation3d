@@ -85,7 +85,7 @@ public class configmanipulator2
     public float FingerConnectorHeight = 0.001f;
     public float FingerRibHeight = 0.005f;
     public float FingerSectionMass = 0.005f;
-    public float FingerSectionHeight = 0.03f;
+    public float FingerSectionHeight = 0.015f;
     public float FingerSectionWidth = 0.025f;
     public float FingerSectionThick = 0.005f;
     public float FingerSectionKinematicAngularVelocity = 100.0f;
