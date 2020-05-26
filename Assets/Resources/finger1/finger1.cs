@@ -99,6 +99,9 @@ public class finger1section
 
 public class finger1 : device
 {
+    public delegate void Oncaught(GameObject gameObject);
+    public Oncaught oncaught = null;
+
     public pivot pivot = new pivot();
     public configfinger1 config = new configfinger1();
 
@@ -188,13 +191,13 @@ public class finger1 : device
 
     private void OnTriggerEnter(Collider other, int index)
     {
-        if (other.tag != "thing")
+        if (other.gameObject.GetComponent<thing>() == null)
             return;
 
         if (!isclenched)
             return;
 
-        if (index < caught)
+        if (index <= caught)
             return;
 
         caught = index;
@@ -212,6 +215,11 @@ public class finger1 : device
                 sections[i].SetLimits(config.SectionAngle0, angle1);
                 sections[i].SetPos(angle1);
             }
+        }
+
+        if (oncaught != null)
+        {
+            oncaught(other.gameObject);
         }
     }
 

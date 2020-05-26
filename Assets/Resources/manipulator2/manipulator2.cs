@@ -121,6 +121,7 @@ public class manipulator2 : device
 
     private capture1 capture = null;
     private List<finger1> fingers = new List<finger1>();
+    private GameObject caughtObject = null;
 
     private AngleRange kinematicanglerange0 = new AngleRange();
     private AngleRange kinematicanglerange1 = new AngleRange();
@@ -424,6 +425,8 @@ public class manipulator2 : device
                         break;
                 }
 
+                fingers[i].oncaught = OnCaught;
+
                 fingers[i].Place();
             }
         }
@@ -587,21 +590,38 @@ public class manipulator2 : device
     public void SetGripper(bool gripped)
     {
         for (int i = 0; i < fingers.Count; i++)
+        {
             fingers[i].Clench(gripped);
+        }
 
-        // здесь мы не сможем дождаться ни просто сжатия ни захвата предмета
-        // в сервере нужно делать отдельную команду чтения состояния захвата
+        if (!gripped && caughtObject != null)
+        {
+            caughtObject.GetComponent<thing>().Detach();
+            caughtObject = null;
+        }
     }
 
     public bool IsGripped()
     {
-        // если зацепили все пальцы
-
+        // проверка, что зацепили все пальцы
         bool gripped = true;
-
         for (int i = 0; i < fingers.Count; i++)
             gripped &= fingers[i].IsCaught();
 
+        // проверка, что зацепил хотя бы один палец
+        //bool gripped = false;
+        //for (int i = 0; i < fingers.Count; i++)
+        //    gripped |= fingers[i].IsCaught();
+
         return gripped;
+    }
+
+    private void OnCaught(GameObject gameObject)
+    {
+        if (!IsGripped() || caughtObject != null)
+            return;
+
+        caughtObject = gameObject;
+        caughtObject.GetComponent<thing>().Attach(capture.GetClamp());
     }
 }
