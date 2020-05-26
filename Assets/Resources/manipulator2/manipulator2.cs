@@ -584,31 +584,24 @@ public class manipulator2 : device
         return capture.GetPos1();
     }
 
-    public void SetGripper(float angle)
+    public void SetGripper(bool gripped)
     {
         for (int i = 0; i < fingers.Count; i++)
-            fingers[i].SetPos(angle);
+            fingers[i].Clench(gripped);
+
+        // здесь мы не сможем дождаться ни просто сжатия ни захвата предмета
+        // в сервере нужно делать отдельную команду чтения состояния захвата
     }
 
-    public float GetGripper()
+    public bool IsGripped()
     {
-        return fingers[0].GetPos0();
-    }
+        // если зацепили все пальцы
 
-    public int SetGripper(int gripped)
-    {
-        if (gripped == 0)
-        {
-            SetGripper(config.FingerSectionAngle0);
-            return gripped;
-        }
+        bool gripped = true;
 
-        if (gripped == 1)
-        {
-            SetGripper(config.FingerSectionAngle1);
-            return gripped;
-        }
+        for (int i = 0; i < fingers.Count; i++)
+            gripped &= fingers[i].IsCaught();
 
-        return -1;
+        return gripped;
     }
 }

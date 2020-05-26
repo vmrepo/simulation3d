@@ -40,10 +40,7 @@ public class DriveJoint
 
     public void Update()
     {
-        Quaternion localRotation = Quaternion.Inverse(pivotObject.transform.rotation) * gameObject.transform.rotation;
-        Quaternion rotation = Quaternion.Inverse(rotationInit) * localRotation;
-
-        float angle = AngleRange.CheckRange(Vector3.Dot(rotation.eulerAngles, Vector3.up));
+        float angle = GetAngle();
 
         float deltaAngle = AngleRange.Delta(angle, AngleRange.GetTarget());
 
@@ -79,5 +76,13 @@ public class DriveJoint
         motor.freeSpin = true;
         hingeJoint.motor = motor;
         hingeJoint.useMotor = true;
+    }
+
+    public float GetAngle()
+    {
+        Quaternion localRotation = Quaternion.Inverse(pivotObject.transform.rotation) * gameObject.transform.rotation;
+        Quaternion rotation = Quaternion.Inverse(rotationInit) * localRotation;
+
+        return AngleRange.CheckRange(Vector3.Dot(rotation.eulerAngles, Vector3.up));
     }
 }

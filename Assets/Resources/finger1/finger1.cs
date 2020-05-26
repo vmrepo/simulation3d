@@ -25,10 +25,13 @@ public class configfinger1
 
 public class finger1section
 {
+    public delegate void Ontriggerenter(Collider other, int index);
     public GameObject connection = null;
     public GameObject section = null;
+    public int index = -1;
+    public Ontriggerenter ontriggerenter = null;
 
-    static public finger1section Create(GameObject pivotObject, bool isFirst)
+    static public finger1section Create(GameObject pivotObject, int index)
     {
         finger1section section = new finger1section();
 
@@ -36,8 +39,10 @@ public class finger1section
         section.section = GameObject.Instantiate(Resources.Load("finger1/section", typeof(GameObject)) as GameObject);
 
         section.connection.GetComponent<connectionfinger1>().pivotObject = pivotObject;
-        section.connection.GetComponent<connectionfinger1>().isFirst = isFirst;
+        section.connection.GetComponent<connectionfinger1>().isFirst = (index == 0);
         section.section.GetComponent<sectionfinger1>().pivotObject = section.connection;
+        section.section.GetComponent<sectionfinger1>().ontriggerenter = section.OnTriggerEnter;
+        section.index = index;
 
         return section;
     }
@@ -63,6 +68,11 @@ public class finger1section
         section.GetComponent<sectionfinger1>().KinematicUpdate();
     }
 
+    public void SetLimits(float angle0, float angle1)
+    {
+        connection.GetComponent<connectionfinger1>().drive.AngleRange.SetLimits(angle0, angle1);
+    }
+
     public void SetPos(float angle0)
     {
         connection.GetComponent<connectionfinger1>().drive.AngleRange.SetTarget(angle0);
@@ -72,12 +82,28 @@ public class finger1section
     {
         return connection.GetComponent<connectionfinger1>().drive.AngleRange.GetTarget();
     }
+
+    public float GetCurrent0()
+    {
+        return connection.GetComponent<connectionfinger1>().drive.GetAngle();
+    }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (ontriggerenter != null)
+        {
+            ontriggerenter(other, index);
+        }
+    }
 }
 
 public class finger1 : device
 {
     public pivot pivot = new pivot();
     public configfinger1 config = new configfinger1();
+
+    private bool isclenched = false;//палец сжимается или сжат
+    private int caught = -1;//индекс зацепившейся секции пальца
 
     private bool iscreated = false;
     private GameObject connector = null;
@@ -94,7 +120,7 @@ public class finger1 : device
             GameObject pivotObject = connector;
             for (int i = 0; i < config.SectionCount; i++)
             {
-                sections.Add(finger1section.Create(pivotObject, i == 0));
+                sections.Add(finger1section.Create(pivotObject, i));
                 pivotObject = sections[i].section;
             }
 
@@ -104,7 +130,10 @@ public class finger1 : device
         connector.GetComponent<connectorfinger1>().Init(this);
 
         for (int i = 0; i < config.SectionCount; i++)
+        {
             sections[i].Init(this);
+            sections[i].ontriggerenter = OnTriggerEnter;
+        }
     }
 
     public override void Remove()
@@ -112,7 +141,9 @@ public class finger1 : device
         MonoBehaviour.Destroy(connector);
 
         for (int i = 0; i < config.SectionCount; i++)
+        {
             sections[i].Remove();
+        }
 
         iscreated = false;
         connector = null;
@@ -125,17 +156,67 @@ public class finger1 : device
         connector.GetComponent<connectorfinger1>().KinematicUpdate();
 
         for (int i = 0; i < config.SectionCount; i++)
+        {
             sections[i].KinematicUpdate();
+        }
     }
 
-    public void SetPos(float angle0)
+    public void Clench(bool isclenched_)
     {
+        if(!isclenched && isclenched_)
+        {
+            for (int i = 0; i < config.SectionCount; i++)
+            {
+                sections[i].SetPos(config.SectionAngle1);
+            }
+        }
+
+        if (isclenched && !isclenched_)
+        {
+            for (int i = 0; i < config.SectionCount; i++)
+            {
+                // на штатные лимиты
+                sections[i].SetLimits(config.SectionAngle0, config.SectionAngle1);
+                sections[i].SetPos(config.SectionAngle0);
+            }
+
+            caught = -1;
+        }
+
+        isclenched = isclenched_;
+    }
+
+    private void OnTriggerEnter(Collider other, int index)
+    {
+        if (other.tag != "thing")
+            return;
+
+        if (!isclenched)
+            return;
+
+        if (index < caught)
+            return;
+
+        caught = index;
+
+        // переустановить лимиты, задать целевые углы
         for (int i = 0; i < config.SectionCount; i++)
-            sections[i].SetPos(angle0);
+        {
+            if (i <= index)
+            {
+                sections[i].SetPos(sections[i].GetCurrent0());
+            }
+            else
+            {
+                float angle1 = 30;//угол доводки секции, который лучше выглядит
+                sections[i].SetLimits(config.SectionAngle0, angle1);
+                sections[i].SetPos(angle1);
+            }
+        }
     }
 
-    public float GetPos0()
+    public bool IsCaught()
     {
-        return sections[0].GetPos0();
+        return caught != -1;
     }
 }

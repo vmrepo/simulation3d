@@ -122,12 +122,12 @@ public class mainscene : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            manipulator1.SetGripper(manipulator1.GetGripper() - delta);
+            manipulator1.SetGripper(false);
         }
 
         if (Input.GetKeyDown(KeyCode.H))
         {
-            manipulator1.SetGripper(manipulator1.GetGripper() + delta);
+            manipulator1.SetGripper(true);
         }*/
     }
 

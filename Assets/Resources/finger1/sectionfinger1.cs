@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class sectionfinger1 : MonoBehaviour
 {
+    public delegate void Ontriggerenter(Collider other);
     public GameObject pivotObject = null;
     public CommonJoint joint = new CommonJoint();
+    public Ontriggerenter ontriggerenter = null;
 
     public void Init(finger1 device)
     {
@@ -41,5 +43,13 @@ public class sectionfinger1 : MonoBehaviour
     public void KinematicUpdate()
     {
         joint.KinematicUpdate();
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (ontriggerenter != null)
+        {
+            ontriggerenter(other);
+        }
     }
 }

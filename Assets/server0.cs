@@ -297,24 +297,22 @@ public class Server0
         PacketSetgripper setgripper = UnityEngine.JsonUtility.FromJson<PacketSetgripper>(packet.json_data);
 
         if (!devices.ContainsKey(setgripper.id))
-            return new PacketSetgripperReady(-1);
-
-        int gripped;
+            return new PacketSetgripperReady(0);
 
         switch (devices[setgripper.id].GetType().ToString())
         {
             case "manipulator2":
                 {
                     manipulator2 manipulator = (manipulator2)devices[setgripper.id];
-                    gripped = manipulator.SetGripper(setgripper.gripped);
+                    manipulator.SetGripper(setgripper.gripped == 0 ? false : true);
                 }
                 break;
 
             default:
-                return new PacketSetgripperReady(-1);
+                return new PacketSetgripperReady(0);
         }
 
-        return new PacketSetgripperReady(gripped);
+        return new PacketSetgripperReady(1);
     }
 
     // вызывается из потока собыйти unity
