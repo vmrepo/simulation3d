@@ -100,6 +100,19 @@ public class PacketThing : Packet
 }
 
 [System.Serializable]
+public class PacketTable : Packet
+{
+    public string name;
+    public bool kinematic;
+    public float x;
+    public float y;
+    public float z;
+    public float ex;
+    public float ey;
+    public float ez;
+}
+
+[System.Serializable]
 public class PacketGripped : Packet
 {
     public int id;
@@ -196,6 +209,7 @@ public class Server0
     static private int maxid = 0;
     static private Dictionary<int, device> devices = new Dictionary<int, device>();
     static private Dictionary<int, thing> things = new Dictionary<int, thing>();
+    static private Dictionary<int, table> tables = new Dictionary<int, table>();
 
     static private Mutex stoppedmutex = new Mutex();
     static private bool stopped = false;
@@ -246,6 +260,9 @@ public class Server0
             case "thing":
                 return new PacketCreateReady(create_thing(packet));
 
+            case "table":
+                return new PacketCreateReady(create_table(packet));
+
             default:
                 return new PacketCreateReady(0);
         }
@@ -270,6 +287,13 @@ public class Server0
             return new PacketDeleteReady(1);
         }
 
+        if (tables.ContainsKey(delete.id))
+        {
+            tables[delete.id].Remove();
+            tables.Remove(delete.id);
+            return new PacketDeleteReady(1);
+        }
+
         return new PacketDeleteReady(0);
     }
 
@@ -289,6 +313,13 @@ public class Server0
         }
 
         things.Clear();
+
+        foreach (KeyValuePair<int, table> pair in tables)
+        {
+            pair.Value.Remove();
+        }
+
+        tables.Clear();
 
         return new PacketClearReady(1);
     }
@@ -322,6 +353,11 @@ public class Server0
         if (things.ContainsKey(setpos.id))
         {
             things[setpos.id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6 != 0.0f);
+        }
+
+        if (tables.ContainsKey(setpos.id))
+        {
+            tables[setpos.id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6 != 0.0f);
         }
 
         return;
@@ -391,6 +427,15 @@ public class Server0
         maxid++;
         PacketThing data = UnityEngine.JsonUtility.FromJson<PacketThing>(packet.json_data);
         things[maxid] = thing.Create(data.name, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.kinematic);
+        return maxid;
+    }
+
+    // в потоке клиента нельзя вызывать, только из потока событий unity
+    static private int create_table(PacketHeader packet)
+    {
+        maxid++;
+        PacketTable data = UnityEngine.JsonUtility.FromJson<PacketTable>(packet.json_data);
+        tables[maxid] = table.Create(data.name, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.kinematic);
         return maxid;
     }
 
