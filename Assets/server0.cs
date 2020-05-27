@@ -71,7 +71,8 @@ public class PacketSetpos : Packet
     public float a2;
     public float a3;
     public float a4;
-    public int g = 0;
+    public float a5;
+    public float a6;
 }
 
 [System.Serializable]
@@ -83,6 +84,19 @@ public class PacketSetcamera : Packet
     public float x1;
     public float y1;
     public float z1;
+}
+
+[System.Serializable]
+public class PacketThing : Packet
+{
+    public string name;
+    public bool kinematic;
+    public float x;
+    public float y;
+    public float z;
+    public float ex;
+    public float ey;
+    public float ez;
 }
 
 [System.Serializable]
@@ -162,6 +176,7 @@ public class Server0
     //доступ только из потока событий unity
     static private int maxid = 0;
     static private Dictionary<int, device> devices = new Dictionary<int, device>();
+    static private Dictionary<int, thing> things = new Dictionary<int, thing>();
 
     static private Mutex stoppedmutex = new Mutex();
     static private bool stopped = false;
@@ -209,6 +224,9 @@ public class Server0
             case "manipulator2":
                 return new PacketCreateReady(create_manipulator2(packet));
 
+            case "thing":
+                return new PacketCreateReady(create_thing(packet));
+
             default:
                 return new PacketCreateReady(0);
         }
@@ -219,20 +237,26 @@ public class Server0
     {
         PacketDelete delete = UnityEngine.JsonUtility.FromJson<PacketDelete>(packet.json_data);
 
-        if (!devices.ContainsKey(delete.id))
-            return new PacketDeleteReady(0);
+        if (devices.ContainsKey(delete.id))
+        {
+            devices[delete.id].Remove();
+            devices.Remove(delete.id);
+            return new PacketDeleteReady(1);
+        }
 
-        devices[delete.id].Remove();
-        devices.Remove(delete.id);
+        if (things.ContainsKey(delete.id))
+        {
+            things[delete.id].Remove();
+            things.Remove(delete.id);
+            return new PacketDeleteReady(1);
+        }
 
-        return new PacketDeleteReady(1);
+        return new PacketDeleteReady(0);
     }
 
     // вызывается из потока собыйти unity
     static private PacketClearReady clear(PacketHeader packet)
     {
-        PacketClear delete = UnityEngine.JsonUtility.FromJson<PacketClear>(packet.json_data);
-
         foreach (KeyValuePair<int, device> pair in devices) 
         {
             pair.Value.Remove();
@@ -240,33 +264,45 @@ public class Server0
 
         devices.Clear();
 
+        foreach (KeyValuePair<int, thing> pair in things)
+        {
+            pair.Value.Remove();
+        }
+
+        things.Clear();
+
         return new PacketClearReady(1);
     }
 
     // вызывается из потока собыйти unity
     static private void setpos(PacketSetpos setpos)
     {
-        if (!devices.ContainsKey(setpos.id))
-            return;
-
-        switch (devices[setpos.id].GetType().ToString())
+        if (devices.ContainsKey(setpos.id))
         {
-            case "manipulator1":
-                {
-                    manipulator1 manipulator = (manipulator1)devices[setpos.id];
-                    manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2);
-                }
-                break;
+            switch (devices[setpos.id].GetType().ToString())
+            {
+                case "manipulator1":
+                    {
+                        manipulator1 manipulator = (manipulator1)devices[setpos.id];
+                        manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2);
+                    }
+                    break;
 
-            case "manipulator2":
-                {
-                    manipulator2 manipulator = (manipulator2)devices[setpos.id];
-                    manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.g != 0);
-                }
-                break;
+                case "manipulator2":
+                    {
+                        manipulator2 manipulator = (manipulator2)devices[setpos.id];
+                        manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5 != 0.0f);
+                    }
+                    break;
 
-            default:
-                return;
+                default:
+                    return;
+            }
+        }
+
+        if (things.ContainsKey(setpos.id))
+        {
+            things[setpos.id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6 != 0.0f);
         }
 
         return;
@@ -307,6 +343,15 @@ public class Server0
         ((manipulator2)dev).config = UnityEngine.JsonUtility.FromJson<configmanipulator2>(packet.json_data);
         dev.Place();
         devices[maxid] = dev;
+        return maxid;
+    }
+
+    // в потоке клиента нельзя вызывать, только из потока событий unity
+    static private int create_thing(PacketHeader packet)
+    {
+        maxid++;
+        PacketThing data = UnityEngine.JsonUtility.FromJson<PacketThing>(packet.json_data);
+        things[maxid] = thing.Create(data.name, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.kinematic);
         return maxid;
     }
 

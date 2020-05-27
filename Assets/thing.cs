@@ -43,6 +43,31 @@ public class thing : MonoBehaviour
         }
     }
 
+    static public thing Create(string name, float x, float y, float z, float ex, float ey, float ez, bool kinematic)
+    {
+        GameObject gameObject = GameObject.Instantiate(Resources.Load("things/" + name, typeof(GameObject)) as GameObject);
+        gameObject.GetComponent<Rigidbody>().isKinematic = kinematic;
+        gameObject.transform.position = new Vector3(x, y, z) - gameObject.GetComponent<Rigidbody>().centerOfMass; ;
+        gameObject.transform.rotation = Quaternion.Euler(ex, ey, ez);
+        if (!kinematic)
+            gameObject.GetComponent<thing>().StartTimer();
+        return gameObject.GetComponent<thing>();
+    }
+
+    public void Remove()
+    {
+        Destroy(gameObject);
+    }
+
+    public void SetPos(float x, float y, float z, float ex, float ey, float ez, bool kinematic)
+    {
+        transform.position = new Vector3(x, y, z) - GetComponent<Rigidbody>().centerOfMass;
+        transform.rotation = Quaternion.Euler(ex, ey, ez);
+        gameObject.GetComponent<Rigidbody>().isKinematic = kinematic;
+        if (!kinematic)
+            StartTimer();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -52,7 +77,7 @@ public class thing : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        adapt();
+        //adapt();
         WaitTimer();
     }
 
