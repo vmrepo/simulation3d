@@ -3,34 +3,44 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Cкрипт для предмета, который захватывает манипулятор.
-// Подразумевается, что у предмета вкючён BoxCollider, имеется Rigidbody, isKinematic = true, CollisionDetection - Continuous Speculative
+// Подразумевается, что у предмета вкючён (Box)CapsuleCollider, имеется Rigidbody, isKinematic = true, CollisionDetection - Continuous Speculative
+// MeshCollider - нельзя т.к. глючит на событиях столкновения.
+// Если Rigidbody предмета при захвате не находится в состоянии isKinematic = true будут артефакты.
+// Таймер при падении должен успеть включить isKinematic до следующего захвата, но чаще всего так и будет.
 
 public class thing : MonoBehaviour
 {
     const float Timeout = 3.0f;
-    private GameObject ownerObject = null;
-    private Vector3 localPosition = Vector3.zero;
-    private Quaternion localRotation = Quaternion.identity;
-    private float waitTime = 0.0f;
+    private float timer = 0.0f;
+    public CommonJoint joint = new CommonJoint();
 
     // адаптация, чтобы находится под захватом манипулятора (для отладки)
-    bool isadapt = true;
-    GameObject adapted = null;
-
+    GameObject adaptTo = null;
+    bool adaptIs = false;
+    Vector3 adaptCenterOfMass = Vector3.zero;
+    Vector3 adpatOffset = Vector3.zero;
     void adapt()
     {
-        if (!isadapt && waitTime <= 0)
-            isadapt = true;
-
-        if (ownerObject == null && isadapt)
+        if (adaptTo == null)
         {
-            if (adapted == null)
-                adapted = GameObject.Find("clamp(Clone)");
-            transform.position = new Vector3(adapted.transform.position.x, transform.localScale.y / 2, adapted.transform.position.z);
-            transform.rotation = Quaternion.identity;
+            adaptTo = GameObject.Find("clamp(Clone)");
+        }
+
+        if (!adaptIs && timer <= 0)
+        {
+            adaptIs = true;
+            adaptCenterOfMass = GetComponent<Rigidbody>().centerOfMass;
+            adpatOffset = transform.localRotation * adaptCenterOfMass;
+        }
+
+        if (joint.GetPivotObject() == null && adaptIs)
+        {
+            transform.position = new Vector3(adaptTo.transform.position.x - adpatOffset.x, transform.position.y, adaptTo.transform.position.z - adpatOffset.z);
         }
         else
-            isadapt = false;
+        {
+            adaptIs = false;
+        }
     }
 
     // Start is called before the first frame update
@@ -42,38 +52,30 @@ public class thing : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (ownerObject != null)
-        {
-            transform.position = ownerObject.transform.position + localPosition;
-            transform.rotation = ownerObject.transform.rotation * localRotation;
-        }
+        adapt();
+        WaitTimer();
+    }
 
-        if (waitTime > 0)
-        {
-            waitTime -= Time.deltaTime;
+    public void StartTimer()
+    {
+        timer = Timeout;
+    }
 
-            if (waitTime <= 0)
+    private void WaitTimer()
+    {
+        if (timer > 0)
+        {
+            timer -= Time.deltaTime;
+
+            if (timer <= 0)
             {
                 gameObject.GetComponent<Rigidbody>().isKinematic = true;
             }
         }
-
-        //adapt();
     }
 
-    public void Attach(GameObject gameObject_)
+    public void KinematicUpdate()
     {
-        ownerObject = gameObject_;
-        gameObject.GetComponent<Rigidbody>().isKinematic = true;
-        localPosition = transform.position - ownerObject.transform.position;
-        localRotation = Quaternion.Inverse(ownerObject.transform.rotation) * transform.rotation;
-    }
-
-    public void Detach()
-    {
-        ownerObject = null;
-        gameObject.GetComponent<Rigidbody>().isKinematic = false;
-        gameObject.GetComponent<Rigidbody>().useGravity = true;
-        waitTime = Timeout;
+        joint.KinematicUpdate();
     }
 }

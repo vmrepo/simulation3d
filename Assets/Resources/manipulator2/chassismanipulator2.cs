@@ -24,6 +24,7 @@ public class chassismanipulator2 : MonoBehaviour
     //назначаются сверху только из-за KinematicUpdate
     public capture1 capture = null;
     public List<finger1> fingers = null;
+    public thing thing = null;
 
     public float x = 0.0f;
     public float y = 0.0f;
@@ -140,5 +141,7 @@ public class chassismanipulator2 : MonoBehaviour
         capture.KinematicUpdate();
         for (int i = 0; i < fingers.Count; i++)
             fingers[i].KinematicUpdate();
+        if (thing != null)
+            thing.KinematicUpdate();
     }
 }

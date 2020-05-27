@@ -121,7 +121,7 @@ public class manipulator2 : device
 
     private capture1 capture = null;
     private List<finger1> fingers = new List<finger1>();
-    private GameObject caughtObject = null;
+    private thing thing = null;
 
     private AngleRange kinematicanglerange0 = new AngleRange();
     private AngleRange kinematicanglerange1 = new AngleRange();
@@ -491,7 +491,7 @@ public class manipulator2 : device
         fingers.Clear();
     }
 
-    public void SetPos(float angle0, float angle1, float angle2, float angle3, float angle4)
+    public void SetPos(float angle0, float angle1, float angle2, float angle3, float angle4, bool gripped)
     {
         if (config.Kinematic)
         {
@@ -531,6 +531,8 @@ public class manipulator2 : device
         {
             capture.SetPos(angle3, angle4);
         }
+
+        SetGripper(gripped);
     }
 
     public float GetPos0()
@@ -594,10 +596,14 @@ public class manipulator2 : device
             fingers[i].Clench(gripped);
         }
 
-        if (!gripped && caughtObject != null)
+        if (!gripped && thing != null)
         {
-            caughtObject.GetComponent<thing>().Detach();
-            caughtObject = null;
+            chassis.GetComponent<chassismanipulator2>().thing = null;
+            thing.joint.Break();
+            thing.gameObject.GetComponent<Rigidbody>().isKinematic = false;
+            thing.gameObject.GetComponent<Rigidbody>().useGravity = true;
+            thing.StartTimer();
+            thing = null;
         }
     }
 
@@ -616,12 +622,13 @@ public class manipulator2 : device
         return gripped;
     }
 
-    private void OnCaught(GameObject gameObject)
+    private void OnCaught(thing thing_)
     {
-        if (!IsGripped() || caughtObject != null)
+        if (!IsGripped() || thing != null)
             return;
 
-        caughtObject = gameObject;
-        caughtObject.GetComponent<thing>().Attach(capture.GetClamp());
+        thing = thing_;
+        thing.joint.Config(capture.GetClamp(), thing.gameObject, true, JointPhysics.Fixed);
+        chassis.GetComponent<chassismanipulator2>().thing = thing;
     }
 }

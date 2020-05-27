@@ -100,11 +100,8 @@ def main():
 
         send_packet(context, {'packet':'setpos', 'id':id1, 'a0':90, 'a1':45, 'a2':90})
         time.sleep(0.2)
-        send_packet(context, {'packet':'setpos', 'id':id2, 'a0':90, 'a1':45, 'a2':90, 'a3':90, 'a4':0})
+        send_packet(context, {'packet':'setpos', 'id':id2, 'a0':90, 'a1':45, 'a2':90, 'a3':90, 'a4':0, 'g':1})
         time.sleep(0.2)
-
-        send_packet(context, {'packet':'setgripper', 'id':id2, 'gripped':1})
-        data = receive_packet(context)
 
         #send_packet(context, {'packet':'delete', 'id':id1})
         #data = receive_packet(context)

@@ -99,7 +99,7 @@ public class finger1section
 
 public class finger1 : device
 {
-    public delegate void Oncaught(GameObject gameObject);
+    public delegate void Oncaught(thing thing);
     public Oncaught oncaught = null;
 
     public pivot pivot = new pivot();
@@ -191,7 +191,9 @@ public class finger1 : device
 
     private void OnTriggerEnter(Collider other, int index)
     {
-        if (other.gameObject.GetComponent<thing>() == null)
+        thing thing = other.gameObject.GetComponent<thing>();
+
+        if (thing == null)
             return;
 
         if (!isclenched)
@@ -219,7 +221,7 @@ public class finger1 : device
 
         if (oncaught != null)
         {
-            oncaught(other.gameObject);
+            oncaught(thing);
         }
     }
 

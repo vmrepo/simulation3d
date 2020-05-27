@@ -73,9 +73,21 @@ public class CommonJoint
         }
     }
 
+    public void Break()
+    {
+        pivotObject = null;
+        gameObject = null;
+
+        if (jointPhysics != null)
+        {
+            MonoBehaviour.Destroy(jointPhysics);
+            jointPhysics = null;
+        }
+    }
+
     public void KinematicRotate(Quaternion rotation)
     {
-        if (gameObject.GetComponent<Rigidbody>().isKinematic)
+        if (gameObject != null && gameObject.GetComponent<Rigidbody>().isKinematic)
         {
             rotationExtra = rotation;
         }
@@ -83,7 +95,7 @@ public class CommonJoint
 
     public void KinematicUpdate()
     {
-        if (gameObject.GetComponent<Rigidbody>().isKinematic)
+        if (gameObject != null && gameObject.GetComponent<Rigidbody>().isKinematic)
         {
             gameObject.transform.position = pivotObject.transform.rotation * positionInit + pivotObject.transform.position;
             gameObject.transform.rotation = pivotObject.transform.rotation * rotationInit * rotationExtra;
