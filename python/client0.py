@@ -103,6 +103,10 @@ def main():
         send_packet(context, {'packet':'setpos', 'id':id2, 'a0':90, 'a1':45, 'a2':90, 'a3':90, 'a4':0, 'a5':1})
         time.sleep(0.2)
 
+        send_packet(context, {'packet':'gripped', 'id':id2})
+        data = receive_packet(context)
+        gripped = data['gripped']
+
         send_packet(context, {'packet':'create', 'type':'thing', 'name':'bottle1', 'kinematic':True, 'x':0, 'y':2, 'z':0, 'ex':0, 'ey':0, 'ez':0})
         data = receive_packet(context)
         id3 = data['id']

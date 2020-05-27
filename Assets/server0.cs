@@ -100,6 +100,12 @@ public class PacketThing : Packet
 }
 
 [System.Serializable]
+public class PacketGripped : Packet
+{
+    public int id;
+}
+
+[System.Serializable]
 public class PacketCreateReady : Packet
 {
     public int id;
@@ -147,6 +153,18 @@ public class PacketSetcameraReady : Packet
     }
 }
 
+[System.Serializable]
+public class PacketGrippedReady : Packet
+{
+    public bool gripped;
+
+    public PacketGrippedReady(bool gripped_)
+    {
+        packet = "ready";
+        gripped = gripped_;
+    }
+}
+
 public enum Calltype
 {
     None,
@@ -154,7 +172,8 @@ public enum Calltype
     Delete,
     Clear,
     Setpos,
-    Setcamera
+    Setcamera,
+    Gripped
 }
 
 public class Calldata
@@ -322,6 +341,26 @@ public class Server0
         bhv.Init();
 
         return new PacketSetcameraReady(1);
+    }
+
+    // вызывается из потока собыйти unity
+    static private PacketGrippedReady gripped(PacketHeader packet)
+    {
+        PacketGripped gripped = UnityEngine.JsonUtility.FromJson<PacketGripped>(packet.json_data);
+
+        if (devices.ContainsKey(gripped.id))
+        {
+            switch (devices[gripped.id].GetType().ToString())
+            {
+                case "manipulator2":
+                    {
+                        manipulator2 manipulator = (manipulator2)devices[gripped.id];
+                        return new PacketGrippedReady(manipulator.IsGripped());
+                    }
+            }
+        }
+
+        return new PacketGrippedReady(false);
     }
 
     // в потоке клиента нельзя вызывать, только из потока событий unity
@@ -557,6 +596,11 @@ public class Server0
                 calldata.manualevent.Set();
                 break;
 
+            case Calltype.Gripped:
+                calldata.outputpacket = gripped((PacketHeader)calldata.inputpacket);
+                calldata.manualevent.Set();
+                break;
+
             default:
                 calldata.manualevent.Set();
                 break;
@@ -664,6 +708,11 @@ public class Server0
                     else if (packet.packet == "setcamera")
                     {
                         send_packet(context, call(Calltype.Setcamera, packet));
+                        continue;
+                    }
+                    else if (packet.packet == "gripped")
+                    {
+                        send_packet(context, call(Calltype.Gripped, packet));
                         continue;
                     }
                     else if (packet.packet == "end")
