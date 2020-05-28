@@ -10,11 +10,13 @@ public class table : MonoBehaviour
 {
     const float Timeout = 3.0f;
     private float timer = 0.0f;
+    private float scale = 1.0f;
 
-    static public table Create(string name, float x, float y, float z, float ex, float ey, float ez, bool kinematic)
+    static public table Create(string name, float x, float y, float z, float ex, float ey, float ez, float scale_, bool kinematic)
     {
         GameObject gameObject = GameObject.Instantiate(Resources.Load("tables/" + name, typeof(GameObject)) as GameObject);
         gameObject.GetComponent<Rigidbody>().isKinematic = kinematic;
+        gameObject.transform.localScale = Vector3.Scale(gameObject.transform.localScale, Vector3.one * scale_);
 
         Vector3 localCenter = Vector3.zero;
         if (gameObject.GetComponent<BoxCollider>() != null)
@@ -24,6 +26,8 @@ public class table : MonoBehaviour
 
         gameObject.transform.rotation = Quaternion.Euler(ex, ey, ez);
         gameObject.transform.position = new Vector3(x, y, z) - gameObject.transform.rotation * localCenter;
+
+        gameObject.GetComponent<table>().scale = scale_;
 
         if (!kinematic)
             gameObject.GetComponent<table>().StartTimer();
@@ -35,8 +39,10 @@ public class table : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public void SetPos(float x, float y, float z, float ex, float ey, float ez, bool kinematic)
+    public void SetPos(float x, float y, float z, float ex, float ey, float ez, float scale_, bool kinematic)
     {
+        transform.localScale = Vector3.Scale(transform.localScale, Vector3.one * scale_);
+
         Vector3 localCenter = Vector3.zero;
         if (GetComponent<BoxCollider>() != null)
             localCenter = Vector3.Scale(transform.localScale, GetComponent<BoxCollider>().center);
@@ -45,6 +51,8 @@ public class table : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(ex, ey, ez);
         transform.position = new Vector3(x, y, z) - transform.rotation * localCenter;
+
+        scale = scale_;
 
         gameObject.GetComponent<Rigidbody>().isKinematic = kinematic;
         if (!kinematic)
@@ -61,6 +69,7 @@ public class table : MonoBehaviour
             ret.Add(transform.position + Vector3.Scale(transform.localScale, box.center));
             ret.Add(transform.rotation.eulerAngles);
             ret.Add(Vector3.Scale(transform.localScale, box.size));
+            ret.Add(Vector3.one * scale);
         }
 
         if (GetComponent<CapsuleCollider>() != null)
@@ -82,6 +91,7 @@ public class table : MonoBehaviour
                     ret.Add(Vector3.Scale(transform.localScale, new Vector3(capsule.radius, capsule.radius, capsule.height)));
                     break;
             }
+            ret.Add(Vector3.one * scale);
         }
 
         return ret;

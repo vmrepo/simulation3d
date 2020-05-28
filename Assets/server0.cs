@@ -73,6 +73,7 @@ public class PacketSetpos : Packet
     public float a4;
     public float a5;
     public float a6;
+    public float a7;
 }
 
 [System.Serializable]
@@ -97,6 +98,7 @@ public class PacketThing : Packet
     public float ex;
     public float ey;
     public float ez;
+    public float scale;
 }
 
 [System.Serializable]
@@ -110,6 +112,7 @@ public class PacketTable : Packet
     public float ex;
     public float ey;
     public float ez;
+    public float scale;
 }
 
 [System.Serializable]
@@ -199,8 +202,9 @@ public class PacketTransformReady : Packet
     public float sx;
     public float sy;
     public float sz;
+    public float scale;
 
-    public PacketTransformReady(int ok_, float x_, float y_, float z_, float ex_, float ey_, float ez_, float sx_, float sy_, float sz_)
+    public PacketTransformReady(int ok_, float x_, float y_, float z_, float ex_, float ey_, float ez_, float sx_, float sy_, float sz_, float scale_)
     {
         packet = "ready";
         ok = ok_;
@@ -213,6 +217,7 @@ public class PacketTransformReady : Packet
         sx = sx_;
         sy = sy_;
         sz = sz_;
+        scale = scale_;
     }
 }
 
@@ -391,12 +396,12 @@ public class Server0
 
         if (things.ContainsKey(setpos.id))
         {
-            things[setpos.id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6 != 0.0f);
+            things[setpos.id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6, setpos.a7 != 0.0f);
         }
 
         if (tables.ContainsKey(setpos.id))
         {
-            tables[setpos.id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6 != 0.0f);
+            tables[setpos.id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6, setpos.a7 != 0.0f);
         }
 
         return;
@@ -447,17 +452,17 @@ public class Server0
         {
             thing thing = (thing)things[transform.id];
             List<UnityEngine.Vector3> pos = thing.GetPos();
-            return new PacketTransformReady(1, pos[0].x, pos[0].y, pos[0].z, pos[1].x, pos[1].y, pos[1].z, pos[2].x, pos[2].y, pos[2].z);
+            return new PacketTransformReady(1, pos[0].x, pos[0].y, pos[0].z, pos[1].x, pos[1].y, pos[1].z, pos[2].x, pos[2].y, pos[2].z, pos[3].x);
         }
 
         if (tables.ContainsKey(transform.id))
         {
             table table = (table)tables[transform.id];
             List<UnityEngine.Vector3> pos = table.GetPos();
-            return new PacketTransformReady(1, pos[0].x, pos[0].y, pos[0].z, pos[1].x, pos[1].y, pos[1].z, pos[2].x, pos[2].y, pos[2].z);
+            return new PacketTransformReady(1, pos[0].x, pos[0].y, pos[0].z, pos[1].x, pos[1].y, pos[1].z, pos[2].x, pos[2].y, pos[2].z, pos[3].x);
         }
 
-        return new PacketTransformReady(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        return new PacketTransformReady(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     // в потоке клиента нельзя вызывать, только из потока событий unity
@@ -487,7 +492,7 @@ public class Server0
     {
         maxid++;
         PacketThing data = UnityEngine.JsonUtility.FromJson<PacketThing>(packet.json_data);
-        things[maxid] = thing.Create(data.name, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.kinematic);
+        things[maxid] = thing.Create(data.name, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.scale, data.kinematic);
         return maxid;
     }
 
@@ -496,7 +501,7 @@ public class Server0
     {
         maxid++;
         PacketTable data = UnityEngine.JsonUtility.FromJson<PacketTable>(packet.json_data);
-        tables[maxid] = table.Create(data.name, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.kinematic);
+        tables[maxid] = table.Create(data.name, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.scale, data.kinematic);
         return maxid;
     }
 

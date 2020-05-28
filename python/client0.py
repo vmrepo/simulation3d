@@ -107,15 +107,15 @@ def main():
         data = receive_packet(context)
         gripped = data['gripped']
 
-        send_packet(context, {'packet':'create', 'type':'table', 'name':'conveyor1', 'kinematic':False, 'x':0, 'y':1, 'z':1, 'ex':0, 'ey':0, 'ez':0})
+        send_packet(context, {'packet':'create', 'type':'table', 'name':'conveyor1', 'kinematic':False, 'x':0, 'y':1, 'z':1, 'ex':0, 'ey':0, 'ez':0, 'scale':1})
         data = receive_packet(context)
         id3 = data['id']
 
-        send_packet(context, {'packet':'create', 'type':'thing', 'name':'bottle1', 'kinematic':True, 'x':0, 'y':2, 'z':0, 'ex':0, 'ey':0, 'ez':0})
+        send_packet(context, {'packet':'create', 'type':'thing', 'name':'bottle1', 'kinematic':True, 'x':0, 'y':2, 'z':0, 'ex':0, 'ey':0, 'ez':0, 'scale':1})
         data = receive_packet(context)
         id4 = data['id']
-        send_packet(context, {'packet':'setpos', 'id':id4, 'a0':0, 'a1':2, 'a2':1, 'a3':0, 'a4':0, 'a5':0, 'a6':0})
-        time.sleep(3)
+        send_packet(context, {'packet':'setpos', 'id':id4, 'a0':0, 'a1':2, 'a2':1, 'a3':0, 'a4':0, 'a5':0, 'a6':1, 'a7':0})
+        time.sleep(2)
         send_packet(context, {'packet':'transform', 'id':id3})
         data = receive_packet(context)
         send_packet(context, {'packet':'transform', 'id':id4})
