@@ -44,8 +44,11 @@ public class mainscene : MonoBehaviour
 
         /*manipulator1 = new manipulator2();
         manipulator1.config.x = 2;
-        manipulator1.config.FingerDown = false;
-        manipulator1.config.Kinematic = false;
+        manipulator1.config.FingerDown = true;
+        manipulator1.config.Kinematic = true;
+        //manipulator1.config.FingerSectionAngle0 = 345.0f;
+        //manipulator1.config.FingerSectionAngle1 = 1.0f;
+        //manipulator1.config.FingerSectionCount = 8;
         manipulator1.Place();*/
 
         GameObject.Find("Main Camera").GetComponent<camera>().targetposition = new Vector3(0, 0, 0);
@@ -62,7 +65,7 @@ public class mainscene : MonoBehaviour
             Application.Quit();
         }
 
-        /*float delta = 10.0f;
+        /*float delta = 5.0f;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {

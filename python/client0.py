@@ -115,7 +115,11 @@ def main():
         data = receive_packet(context)
         id4 = data['id']
         send_packet(context, {'packet':'setpos', 'id':id4, 'a0':0, 'a1':2, 'a2':1, 'a3':0, 'a4':0, 'a5':0, 'a6':0})
-        time.sleep(0.2)
+        time.sleep(3)
+        send_packet(context, {'packet':'transform', 'id':id3})
+        data = receive_packet(context)
+        send_packet(context, {'packet':'transform', 'id':id4})
+        data = receive_packet(context)
 
         #send_packet(context, {'packet':'delete', 'id':id1})
         #data = receive_packet(context)

@@ -119,6 +119,12 @@ public class PacketGripped : Packet
 }
 
 [System.Serializable]
+public class PacketTransform : Packet
+{
+    public int id;
+}
+
+[System.Serializable]
 public class PacketCreateReady : Packet
 {
     public int id;
@@ -169,12 +175,44 @@ public class PacketSetcameraReady : Packet
 [System.Serializable]
 public class PacketGrippedReady : Packet
 {
+    public int ok;
     public bool gripped;
 
-    public PacketGrippedReady(bool gripped_)
+    public PacketGrippedReady(int ok_, bool gripped_)
     {
         packet = "ready";
+        ok = ok_;
         gripped = gripped_;
+    }
+}
+
+[System.Serializable]
+public class PacketTransformReady : Packet
+{
+    public int ok;
+    public float x;
+    public float y;
+    public float z;
+    public float ex;
+    public float ey;
+    public float ez;
+    public float sx;
+    public float sy;
+    public float sz;
+
+    public PacketTransformReady(int ok_, float x_, float y_, float z_, float ex_, float ey_, float ez_, float sx_, float sy_, float sz_)
+    {
+        packet = "ready";
+        ok = ok_;
+        x = x_;
+        y = y_;
+        z = z_;
+        ex = ex_;
+        ey = ey_;
+        ez = ez_;
+        sx = sx_;
+        sy = sy_;
+        sz = sz_;
     }
 }
 
@@ -186,7 +224,8 @@ public enum Calltype
     Clear,
     Setpos,
     Setcamera,
-    Gripped
+    Gripped,
+    Transform
 }
 
 public class Calldata
@@ -391,12 +430,34 @@ public class Server0
                 case "manipulator2":
                     {
                         manipulator2 manipulator = (manipulator2)devices[gripped.id];
-                        return new PacketGrippedReady(manipulator.IsGripped());
+                        return new PacketGrippedReady(1, manipulator.IsGripped());
                     }
             }
         }
 
-        return new PacketGrippedReady(false);
+        return new PacketGrippedReady(0, false);
+    }
+
+    // вызывается из потока собыйти unity
+    static private PacketTransformReady transform(PacketHeader packet)
+    {
+        PacketTransform transform = UnityEngine.JsonUtility.FromJson<PacketTransform>(packet.json_data);
+
+        if (things.ContainsKey(transform.id))
+        {
+            thing thing = (thing)things[transform.id];
+            List<UnityEngine.Vector3> pos = thing.GetPos();
+            return new PacketTransformReady(1, pos[0].x, pos[0].y, pos[0].z, pos[1].x, pos[1].y, pos[1].z, pos[2].x, pos[2].y, pos[2].z);
+        }
+
+        if (tables.ContainsKey(transform.id))
+        {
+            table table = (table)tables[transform.id];
+            List<UnityEngine.Vector3> pos = table.GetPos();
+            return new PacketTransformReady(1, pos[0].x, pos[0].y, pos[0].z, pos[1].x, pos[1].y, pos[1].z, pos[2].x, pos[2].y, pos[2].z);
+        }
+
+        return new PacketTransformReady(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     // в потоке клиента нельзя вызывать, только из потока событий unity
@@ -646,6 +707,11 @@ public class Server0
                 calldata.manualevent.Set();
                 break;
 
+            case Calltype.Transform:
+                calldata.outputpacket = transform((PacketHeader)calldata.inputpacket);
+                calldata.manualevent.Set();
+                break;
+
             default:
                 calldata.manualevent.Set();
                 break;
@@ -758,6 +824,11 @@ public class Server0
                     else if (packet.packet == "gripped")
                     {
                         send_packet(context, call(Calltype.Gripped, packet));
+                        continue;
+                    }
+                    else if (packet.packet == "transform")
+                    {
+                        send_packet(context, call(Calltype.Transform, packet));
                         continue;
                     }
                     else if (packet.packet == "end")

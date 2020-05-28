@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Cкрипт для стола (конвейра).
-// Подразумевается, что у предмета вкючён (Box)CapsuleCollider, имеется Rigidbody, isKinematic = true, CollisionDetection - Continuous Speculative
+// Подразумевается, что у предмета вкючён один из двух: BoxCollider или CapsuleCollider, имеется Rigidbody, isKinematic = true, CollisionDetection - Continuous Speculative
 // MeshCollider - нельзя т.к. глючит на событиях столкновения.
 
 public class table : MonoBehaviour
@@ -15,8 +15,16 @@ public class table : MonoBehaviour
     {
         GameObject gameObject = GameObject.Instantiate(Resources.Load("tables/" + name, typeof(GameObject)) as GameObject);
         gameObject.GetComponent<Rigidbody>().isKinematic = kinematic;
-        gameObject.transform.position = new Vector3(x, y, z) - gameObject.GetComponent<Rigidbody>().centerOfMass; ;
+
+        Vector3 localCenter = Vector3.zero;
+        if (gameObject.GetComponent<BoxCollider>() != null)
+            localCenter = Vector3.Scale(gameObject.transform.localScale, gameObject.GetComponent<BoxCollider>().center);
+        if (gameObject.GetComponent<CapsuleCollider>() != null)
+            localCenter = Vector3.Scale(gameObject.transform.localScale, gameObject.GetComponent<CapsuleCollider>().center);
+
         gameObject.transform.rotation = Quaternion.Euler(ex, ey, ez);
+        gameObject.transform.position = new Vector3(x, y, z) - gameObject.transform.rotation * localCenter;
+
         if (!kinematic)
             gameObject.GetComponent<table>().StartTimer();
         return gameObject.GetComponent<table>();
@@ -29,11 +37,54 @@ public class table : MonoBehaviour
 
     public void SetPos(float x, float y, float z, float ex, float ey, float ez, bool kinematic)
     {
-        transform.position = new Vector3(x, y, z) - GetComponent<Rigidbody>().centerOfMass;
+        Vector3 localCenter = Vector3.zero;
+        if (GetComponent<BoxCollider>() != null)
+            localCenter = Vector3.Scale(transform.localScale, GetComponent<BoxCollider>().center);
+        if (GetComponent<CapsuleCollider>() != null)
+            localCenter = Vector3.Scale(transform.localScale, GetComponent<CapsuleCollider>().center);
+
         transform.rotation = Quaternion.Euler(ex, ey, ez);
+        transform.position = new Vector3(x, y, z) - transform.rotation * localCenter;
+
         gameObject.GetComponent<Rigidbody>().isKinematic = kinematic;
         if (!kinematic)
             StartTimer();
+    }
+
+    public List<Vector3> GetPos()
+    {
+        List<Vector3> ret = new List<Vector3>();
+
+        if (GetComponent<BoxCollider>() != null)
+        {
+            BoxCollider box = GetComponent<BoxCollider>();
+            ret.Add(transform.position + Vector3.Scale(transform.localScale, box.center));
+            ret.Add(transform.rotation.eulerAngles);
+            ret.Add(Vector3.Scale(transform.localScale, box.size));
+        }
+
+        if (GetComponent<CapsuleCollider>() != null)
+        {
+            CapsuleCollider capsule = GetComponent<CapsuleCollider>();
+            ret.Add(transform.position + Vector3.Scale(transform.localScale, capsule.center));
+            ret.Add(transform.rotation.eulerAngles);
+            switch (capsule.direction)
+            {
+                case 0:
+                    ret.Add(Vector3.Scale(transform.localScale, new Vector3(capsule.height, capsule.radius, capsule.radius)));
+                    break;
+
+                case 1:
+                    ret.Add(Vector3.Scale(transform.localScale, new Vector3(capsule.radius, capsule.height, capsule.radius)));
+                    break;
+
+                case 2:
+                    ret.Add(Vector3.Scale(transform.localScale, new Vector3(capsule.radius, capsule.radius, capsule.height)));
+                    break;
+            }
+        }
+
+        return ret;
     }
 
     // Start is called before the first frame update
