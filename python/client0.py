@@ -90,38 +90,34 @@ def main():
         send_packet(context, {'packet':'setcamera', 'x0':0, 'y0':0, 'z0':0, 'x1':0, 'y1':5, 'z1':5})
         data = receive_packet(context)
 
-        send_packet(context, {'packet':'create', 'type':'manipulator1', 'x':-1, 'y':0, 'z':0})
+        send_packet(context, {'packet':'create', 'type':'manipulator1', 'idname':'manipulator1', 'x':-1, 'y':0, 'z':0})
         data = receive_packet(context)
-        id1 = data['id']
 
-        send_packet(context, {'packet':'create', 'type':'manipulator2', 'x':1, 'y':0, 'z':0, 'FingerDown':False})
+        send_packet(context, {'packet':'create', 'type':'manipulator2', 'idname':'manipulator2', 'x':1, 'y':0, 'z':0, 'FingerDown':False})
         data = receive_packet(context)
-        id2 = data['id']
 
-        send_packet(context, {'packet':'setpos', 'id':id1, 'a0':90, 'a1':45, 'a2':90})
+        send_packet(context, {'packet':'setpos', 'idname':'manipulator1', 'a0':90, 'a1':45, 'a2':90})
         time.sleep(0.2)
-        send_packet(context, {'packet':'setpos', 'id':id2, 'a0':90, 'a1':45, 'a2':90, 'a3':90, 'a4':0, 'a5':45, 'a6':1})
+        send_packet(context, {'packet':'setpos', 'idname':'manipulator2', 'a0':90, 'a1':45, 'a2':90, 'a3':90, 'a4':0, 'a5':45, 'a6':1})
         time.sleep(0.2)
 
-        send_packet(context, {'packet':'gripped', 'id':id2})
+        send_packet(context, {'packet':'gripped', 'idname':'manipulator2'})
         data = receive_packet(context)
         gripped = data['gripped']
 
-        send_packet(context, {'packet':'create', 'type':'table', 'name':'conveyor1', 'kinematic':False, 'x':0, 'y':1, 'z':1, 'ex':0, 'ey':0, 'ez':0, 'scale':1})
+        send_packet(context, {'packet':'create', 'type':'table', 'model':'conveyor1', 'idname':'conveyor', 'kinematic':False, 'x':0, 'y':1, 'z':1, 'ex':0, 'ey':0, 'ez':0, 'scale':1})
         data = receive_packet(context)
-        id3 = data['id']
 
-        send_packet(context, {'packet':'create', 'type':'thing', 'name':'juice1', 'kinematic':True, 'x':0, 'y':2, 'z':0, 'ex':0, 'ey':0, 'ez':0, 'scale':1})
+        send_packet(context, {'packet':'create', 'type':'thing', 'model':'juice1', 'idname':'juice', 'kinematic':True, 'x':0, 'y':2, 'z':0, 'ex':0, 'ey':0, 'ez':0, 'scale':1})
         data = receive_packet(context)
-        id4 = data['id']
-        send_packet(context, {'packet':'setpos', 'id':id4, 'a0':0, 'a1':2, 'a2':1, 'a3':0, 'a4':0, 'a5':0, 'a6':1, 'a7':0})
+        send_packet(context, {'packet':'setpos', 'idname':'juice', 'a0':0, 'a1':2, 'a2':1, 'a3':0, 'a4':0, 'a5':0, 'a6':1, 'a7':0})
         time.sleep(2)
-        send_packet(context, {'packet':'transform', 'id':id3})
+        send_packet(context, {'packet':'transform', 'idname':'conveyor'})
         data = receive_packet(context)
-        send_packet(context, {'packet':'transform', 'id':id4})
+        send_packet(context, {'packet':'transform', 'idname':'juice'})
         data = receive_packet(context)
 
-        #send_packet(context, {'packet':'delete', 'id':id1})
+        #send_packet(context, {'packet':'delete', 'idname':'manipulator1'})
         #data = receive_packet(context)
 
         #send_packet(context, {'packet':'clear'})

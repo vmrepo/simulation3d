@@ -21,7 +21,7 @@ public class Context
     public string buffer;
     public Status status;
     public Queue<Packet> packetdeque = new Queue<Packet>();
-    public Dictionary<int, Packet> packetdict = new Dictionary<int, Packet>();
+    public Dictionary<string, Packet> packetdict = new Dictionary<string, Packet>();
 }
 
 [System.Serializable]
@@ -49,12 +49,13 @@ public class PacketHeader : Packet
 public class PacketCreate : Packet
 {
     public string type;
+    public string idname;
 }
 
 [System.Serializable]
 public class PacketDelete : Packet
 {
-    public int id;
+    public string idname;
 }
 
 [System.Serializable]
@@ -65,7 +66,7 @@ public class PacketClear : Packet
 [System.Serializable]
 public class PacketSetpos : Packet
 {
-    public int id;
+    public string idname;
     public float a0;
     public float a1;
     public float a2;
@@ -90,7 +91,7 @@ public class PacketSetcamera : Packet
 [System.Serializable]
 public class PacketThing : Packet
 {
-    public string name;
+    public string model;
     public bool kinematic;
     public float x;
     public float y;
@@ -104,7 +105,7 @@ public class PacketThing : Packet
 [System.Serializable]
 public class PacketTable : Packet
 {
-    public string name;
+    public string model;
     public bool kinematic;
     public float x;
     public float y;
@@ -118,24 +119,24 @@ public class PacketTable : Packet
 [System.Serializable]
 public class PacketGripped : Packet
 {
-    public int id;
+    public string idname;
 }
 
 [System.Serializable]
 public class PacketTransform : Packet
 {
-    public int id;
+    public string idname;
 }
 
 [System.Serializable]
 public class PacketCreateReady : Packet
 {
-    public int id;
+    public int ok;
 
-    public PacketCreateReady(int id_)
+    public PacketCreateReady(int ok_)
     {
         packet = "ready";
-        id = id_;
+        ok = ok_;
     }
 }
 
@@ -251,6 +252,7 @@ public class Server0
 
     //доступ только из потока событий unity
     static private int maxid = 0;
+    static private Dictionary<string, int> idnames = new Dictionary<string, int>();
     static private Dictionary<int, device> devices = new Dictionary<int, device>();
     static private Dictionary<int, thing> things = new Dictionary<int, thing>();
     static private Dictionary<int, table> tables = new Dictionary<int, table>();
@@ -316,29 +318,7 @@ public class Server0
     static private PacketDeleteReady delete(PacketHeader packet)
     {
         PacketDelete delete = UnityEngine.JsonUtility.FromJson<PacketDelete>(packet.json_data);
-
-        if (devices.ContainsKey(delete.id))
-        {
-            devices[delete.id].Remove();
-            devices.Remove(delete.id);
-            return new PacketDeleteReady(1);
-        }
-
-        if (things.ContainsKey(delete.id))
-        {
-            things[delete.id].Remove();
-            things.Remove(delete.id);
-            return new PacketDeleteReady(1);
-        }
-
-        if (tables.ContainsKey(delete.id))
-        {
-            tables[delete.id].Remove();
-            tables.Remove(delete.id);
-            return new PacketDeleteReady(1);
-        }
-
-        return new PacketDeleteReady(0);
+        return new PacketDeleteReady(Server0.delete(delete.idname) ? 1 : 0);
     }
 
     // вызывается из потока собыйти unity
@@ -365,26 +345,35 @@ public class Server0
 
         tables.Clear();
 
+        idnames.Clear();
+
         return new PacketClearReady(1);
     }
 
     // вызывается из потока собыйти unity
     static private void setpos(PacketSetpos setpos)
     {
-        if (devices.ContainsKey(setpos.id))
+        if (!idnames.ContainsKey(setpos.idname))
         {
-            switch (devices[setpos.id].GetType().ToString())
+            return;
+        }
+
+        int id = idnames[setpos.idname];
+
+        if (devices.ContainsKey(id))
+        {
+            switch (devices[id].GetType().ToString())
             {
                 case "manipulator1":
                     {
-                        manipulator1 manipulator = (manipulator1)devices[setpos.id];
+                        manipulator1 manipulator = (manipulator1)devices[id];
                         manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2);
                     }
                     break;
 
                 case "manipulator2":
                     {
-                        manipulator2 manipulator = (manipulator2)devices[setpos.id];
+                        manipulator2 manipulator = (manipulator2)devices[id];
                         manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6 != 0.0f);
                     }
                     break;
@@ -394,14 +383,14 @@ public class Server0
             }
         }
 
-        if (things.ContainsKey(setpos.id))
+        if (things.ContainsKey(id))
         {
-            things[setpos.id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6, setpos.a7 != 0.0f);
+            things[id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6, setpos.a7 != 0.0f);
         }
 
-        if (tables.ContainsKey(setpos.id))
+        if (tables.ContainsKey(id))
         {
-            tables[setpos.id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6, setpos.a7 != 0.0f);
+            tables[id].SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6, setpos.a7 != 0.0f);
         }
 
         return;
@@ -428,13 +417,20 @@ public class Server0
     {
         PacketGripped gripped = UnityEngine.JsonUtility.FromJson<PacketGripped>(packet.json_data);
 
-        if (devices.ContainsKey(gripped.id))
+        if (!idnames.ContainsKey(gripped.idname))
         {
-            switch (devices[gripped.id].GetType().ToString())
+            return new PacketGrippedReady(0, false);
+        }
+
+        int id = idnames[gripped.idname];
+
+        if (devices.ContainsKey(id))
+        {
+            switch (devices[id].GetType().ToString())
             {
                 case "manipulator2":
                     {
-                        manipulator2 manipulator = (manipulator2)devices[gripped.id];
+                        manipulator2 manipulator = (manipulator2)devices[id];
                         return new PacketGrippedReady(1, manipulator.IsGripped());
                     }
             }
@@ -448,16 +444,23 @@ public class Server0
     {
         PacketTransform transform = UnityEngine.JsonUtility.FromJson<PacketTransform>(packet.json_data);
 
-        if (things.ContainsKey(transform.id))
+        if (!idnames.ContainsKey(transform.idname))
         {
-            thing thing = (thing)things[transform.id];
+            return new PacketTransformReady(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        }
+
+        int id = idnames[transform.idname];
+
+        if (things.ContainsKey(id))
+        {
+            thing thing = (thing)things[id];
             List<UnityEngine.Vector3> pos = thing.GetPos();
             return new PacketTransformReady(1, pos[0].x, pos[0].y, pos[0].z, pos[1].x, pos[1].y, pos[1].z, pos[2].x, pos[2].y, pos[2].z, pos[3].x);
         }
 
-        if (tables.ContainsKey(transform.id))
+        if (tables.ContainsKey(id))
         {
-            table table = (table)tables[transform.id];
+            table table = (table)tables[id];
             List<UnityEngine.Vector3> pos = table.GetPos();
             return new PacketTransformReady(1, pos[0].x, pos[0].y, pos[0].z, pos[1].x, pos[1].y, pos[1].z, pos[2].x, pos[2].y, pos[2].z, pos[3].x);
         }
@@ -469,10 +472,13 @@ public class Server0
     static private int create_manipulator1(PacketHeader packet)
     {
         maxid++;
+        PacketCreate create = UnityEngine.JsonUtility.FromJson<PacketCreate>(packet.json_data);
+        delete(create.idname);
         device dev = new manipulator1();
         ((manipulator1)dev).config = UnityEngine.JsonUtility.FromJson<configmanipulator1>(packet.json_data);
         dev.Place();
         devices[maxid] = dev;
+        idnames[create.idname] = maxid;
         return maxid;
     }
 
@@ -480,10 +486,13 @@ public class Server0
     static private int create_manipulator2(PacketHeader packet)
     {
         maxid++;
+        PacketCreate create = UnityEngine.JsonUtility.FromJson<PacketCreate>(packet.json_data);
+        delete(create.idname);
         device dev = new manipulator2();
         ((manipulator2)dev).config = UnityEngine.JsonUtility.FromJson<configmanipulator2>(packet.json_data);
         dev.Place();
         devices[maxid] = dev;
+        idnames[create.idname] = maxid;
         return maxid;
     }
 
@@ -491,8 +500,11 @@ public class Server0
     static private int create_thing(PacketHeader packet)
     {
         maxid++;
+        PacketCreate create = UnityEngine.JsonUtility.FromJson<PacketCreate>(packet.json_data);
+        delete(create.idname);
         PacketThing data = UnityEngine.JsonUtility.FromJson<PacketThing>(packet.json_data);
-        things[maxid] = thing.Create(data.name, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.scale, data.kinematic);
+        things[maxid] = thing.Create(data.model, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.scale, data.kinematic);
+        idnames[create.idname] = maxid;
         return maxid;
     }
 
@@ -500,9 +512,46 @@ public class Server0
     static private int create_table(PacketHeader packet)
     {
         maxid++;
+        PacketCreate create = UnityEngine.JsonUtility.FromJson<PacketCreate>(packet.json_data);
+        delete(create.idname);
         PacketTable data = UnityEngine.JsonUtility.FromJson<PacketTable>(packet.json_data);
-        tables[maxid] = table.Create(data.name, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.scale, data.kinematic);
+        tables[maxid] = table.Create(data.model, data.x, data.y, data.z, data.ex, data.ey, data.ez, data.scale, data.kinematic);
+        idnames[create.idname] = maxid;
         return maxid;
+    }
+
+    // в потоке клиента нельзя вызывать, только из потока событий unity
+    static private bool delete(string idname)
+    {
+        if (!idnames.ContainsKey(idname))
+        {
+            return false;
+        }
+
+        int id = idnames[idname];
+
+        if (devices.ContainsKey(id))
+        {
+            devices[id].Remove();
+            devices.Remove(id);
+            return true;
+        }
+
+        if (things.ContainsKey(id))
+        {
+            things[id].Remove();
+            things.Remove(id);
+            return true;
+        }
+
+        if (tables.ContainsKey(id))
+        {
+            tables[id].Remove();
+            tables.Remove(id);
+            return true;
+        }
+
+        return false;
     }
 
     static public void Log(string text)
@@ -596,7 +645,7 @@ public class Server0
                 if (header.packet == "setpos")
                 {
                     PacketSetpos setpos = UnityEngine.JsonUtility.FromJson<PacketSetpos>(header.json_data);
-                    context.packetdict[setpos.id] = setpos;
+                    context.packetdict[setpos.idname] = setpos;
                 }
                 else
                 {
