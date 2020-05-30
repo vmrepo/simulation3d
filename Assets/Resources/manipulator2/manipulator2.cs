@@ -80,6 +80,12 @@ public class configmanipulator2
     public float CaptureClampAngle1 = 120.0f;
     public float CaptureClampDiameter = 0.06f;
     public float CaptureClampWidth = 0.028f;
+    public float CaptureClampConnectorKinematicAngularVelocity = 100.0f;
+    public float CaptureClampConnectorACSProportional = 1.5f;
+    public float CaptureClampConnectorACSIntegral = 0.0f;
+    public float CaptureClampConnectorACSDifferential = 1.1f;
+    public float CaptureClampConnectorAngle0 = 0.0f;
+    public float CaptureClampConnectorAngle1 = 360.0f;
     public bool FingerKinematic = true;
     public float FingerConnectorMass = 0.005f;
     public float FingerConnectorHeight = 0.001f;
@@ -369,6 +375,12 @@ public class manipulator2 : device
             capture.config.ClampAngle1 = config.CaptureClampAngle1;
             capture.config.ClampDiameter = config.CaptureClampDiameter;
             capture.config.ClampWidth = config.CaptureClampWidth;
+            capture.config.ClampConnectorKinematicAngularVelocity = config.CaptureClampConnectorKinematicAngularVelocity;
+            capture.config.ClampConnectorACSProportional = config.CaptureClampConnectorACSProportional;
+            capture.config.ClampConnectorACSIntegral = config.CaptureClampConnectorACSIntegral;
+            capture.config.ClampConnectorACSDifferential = config.CaptureClampConnectorACSDifferential;
+            capture.config.ClampConnectorAngle0 = config.CaptureClampConnectorAngle0;
+            capture.config.ClampConnectorAngle1 = config.CaptureClampConnectorAngle1;
             capture.pivot.Object = arm;
             capture.pivot.position = Vector3.up * arm.transform.localScale.y / 2;
             capture.pivot.rotation = Quaternion.AngleAxis(180, Vector3.forward) * Quaternion.AngleAxis(90, Vector3.down);
@@ -445,7 +457,7 @@ public class manipulator2 : device
             chassis.GetComponent<chassismanipulator2>().Kinematic(kinematicanglerange0.GetTarget(), kinematicanglerange1.GetTarget(), kinematicanglerange2.GetTarget());
         }
 
-        capture.SetPos(0, GetPos1() + GetPos2() - 180);//схват вниз
+        capture.SetPos(0, GetPos1() + GetPos2() - 180, GetPos5());//схват вниз
     }
 
     public override void Remove()
@@ -491,7 +503,7 @@ public class manipulator2 : device
         fingers.Clear();
     }
 
-    public void SetPos(float angle0, float angle1, float angle2, float angle3, float angle4, bool gripped)
+    public void SetPos(float angle0, float angle1, float angle2, float angle3, float angle4, float angle5, bool gripped)
     {
         if (config.Kinematic)
         {
@@ -525,11 +537,11 @@ public class manipulator2 : device
 
         if (config.FingerDown)
         {
-            capture.SetPos(0, GetPos1() + GetPos2() - 180);
+            capture.SetPos(0, GetPos1() + GetPos2() - 180, angle5);
         }
         else
         {
-            capture.SetPos(angle3, angle4);
+            capture.SetPos(angle3, angle4, angle5);
         }
 
         SetGripper(gripped);
@@ -587,6 +599,11 @@ public class manipulator2 : device
     public float GetPos4()
     {
         return capture.GetPos1();
+    }
+
+    public float GetPos5()
+    {
+        return capture.GetPos2();
     }
 
     public void SetGripper(bool gripped)

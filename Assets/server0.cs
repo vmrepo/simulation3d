@@ -385,7 +385,7 @@ public class Server0
                 case "manipulator2":
                     {
                         manipulator2 manipulator = (manipulator2)devices[setpos.id];
-                        manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5 != 0.0f);
+                        manipulator.SetPos(setpos.a0, setpos.a1, setpos.a2, setpos.a3, setpos.a4, setpos.a5, setpos.a6 != 0.0f);
                     }
                     break;
 
