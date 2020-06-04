@@ -225,6 +225,7 @@ public class PacketTransformReady : Packet
 public enum Calltype
 {
     None,
+    Close,
     Create,
     Delete,
     Clear,
@@ -731,6 +732,12 @@ public class Server0
 
         switch (calldata.type)
         {
+            case Calltype.Close:
+                //async
+                calldata.type = Calltype.None;
+                UnityEngine.Application.Quit();
+                break;
+
             case Calltype.Create:
                 calldata.outputpacket = create((PacketHeader)calldata.inputpacket);
                 calldata.manualevent.Set();
@@ -846,6 +853,11 @@ public class Server0
                     if (packet == null)
                     {
                         break;
+                    }
+                    else if (packet.packet == "close")
+                    {
+                        async(Calltype.Close, packet);
+                        continue;
                     }
                     else if (packet.packet == "create")
                     {

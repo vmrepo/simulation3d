@@ -123,6 +123,8 @@ def main():
         #send_packet(context, {'packet':'clear'})
         #data = receive_packet(context)
 
+        #send_packet(context, {'packet':'close'})
+
         send_packet(context, {'packet':'end'})
 
 if __name__ == '__main__':
