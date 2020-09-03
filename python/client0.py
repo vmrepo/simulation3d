@@ -90,6 +90,12 @@ def main():
         send_packet(context, {'packet':'setcamera', 'x0':0, 'y0':0, 'z0':0, 'x1':0, 'y1':5, 'z1':5})
         data = receive_packet(context)
 
+        send_packet(context, {'packet':'create', 'type':'camera', 'idname':'mycamera', 'x0':0, 'y0':0, 'z0':0, 'x1':0, 'y1':5, 'z1':5})
+        data = receive_packet(context)
+
+        send_packet(context, {'packet':'activecamera', 'idname':'mycamera'})
+        data = receive_packet(context)
+
         send_packet(context, {'packet':'create', 'type':'manipulator1', 'idname':'manipulator1', 'x':-1, 'y':0, 'z':0})
         data = receive_packet(context)
 

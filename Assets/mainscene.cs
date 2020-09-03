@@ -51,7 +51,11 @@ public class mainscene : MonoBehaviour
         //manipulator1.config.FingerSectionCount = 8;
         manipulator1.Place();*/
 
-        GameObject.Find("Main Camera").GetComponent<camera>().targetposition = new Vector3(0, 0, 0);
+
+        //GameObject camera = GameObject.Instantiate(Resources.Load("camera/camera", typeof(GameObject)) as GameObject);
+        //camera.GetComponent<camera>().targetposition = new Vector3(0, 0, 0);
+        //camera.GetComponent<Camera>().enabled = true;
+
         Server0.Start();
     }
 

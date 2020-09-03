@@ -78,8 +78,15 @@ public class PacketSetpos : Packet
 }
 
 [System.Serializable]
+public class PacketActivecamera : Packet
+{
+    public string idname;
+}
+
+[System.Serializable]
 public class PacketSetcamera : Packet
 {
+    public string idname;
     public float x0;
     public float y0;
     public float z0;
@@ -165,6 +172,18 @@ public class PacketClearReady : Packet
 }
 
 [System.Serializable]
+public class PacketActivecameraReady : Packet
+{
+    public int ok;
+
+    public PacketActivecameraReady(int ok_)
+    {
+        packet = "ready";
+        ok = ok_;
+    }
+}
+
+[System.Serializable]
 public class PacketSetcameraReady : Packet
 {
     public int ok;
@@ -230,6 +249,7 @@ public enum Calltype
     Delete,
     Clear,
     Setpos,
+    Activecamera,
     Setcamera,
     Gripped,
     Transform
@@ -253,7 +273,9 @@ public class Server0
 
     //доступ только из потока событий unity
     static private int maxid = 0;
+    static private string activecamera = "";
     static private Dictionary<string, int> idnames = new Dictionary<string, int>();
+    static private Dictionary<int, UnityEngine.GameObject> cameras = new Dictionary<int, UnityEngine.GameObject>();
     static private Dictionary<int, device> devices = new Dictionary<int, device>();
     static private Dictionary<int, thing> things = new Dictionary<int, thing>();
     static private Dictionary<int, table> tables = new Dictionary<int, table>();
@@ -298,6 +320,9 @@ public class Server0
 
         switch (create.type)
         {
+            case "camera":
+                return new PacketCreateReady(create_camera(packet));
+
             case "manipulator1":
                 return new PacketCreateReady(create_manipulator1(packet));
 
@@ -325,7 +350,16 @@ public class Server0
     // вызывается из потока собыйти unity
     static private PacketClearReady clear(PacketHeader packet)
     {
-        foreach (KeyValuePair<int, device> pair in devices) 
+        activecamera = "";
+
+        foreach (KeyValuePair<int, UnityEngine.GameObject> pair in cameras) 
+        {
+            UnityEngine.GameObject.Destroy(pair.Value);
+        }
+
+        cameras.Clear();
+
+        foreach (KeyValuePair<int, device> pair in devices)
         {
             pair.Value.Remove();
         }
@@ -347,6 +381,9 @@ public class Server0
         tables.Clear();
 
         idnames.Clear();
+
+        create_main_camera();
+        active_random_camera();
 
         return new PacketClearReady(1);
     }
@@ -397,23 +434,64 @@ public class Server0
         return;
     }
 
-    // вызывается из потока собыйти unity
+    // вызывается из потока событий unity
+    static private PacketActivecameraReady activatecamera(PacketHeader packet)
+    {
+        PacketActivecamera active = UnityEngine.JsonUtility.FromJson<PacketActivecamera>(packet.json_data);
+
+        if (!idnames.ContainsKey(active.idname))
+        {
+            return new PacketActivecameraReady(0);
+        }
+
+        int id = idnames[active.idname];
+
+        if (cameras.ContainsKey(id))
+        {
+            activecamera = active.idname;
+
+            foreach (KeyValuePair<int, UnityEngine.GameObject> pair in cameras)
+            {
+                pair.Value.GetComponent<UnityEngine.Camera>().enabled = (pair.Key == id);
+            }
+
+            return new PacketActivecameraReady(1);
+        }
+
+        return new PacketActivecameraReady(0);
+    }
+
+    // вызывается из потока событий unity
     static private PacketSetcameraReady setcamera(PacketHeader packet)
     {
         PacketSetcamera setcamera = UnityEngine.JsonUtility.FromJson<PacketSetcamera>(packet.json_data);
+        setcamera.idname = (setcamera.idname == null) ? activecamera : setcamera.idname;
 
-        UnityEngine.GameObject obj = UnityEngine.GameObject.Find("Main Camera");
-        camera bhv = obj.GetComponent<camera>();
+        if (!idnames.ContainsKey(setcamera.idname))
+        {
+            return new PacketSetcameraReady(0);
+        }
 
-        bhv.targetposition = new UnityEngine.Vector3(setcamera.x0, setcamera.y0, setcamera.z0);
-        obj.transform.position = new UnityEngine.Vector3(setcamera.x1, setcamera.y1, setcamera.z1);
+        int id = idnames[setcamera.idname];
 
-        bhv.Init();
+        if (cameras.ContainsKey(id))
+        {
+            UnityEngine.GameObject obj = cameras[id];
 
-        return new PacketSetcameraReady(1);
+            camera bhv = obj.GetComponent<camera>();
+
+            bhv.targetposition = new UnityEngine.Vector3(setcamera.x0, setcamera.y0, setcamera.z0);
+            obj.transform.position = new UnityEngine.Vector3(setcamera.x1, setcamera.y1, setcamera.z1);
+
+            bhv.Init();
+
+            return new PacketSetcameraReady(1);
+        }
+
+        return new PacketSetcameraReady(0);
     }
 
-    // вызывается из потока собыйти unity
+    // вызывается из потока событий unity
     static private PacketGrippedReady gripped(PacketHeader packet)
     {
         PacketGripped gripped = UnityEngine.JsonUtility.FromJson<PacketGripped>(packet.json_data);
@@ -440,7 +518,7 @@ public class Server0
         return new PacketGrippedReady(0, false);
     }
 
-    // вызывается из потока собыйти unity
+    // вызывается из потока событий unity
     static private PacketTransformReady transform(PacketHeader packet)
     {
         PacketTransform transform = UnityEngine.JsonUtility.FromJson<PacketTransform>(packet.json_data);
@@ -467,6 +545,21 @@ public class Server0
         }
 
         return new PacketTransformReady(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    }
+
+    // в потоке клиента нельзя вызывать, только из потока событий unity
+    static private int create_camera(PacketHeader packet)
+    {
+        maxid++;
+        PacketCreate create = UnityEngine.JsonUtility.FromJson<PacketCreate>(packet.json_data);
+        delete(create.idname);
+        UnityEngine.GameObject obj = UnityEngine.GameObject.Instantiate(UnityEngine.Resources.Load("camera/camera", typeof(UnityEngine.GameObject)) as UnityEngine.GameObject);
+        PacketSetcamera setcamera = UnityEngine.JsonUtility.FromJson<PacketSetcamera>(packet.json_data);
+        obj.GetComponent<camera>().targetposition = new UnityEngine.Vector3(setcamera.x0, setcamera.y0, setcamera.z0);
+        obj.transform.position = new UnityEngine.Vector3(setcamera.x1, setcamera.y1, setcamera.z1);
+        cameras[maxid] = obj;
+        idnames[create.idname] = maxid;
+        return maxid;
     }
 
     // в потоке клиента нельзя вызывать, только из потока событий unity
@@ -530,6 +623,19 @@ public class Server0
         }
 
         int id = idnames[idname];
+        idnames.Remove(idname);
+
+        if (cameras.ContainsKey(id))
+        {
+            UnityEngine.MonoBehaviour.Destroy(cameras[id]);
+            cameras.Remove(id);
+            if (idname == activecamera)
+            {
+                activecamera = "";
+                active_random_camera();
+            }
+            return true;
+        }
 
         if (devices.ContainsKey(id))
         {
@@ -553,6 +659,52 @@ public class Server0
         }
 
         return false;
+    }
+
+    // в потоке клиента нельзя вызывать, только из потока событий unity
+    // может вызываться в случае, если нет ни одной камеры
+    static void create_main_camera()
+    {
+        PacketSetcamera packet = new PacketSetcamera();
+        packet.idname = "maincamera";
+        packet.x0 = 0;
+        packet.y0 = 0;
+        packet.z0 = 0;
+        packet.x1 = 0;
+        packet.y1 = 1;
+        packet.z1 = -10;
+        PacketHeader header = new PacketHeader();
+        header.json_data = UnityEngine.JsonUtility.ToJson(packet); ;
+        create_camera(header);
+    }
+
+    // в потоке клиента нельзя вызывать, только из потока событий unity
+    static void active_random_camera()
+    {
+        activecamera = "";
+        int id = 0;
+
+        foreach (KeyValuePair<int, UnityEngine.GameObject> pair in cameras)
+        {
+            if (id == 0)
+            {
+                id = pair.Key;
+                pair.Value.GetComponent<UnityEngine.Camera>().enabled = true;
+            }
+            else
+            {
+                pair.Value.GetComponent<UnityEngine.Camera>().enabled = false;
+            }
+        }
+
+        foreach (KeyValuePair<string, int> pair in idnames)
+        {
+            if (pair.Value == id)
+            {
+                activecamera = pair.Key;
+                break;
+            }
+        }
     }
 
     static public void Log(string text)
@@ -722,6 +874,9 @@ public class Server0
 
     static public void Start()
     {
+        create_main_camera();
+        active_random_camera();
+
         Thread Thread = new Thread(new ParameterizedThreadStart(ServerThread));
         Thread.Start(Port);
     }
@@ -756,6 +911,11 @@ public class Server0
             case Calltype.Setpos:
                 setpos((PacketSetpos)calldata.inputpacket);//async
                 calldata.type = Calltype.None;
+                break;
+
+            case Calltype.Activecamera:
+                calldata.outputpacket = activatecamera((PacketHeader)calldata.inputpacket);
+                calldata.manualevent.Set();
                 break;
 
             case Calltype.Setcamera:
@@ -880,6 +1040,11 @@ public class Server0
                     else if (packet.packet == "setpos")
                     {
                         async(Calltype.Setpos, packet);
+                        continue;
+                    }
+                    else if (packet.packet == "activecamera")
+                    {
+                        send_packet(context, call(Calltype.Activecamera, packet));
                         continue;
                     }
                     else if (packet.packet == "setcamera")
