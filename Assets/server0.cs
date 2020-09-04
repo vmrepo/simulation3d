@@ -96,6 +96,11 @@ public class PacketSetcamera : Packet
 }
 
 [System.Serializable]
+public class PacketShoot : Packet
+{
+}
+
+[System.Serializable]
 public class PacketThing : Packet
 {
     public string model;
@@ -196,6 +201,20 @@ public class PacketSetcameraReady : Packet
 }
 
 [System.Serializable]
+public class PacketShootReady : Packet
+{
+    public int ok;
+    public string base64jpg;
+
+    public PacketShootReady(int ok_, string base64jpg_)
+    {
+        packet = "ready";
+        ok = ok_;
+        base64jpg = base64jpg_;
+    }
+}
+
+[System.Serializable]
 public class PacketGrippedReady : Packet
 {
     public int ok;
@@ -251,6 +270,7 @@ public enum Calltype
     Setpos,
     Activecamera,
     Setcamera,
+    Shoot,
     Gripped,
     Transform
 }
@@ -492,6 +512,31 @@ public class Server0
     }
 
     // вызывается из потока событий unity
+    static private PacketShootReady shoot(PacketHeader packet)
+    {
+        if (activecamera != "")
+        {
+            UnityEngine.GameObject obj = cameras[idnames[activecamera]];
+
+            switch (obj.GetComponent<camera>().shootStatus)
+            {
+                case ShootStatus.Neutral:
+                    obj.GetComponent<camera>().shootStatus = ShootStatus.Process;
+                    return null;
+
+                case ShootStatus.Process:
+                    return null;
+
+                case ShootStatus.Done:
+                    obj.GetComponent<camera>().shootStatus = ShootStatus.Neutral;
+                    return new PacketShootReady(1, Convert.ToBase64String(obj.GetComponent<camera>().shootJpg));
+            }
+        }
+
+        return new PacketShootReady(0, "");
+    }
+
+    // вызывается из потока событий unity
     static private PacketGrippedReady gripped(PacketHeader packet)
     {
         PacketGripped gripped = UnityEngine.JsonUtility.FromJson<PacketGripped>(packet.json_data);
@@ -722,6 +767,36 @@ public class Server0
         }
     }
 
+    static public string log_reduce(string text)
+    {
+        string keyword = "\"base64jpg\":";
+
+        int pos0 = text.IndexOf(keyword);
+
+        if (pos0 == -1)
+        {
+            return text;
+        }
+
+        pos0 += keyword.Length;
+
+        pos0 = text.IndexOf("\"", pos0);
+
+        if (pos0 == -1)
+        {
+            return text;
+        }
+
+        int pos1 = text.IndexOf("\"", pos0 + 1);
+
+        if (pos1 == -1)
+        {
+            return text;
+        }
+
+        return text.Substring(0, pos0) + text.Substring(pos0 + 1, 6) + "....." + text.Substring(pos1 - 6, 6) + text.Substring(pos1);
+    }
+
     static private Packet receive_packet(Context context, bool blocking = true)
     {
         var start = Process.GetCurrentProcess().TotalProcessorTime;
@@ -848,7 +923,7 @@ public class Server0
     {
         string json_data = UnityEngine.JsonUtility.ToJson(packet);
 
-        Log("sent " + json_data);
+        Log("sent " + log_reduce(json_data));
 
         json_data = "json" + json_data.Length.ToString() + ":" + json_data;
 
@@ -921,6 +996,15 @@ public class Server0
             case Calltype.Setcamera:
                 calldata.outputpacket = setcamera((PacketHeader)calldata.inputpacket);
                 calldata.manualevent.Set();
+                break;
+
+            case Calltype.Shoot:
+                //wait
+                calldata.outputpacket = shoot((PacketHeader)calldata.inputpacket);
+                if (calldata.outputpacket != null)
+                {
+                    calldata.manualevent.Set();
+                }
                 break;
 
             case Calltype.Gripped:
@@ -1050,6 +1134,11 @@ public class Server0
                     else if (packet.packet == "setcamera")
                     {
                         send_packet(context, call(Calltype.Setcamera, packet));
+                        continue;
+                    }
+                    else if (packet.packet == "shoot")
+                    {
+                        send_packet(context, call(Calltype.Shoot, packet));
                         continue;
                     }
                     else if (packet.packet == "gripped")

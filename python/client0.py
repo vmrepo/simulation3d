@@ -29,6 +29,21 @@ def log(s):
 
     print(s)
 
+def log_reduce(data):
+
+    res = {}
+
+    for k in data:
+
+        if k == 'base64jpg':
+
+            res[k] = (data[k][:6] + '.....' + data[k][-6:-1] + data[k][-1]) if len(data[k]) > 12 else data[k]
+
+        else:
+            res[k] = data[k]
+
+    return res
+
 def receive_packet(context, blocking = True):
 
     buf = context.conn.recv(1024).decode() if blocking else ''
@@ -66,7 +81,7 @@ def receive_packet(context, blocking = True):
 
     data = json.loads(json_data)
 
-    log('received ' + str(data))
+    log('received ' + str(log_reduce(data)))
 
     return data
 
@@ -122,6 +137,12 @@ def main():
         data = receive_packet(context)
         send_packet(context, {'packet':'transform', 'idname':'juice'})
         data = receive_packet(context)
+
+        send_packet(context, {'packet':'shoot'})
+        data = receive_packet(context)
+        if data['ok']:
+            image = cv2.imdecode(np.fromstring(base64.b64decode(data['base64jpg']), dtype=np.uint8), -1)
+            cv2.imwrite('shoot.jpg', image)
 
         #send_packet(context, {'packet':'delete', 'idname':'manipulator1'})
         #data = receive_packet(context)
