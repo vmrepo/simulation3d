@@ -101,6 +101,11 @@ public class PacketShoot : Packet
 }
 
 [System.Serializable]
+public class PacketDepth : Packet
+{
+}
+
+[System.Serializable]
 public class PacketThing : Packet
 {
     public string model;
@@ -215,6 +220,20 @@ public class PacketShootReady : Packet
 }
 
 [System.Serializable]
+public class PacketDepthReady : Packet
+{
+    public int ok;
+    public string base64floats;
+
+    public PacketDepthReady(int ok_, string base64floats_)
+    {
+        packet = "ready";
+        ok = ok_;
+        base64floats = base64floats_;
+    }
+}
+
+[System.Serializable]
 public class PacketGrippedReady : Packet
 {
     public int ok;
@@ -271,6 +290,7 @@ public enum Calltype
     Activecamera,
     Setcamera,
     Shoot,
+    Depth,
     Gripped,
     Transform
 }
@@ -516,24 +536,86 @@ public class Server0
     {
         if (activecamera != "")
         {
+            int w = 1280;
+            int h = 720;
+
             UnityEngine.GameObject obj = cameras[idnames[activecamera]];
+            UnityEngine.Camera camera = obj.GetComponent<UnityEngine.Camera>();
 
-            switch (obj.GetComponent<camera>().shootStatus)
-            {
-                case ShootStatus.Neutral:
-                    obj.GetComponent<camera>().shootStatus = ShootStatus.Process;
-                    return null;
+            UnityEngine.Texture2D image = new UnityEngine.Texture2D(w, h, UnityEngine.TextureFormat.RGB24, false);
 
-                case ShootStatus.Process:
-                    return null;
+            UnityEngine.RenderTexture texture = new UnityEngine.RenderTexture(w, h, 0);
+            UnityEngine.RenderTexture.active = texture;
+            camera.targetTexture = texture;
+            camera.Render();
 
-                case ShootStatus.Done:
-                    obj.GetComponent<camera>().shootStatus = ShootStatus.Neutral;
-                    return new PacketShootReady(1, Convert.ToBase64String(obj.GetComponent<camera>().shootJpg));
-            }
+            image.ReadPixels(new UnityEngine.Rect(0, 0, w, h), 0, 0);
+            image.Apply();
+
+            byte[] jpg = UnityEngine.ImageConversion.EncodeToJPG(image);
+
+            camera.targetTexture = null;
+            UnityEngine.RenderTexture.active = null;
+            UnityEngine.Object.Destroy(image);
+
+            return new PacketShootReady(1, Convert.ToBase64String(jpg));
         }
 
         return new PacketShootReady(0, "");
+    }
+
+    // вызывается из потока событий unity
+    static private PacketDepthReady depth(PacketHeader packet)
+    {
+        if (activecamera != "")
+        {
+            int w = 1280;
+            int h = 720;
+
+            UnityEngine.GameObject obj = cameras[idnames[activecamera]];
+            UnityEngine.Camera camera = obj.GetComponent<UnityEngine.Camera>();
+
+            UnityEngine.Texture2D map = new UnityEngine.Texture2D(w, h, UnityEngine.TextureFormat.RGB24, false);
+
+            UnityEngine.RenderTexture texture = new UnityEngine.RenderTexture(w, h, 0);
+            UnityEngine.RenderTexture.active = texture;
+            camera.targetTexture = texture;
+            obj.GetComponent<camera>().IsdDepth = true;
+            camera.Render();
+            obj.GetComponent<camera>().IsdDepth = false;
+
+            map.ReadPixels(new UnityEngine.Rect(0, 0, w, h), 0, 0);
+            map.Apply();
+
+            byte[] raw = map.GetRawTextureData();
+            byte[] floats = new byte[h * w * 4];
+
+            for (int y = 0; y < h; y++)
+            {
+                int y_ = h - y - 1;
+                for (int x = 0; x < w; x++)
+                {
+                    float depth =
+                        raw[(y_ * w + x) * 3 + 0] / 255.0f +
+                        raw[(y_ * w + x) * 3 + 1] / 65025.0f +
+                        raw[(y_ * w + x) * 3 + 2] / 16581375.0f;
+                    depth = (depth == 0.0f || depth == 1.0f) ? 0.0f : camera.nearClipPlane + (camera.farClipPlane - camera.nearClipPlane) * depth;
+                    byte[] eb = BitConverter.GetBytes(depth);
+                    floats[(y * w + x) * 4 + 0] = BitConverter.IsLittleEndian ? eb[3] : eb[0];
+                    floats[(y * w + x) * 4 + 1] = BitConverter.IsLittleEndian ? eb[2] : eb[1];
+                    floats[(y * w + x) * 4 + 2] = BitConverter.IsLittleEndian ? eb[1] : eb[2];
+                    floats[(y * w + x) * 4 + 3] = BitConverter.IsLittleEndian ? eb[0] : eb[3];
+                }
+            }
+
+            camera.targetTexture = null;
+            UnityEngine.RenderTexture.active = null;
+            UnityEngine.Object.Destroy(map);
+
+            return new PacketDepthReady(1, Convert.ToBase64String(floats));
+        }
+
+        return new PacketDepthReady(0, "");
     }
 
     // вызывается из потока событий unity
@@ -775,6 +857,12 @@ public class Server0
 
         if (pos0 == -1)
         {
+            keyword = "\"base64floats\":";
+            pos0 = text.IndexOf(keyword);
+        }
+
+        if (pos0 == -1)
+        {
             return text;
         }
 
@@ -999,12 +1087,13 @@ public class Server0
                 break;
 
             case Calltype.Shoot:
-                //wait
                 calldata.outputpacket = shoot((PacketHeader)calldata.inputpacket);
-                if (calldata.outputpacket != null)
-                {
-                    calldata.manualevent.Set();
-                }
+                calldata.manualevent.Set();
+                break;
+
+            case Calltype.Depth:
+                calldata.outputpacket = depth((PacketHeader)calldata.inputpacket);
+                calldata.manualevent.Set();
                 break;
 
             case Calltype.Gripped:
@@ -1139,6 +1228,11 @@ public class Server0
                     else if (packet.packet == "shoot")
                     {
                         send_packet(context, call(Calltype.Shoot, packet));
+                        continue;
+                    }
+                    else if (packet.packet == "depth")
+                    {
+                        send_packet(context, call(Calltype.Depth, packet));
                         continue;
                     }
                     else if (packet.packet == "gripped")

@@ -13,6 +13,7 @@ import numpy as np
 import random
 import base64
 import cv2
+import struct
 
 HOST = 'localhost'
 PORT = 8888
@@ -35,7 +36,7 @@ def log_reduce(data):
 
     for k in data:
 
-        if k == 'base64jpg':
+        if k in ['base64jpg', 'base64floats']:
 
             res[k] = (data[k][:6] + '.....' + data[k][-6:-1] + data[k][-1]) if len(data[k]) > 12 else data[k]
 
@@ -143,6 +144,18 @@ def main():
         if data['ok']:
             image = cv2.imdecode(np.fromstring(base64.b64decode(data['base64jpg']), dtype=np.uint8), -1)
             cv2.imwrite('shoot.jpg', image)
+
+        send_packet(context, {'packet':'depth'})
+        data = receive_packet(context)
+        if data['ok']:
+            data = base64.b64decode(data['base64floats'])
+            w, h = 1280, 720
+            image = np.zeros((h, w), np.float32)
+            for y in range(h):
+                for x in range(w): 
+                    image[y, x] = struct.unpack('>f', data[(y * w + x) * 4 : (y * w + x) * 4  + 4])[0]
+            image *= 10
+            cv2.imwrite('depth.jpg', image)
 
         #send_packet(context, {'packet':'delete', 'idname':'manipulator1'})
         #data = receive_packet(context)

@@ -2,19 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ShootStatus
-{
-    Neutral,
-    Process,
-    Done
-}
-
 public class camera : MonoBehaviour
 {
     public Vector3 targetposition;
-
-    public ShootStatus shootStatus = ShootStatus.Neutral;
-    public byte[] shootJpg;
 
     [SerializeField]
     public float mouseSensitivity = 0.5f;
@@ -72,19 +62,36 @@ public class camera : MonoBehaviour
         }
     }
 
-    public void OnPostRender()
+    public bool IsdDepth = false;
+    private Shader _shader;
+    private Shader shader
     {
-        if (shootStatus == ShootStatus.Process)
+        get { return _shader != null ? _shader : (_shader = Shader.Find("Custom/RenderDepth")); }
+    }
+
+    private Material _material;
+    private Material material
+    {
+        get
         {
-            int w = UnityEngine.Screen.width;
-            int h = UnityEngine.Screen.height;
+            if (_material == null)
+            {
+                _material = new Material(shader);
+                _material.hideFlags = HideFlags.HideAndDontSave;
+            }
+            return _material;
+        }
+    }
 
-            UnityEngine.Texture2D screenShot = new UnityEngine.Texture2D(w, h, UnityEngine.TextureFormat.RGB24, false);
-            screenShot.ReadPixels(new UnityEngine.Rect(0, 0, w, h), 0, 0);
-            screenShot.Apply();
-
-            shootJpg = UnityEngine.ImageConversion.EncodeToJPG(screenShot);
-            shootStatus = ShootStatus.Done;
+    private void OnRenderImage(RenderTexture src, RenderTexture dest)
+    {
+        if (shader != null && IsdDepth)
+        {
+            Graphics.Blit(src, dest, material);
+        }
+        else
+        {
+            Graphics.Blit(src, dest);
         }
     }
 }
